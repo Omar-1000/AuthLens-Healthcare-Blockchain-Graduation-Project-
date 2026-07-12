@@ -25,7 +25,10 @@
 The system allows patients and doctors to authenticate through multiple security layers while ensuring that doctors can access patient records only after receiving explicit approval from the patient.
 
 Sensitive medical information is stored off-chain, while cryptographic hashes are recorded on the blockchain. This provides tamper detection without exposing complete medical records publicly.
+---
+## Project Impact
 
+AuthLens has progressed beyond its academic development stage and is currently being considered for potential implementation at the **University of Jordan Hospital**. This represents a proud milestone for the team and demonstrates the project's potential to contribute to secure, privacy-preserving healthcare systems in real-world environments.
 ---
 
 ## Project Objectives
