@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Verify Profile Access | E-Health</title>
+<link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+<style>
+*{box-sizing:border-box;margin:0;padding:0;font-family:"Segoe UI",Tahoma,Geneva,Verdana,sans-serif;}
+body{
+  min-height:100vh;
+  display:grid;
+  place-items:center;
+  background:
+    radial-gradient(circle at top left, rgba(255,255,255,.9), transparent 24%),
+    radial-gradient(circle at 82% 12%, rgba(196,233,228,.42), transparent 18%),
+    linear-gradient(145deg,#f4fbfa 0%, #ebf6f5 50%, #e0efee 100%);
+  color:#17393a;
+  padding:18px;
+}
+a{text-decoration:none;color:inherit;}
+.verify-card{
+  width:min(520px, 100%);
+  padding:28px;
+  border-radius:30px;
+  background:rgba(255,255,255,.86);
+  border:1px solid rgba(220,234,232,.9);
+  box-shadow:0 22px 48px rgba(0,77,77,.10);
+  backdrop-filter:blur(14px);
+}
+.eyebrow{
+  display:inline-flex;
+  padding:8px 12px;
+  border-radius:999px;
+  background:#edf7f6;
+  color:#416c6b;
+  font-size:11px;
+  font-weight:800;
+  letter-spacing:.12em;
+  text-transform:uppercase;
+  margin-bottom:16px;
+}
+h1{
+  font-size:34px;
+  line-height:1;
+  margin-bottom:12px;
+}
+p{
+  color:#5f7a79;
+  line-height:1.75;
+  font-size:14px;
+  margin-bottom:20px;
+}
+.error-box{
+  margin-bottom:16px;
+  padding:12px 14px;
+  border-radius:16px;
+  background:linear-gradient(180deg, rgba(255,243,244,.98), rgba(255,232,235,.98));
+  border:1px solid #f1c6ce;
+  color:#8c2331;
+  font-size:14px;
+  font-weight:700;
+}
+form{display:grid;gap:12px;}
+label{
+  color:#305555;
+  font-size:13px;
+  font-weight:700;
+}
+input{
+  width:100%;
+  border:1px solid #d7e8e6;
+  border-radius:16px;
+  padding:14px 15px;
+  font:inherit;
+  outline:none;
+}
+input:focus{
+  border-color:#0b7775;
+  box-shadow:0 0 0 4px rgba(0,77,77,.08);
+}
+.actions{
+  display:flex;
+  gap:10px;
+  flex-wrap:wrap;
+  margin-top:4px;
+}
+.btn{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  padding:12px 16px;
+  border:none;
+  border-radius:14px;
+  font-size:14px;
+  font-weight:800;
+  cursor:pointer;
+}
+.btn-primary{
+  background:linear-gradient(135deg,#4d9ea1 0%, #2b7b7e 100%);
+  color:#fff;
+}
+.btn-secondary{
+  background:#f3f9f8;
+  color:#2f5c5d;
+  border:1px solid #d8e7e5;
+}
+@media (max-width:760px){
+  .verify-card{padding:22px;border-radius:24px;}
+  h1{font-size:28px;}
+  .actions{grid-template-columns:1fr;}
+}
+</style>
+</head>
+<body>
+  <div class="verify-card">
+    <div class="eyebrow">Sensitive Access</div>
+    <h1>Confirm your password</h1>
+    <p>Your profile contains private identifiers and wallet information, so please verify your password before continuing.</p>
+
+    {% if error %}
+    <div class="error-box">{{ error }}</div>
+    {% endif %}
+
+    <form method="POST" action="{{ url_for('patient_profile') }}">
+      <div>
+        <label for="password">Password</label>
+        <input type="password" id="password" name="password" placeholder="Enter your password" autocomplete="current-password" required>
+      </div>
+      <div class="actions">
+        <button class="btn btn-primary" type="submit">Open Profile</button>
+        <a class="btn btn-secondary" href="{{ url_for('patient_home') }}">Back Home</a>
+      </div>
+    </form>
+  </div>
+</body>
+</html>

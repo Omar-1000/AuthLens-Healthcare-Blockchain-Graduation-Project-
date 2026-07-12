@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Record History | E-Health</title>
+<link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+<style>
+:root{--teal:#004D4D;--glass:rgba(255,255,255,0.68);--line:rgba(0,77,77,0.10);--text:#153635;--muted:#607978;--shadow:0 24px 54px rgba(0,77,77,0.12);}
+*{box-sizing:border-box;margin:0;padding:0;font-family:"Segoe UI",Tahoma,Geneva,Verdana,sans-serif;}
+body{min-height:100vh;background:radial-gradient(circle at top left, rgba(141,240,216,0.30), transparent 18%),radial-gradient(circle at bottom right, rgba(0,77,77,0.10), transparent 24%),linear-gradient(135deg,#f2fbfb 0%,#e7f1f0 58%,#dfeeee 100%);color:var(--text);}
+.shell{width:min(1300px,94vw);margin:28px auto;}
+.topbar,.panel{background:var(--glass);border:1px solid rgba(255,255,255,0.58);backdrop-filter:blur(18px);box-shadow:var(--shadow);}
+.topbar{border-radius:26px;padding:18px 24px;display:flex;justify-content:space-between;gap:14px;flex-wrap:wrap;margin-bottom:20px;}
+.topbar h1{font-size:24px;}
+.topbar p{font-size:14px;color:var(--muted);margin-top:4px;}
+.topbar-links{display:flex;gap:10px;flex-wrap:wrap;}
+.topbar-links a{text-decoration:none;color:#164847;font-weight:800;padding:10px 14px;border-radius:999px;background:rgba(255,255,255,0.72);border:1px solid rgba(0,77,77,0.08);}
+.panel{border-radius:28px;padding:24px;}
+.hero{background:radial-gradient(circle at top right, rgba(255,255,255,0.18), transparent 24%),linear-gradient(135deg,#0b6d6a 0%,#004D4D 100%);color:#fff;border-radius:24px;padding:22px;margin-bottom:18px;}
+.hero h2{font-size:28px;margin-bottom:8px;}
+.hero p{color:rgba(255,255,255,0.84);line-height:1.7;}
+.timeline{position:relative;display:grid;gap:18px;margin-top:20px;}
+.timeline::before{content:"";position:absolute;left:24px;top:0;bottom:0;width:3px;border-radius:999px;background:linear-gradient(180deg,#0b8d8a 0%,#004D4D 100%);opacity:0.28;}
+.version-card{position:relative;margin-left:54px;background:rgba(255,255,255,0.76);border:1px solid rgba(0,77,77,0.08);border-radius:24px;padding:18px 20px;}
+.version-card::before{content:"";position:absolute;left:-41px;top:24px;width:18px;height:18px;border-radius:50%;background:linear-gradient(135deg,#0b8d8a 0%,#004D4D 100%);box-shadow:0 0 0 8px rgba(11,141,138,0.12);}
+.version-top{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:12px;}
+.block-tag{display:inline-flex;align-items:center;justify-content:center;padding:8px 12px;border-radius:999px;font-size:12px;font-weight:900;background:#dff5f2;color:#0b6d6a;}
+.hash-box{margin-top:12px;padding:14px;border-radius:18px;background:#f8fcfc;border:1px solid rgba(0,77,77,0.08);}
+.hash-box strong{display:block;margin-bottom:8px;}
+.hash-box code{font-size:12px;word-break:break-all;color:#145553;}
+.meta{color:var(--muted);font-size:14px;line-height:1.7;}
+.summary-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-top:18px;}
+.summary{padding:16px;border-radius:20px;background:rgba(255,255,255,0.76);border:1px solid rgba(0,77,77,0.08);}
+.summary strong{display:block;font-size:30px;color:#123c3b;}
+.summary span{display:block;margin-top:8px;color:var(--muted);font-size:13px;line-height:1.6;}
+.broadcast-panel{margin-top:22px;padding:20px;border-radius:24px;background:rgba(255,255,255,0.76);border:1px solid rgba(0,77,77,0.08);}
+.broadcast-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:14px;margin-top:14px;}
+.broadcast-card{padding:16px;border-radius:18px;background:#f8fcfc;border:1px solid rgba(0,77,77,0.08);}
+.broadcast-card code{display:block;margin-top:8px;font-size:12px;word-break:break-all;color:#145553;}
+@media (max-width:860px){.summary-grid{grid-template-columns:1fr;}.timeline::before{left:16px;}.version-card{margin-left:42px;}.version-card::before{left:-33px;}}
+@media (max-width:860px){.broadcast-grid{grid-template-columns:1fr;}}
+</style>
+</head>
+<body>
+<div class="shell">
+  <div class="topbar">
+    <div>
+      <h1>Record History Timeline</h1>
+      <p>Version chain for record #{{ record.id }} with local blockchain-style snapshots.</p>
+    </div>
+    <div class="topbar-links">
+      <a href="{{ url_for('integrity_dashboard', record_id=record.id) }}">Integrity Dashboard</a>
+      <a href="{{ url_for('verify_integrity', record_id=record.id) }}">Verify Record</a>
+      {% if role == 'admin' %}
+      <a href="{{ url_for('integrity_dashboard') }}">Admin Integrity</a>
+      {% elif role == 'patient' %}
+      <a href="{{ url_for('patient_home') }}">Patient Home</a>
+      {% else %}
+      <a href="{{ url_for('dashboard') }}">Doctor Dashboard</a>
+      {% endif %}
+    </div>
+  </div>
+  <div class="panel">
+    <div class="hero">
+      <h2>Version {{ latest_version.version_no }}</h2>
+      <p>Each clean update creates a new local version snapshot with a fresh hash and blockchain transaction reference. This gives you a clear demo trail that looks and feels like linked healthcare blocks.</p>
+    </div>
+    <div class="summary-grid">
+      <div class="summary"><strong>{{ versions|length }}</strong><span>Total versions currently stored for this record.</span></div>
+      <div class="summary"><strong>{{ latest_version.version_no }}</strong><span>Latest version number in the chain.</span></div>
+      <div class="summary"><strong>{{ record.patient_name }}</strong><span>Patient linked to this protected record.</span></div>
+    </div>
+    {% if change_requests %}
+    <div class="broadcast-panel">
+      <h2>Signed Broadcast Trail</h2>
+      <div class="broadcast-grid">
+        {% for request in change_requests %}
+        <div class="broadcast-card">
+          <strong>Version {{ request.version_no }}</strong>
+          <div class="meta">Requested by: {{ request.requested_by_name or 'Unknown' }} ({{ request.requester_role }})</div>
+          <div class="meta">Status: {{ request.request_status }} | Signature: {{ 'Verified' if request.signature_verified else 'Rejected' }}</div>
+          <div class="meta">Broadcast at: {{ request.broadcast_at }}</div>
+          <div class="meta">Ledger updated at: {{ request.ledger_updated_at or 'Pending' }}</div>
+          <code>{{ request.signer_key_id|mask_hash(8,4) }}</code>
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+    {% endif %}
+    <div class="timeline">
+      {% for version in versions %}
+      <div class="version-card">
+        <div class="version-top">
+          <div>
+            <h2>Version {{ version.version_no }}</h2>
+            <div class="meta">Created: {{ version.created_at }}</div>
+            <div class="meta">Updated by: {{ version.updated_by_name or 'System seed' }}</div>
+          </div>
+          <span class="block-tag">Block Snapshot {{ version.version_no }}</span>
+        </div>
+        <div class="hash-box"><strong>Version Hash</strong><code>{{ version.data_hash|mask_hash }}</code></div>
+        <div class="hash-box"><strong>Blockchain Transaction</strong><code>{{ version.blockchain_tx_hash|mask_hash }}</code></div>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+</div>
+</body>
+</html>

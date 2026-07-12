@@ -1,0 +1,808 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Storage Dashboard | E-Health</title>
+<link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+<style>
+:root{
+  --teal:#0f8f8c;
+  --teal-deep:#083f3f;
+  --line:#d7e9e8;
+  --muted:#607c7b;
+  --bg:#edf7f6;
+  --white:#ffffff;
+  --shadow:0 20px 46px rgba(8,63,63,0.10);
+  --ok:#1f9d4d;
+  --warn:#d48806;
+  --danger:#c53f3f;
+}
+*{box-sizing:border-box;margin:0;padding:0;font-family:"Segoe UI",Tahoma,Geneva,Verdana,sans-serif;}
+body{
+  min-height:100vh;
+  background:
+    radial-gradient(circle at 12% 16%, rgba(15,143,140,0.16), transparent 0 18%),
+    radial-gradient(circle at 88% 10%, rgba(239,181,65,0.14), transparent 0 18%),
+    linear-gradient(135deg, #eef8f7 0%, var(--bg) 52%, #e4f1ef 100%);
+  color:#173131;
+}
+.shell{width:min(1380px,94vw);margin:28px auto;background:rgba(255,255,255,0.76);border:1px solid #dbeceb;border-radius:30px;box-shadow:var(--shadow);overflow:hidden;backdrop-filter:blur(12px);}
+.topbar{display:flex;justify-content:space-between;align-items:center;gap:18px;flex-wrap:wrap;padding:24px 28px;background:linear-gradient(135deg,#0d6261 0%,#084847 100%);color:#fff;}
+.title-wrap{display:flex;align-items:center;gap:16px;}
+.brand{width:58px;height:58px;border-radius:20px;background:rgba(255,255,255,0.16);display:grid;place-items:center;font-size:24px;font-weight:800;}
+.title-wrap h1{font-size:28px;margin-bottom:6px;}
+.title-wrap p{color:rgba(255,255,255,0.85);line-height:1.7;font-size:14px;max-width:760px;}
+.top-links{display:flex;gap:10px;flex-wrap:wrap;}
+.top-links a{color:#fff;text-decoration:none;padding:10px 14px;border-radius:999px;background:rgba(255,255,255,0.10);font-weight:700;font-size:14px;}
+.content{padding:26px;}
+.hero{display:grid;grid-template-columns:1.1fr 0.9fr;gap:18px;margin-bottom:20px;}
+.panel,.stat-card,.table-card{background:linear-gradient(180deg,#ffffff 0%,#f8fbfb 100%);border:1px solid var(--line);border-radius:24px;box-shadow:0 14px 28px rgba(8,63,63,0.05);}
+.panel{padding:24px;}
+.hero-card{background:linear-gradient(135deg,#fff 0%,#f3fbfb 100%);}
+.hero-card h2{font-size:34px;color:var(--teal-deep);margin-bottom:10px;}
+.hero-card p{color:var(--muted);line-height:1.8;margin-bottom:14px;max-width:760px;}
+.identity{display:inline-block;padding:10px 14px;border-radius:14px;background:#eef8f8;border:1px solid #d9eceb;color:#1d5553;font-size:13px;word-break:break-all;}
+.alert-box{padding:20px;border-radius:22px;background:linear-gradient(135deg,#fff8e8 0%,#fff3d5 100%);border:1px solid #f0d79a;}
+.alert-box h3{font-size:22px;color:#7a4b00;margin-bottom:8px;}
+.alert-box p{color:#88602b;line-height:1.7;font-size:14px;margin-bottom:14px;}
+.alert-list{display:grid;gap:10px;}
+.alert-item{padding:12px 14px;border-radius:16px;background:rgba(255,255,255,0.76);border:1px solid #efdca9;display:flex;justify-content:space-between;gap:12px;align-items:center;}
+.alert-item strong{color:#5d3a00;}
+.alert-item span{color:#7a5a28;font-size:13px;}
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:20px;}
+.stat-card{padding:20px;}
+.stat-card h3{font-size:14px;color:#557170;margin-bottom:10px;}
+.stat-card strong{display:block;font-size:36px;color:var(--teal-deep);margin-bottom:8px;}
+.stat-card span{color:var(--muted);line-height:1.6;font-size:13px;}
+.work-grid{display:grid;grid-template-columns:0.95fr 1.05fr;gap:18px;margin-bottom:20px;}
+.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
+.field{margin-bottom:14px;}
+.field label{display:block;margin-bottom:7px;font-size:13px;font-weight:700;color:#2d5251;}
+.field input,.field select,.field textarea{width:100%;padding:12px 13px;border:1px solid #d7e8e7;border-radius:14px;background:#fff;color:#163434;outline:none;font:inherit;}
+.field textarea{min-height:90px;resize:vertical;}
+.field input:focus,.field select:focus,.field textarea:focus{border-color:var(--teal);box-shadow:0 0 0 4px rgba(15,143,140,0.08);}
+.btn{border:none;border-radius:14px;padding:13px 16px;cursor:pointer;font-weight:800;font-size:14px;}
+.btn-primary{background:linear-gradient(135deg,#12a39f 0%,#0a7270 100%);color:#fff;box-shadow:0 14px 24px rgba(15,143,140,0.18);}
+.btn-secondary{background:linear-gradient(135deg,#0e5a59 0%,#083f3f 100%);color:#fff;}
+.msg{padding:14px 16px;border-radius:16px;margin-bottom:16px;font-size:14px;}
+.msg.error{background:#fff0f0;border:1px solid #f0c9c9;color:#9d2f2f;}
+.msg.success{background:#f0fff5;border:1px solid #cce9d2;color:#21653a;}
+.toast{
+  position:fixed;
+  top:22px;
+  right:22px;
+  width:min(380px,calc(100vw - 28px));
+  padding:18px 18px 16px;
+  border-radius:22px;
+  color:#fff;
+  z-index:1200;
+  box-shadow:0 22px 40px rgba(8,63,63,0.18);
+  background:linear-gradient(135deg,#12a39f 0%,#0a7270 100%);
+  transform:translateY(-18px);
+  opacity:0;
+  pointer-events:none;
+  transition:opacity .24s ease,transform .24s ease;
+}
+.toast.show{opacity:1;transform:translateY(0);}
+.toast.error{background:linear-gradient(135deg,#d95a5a 0%,#b63f3f 100%);}
+.toast-badge{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  padding:6px 10px;
+  border-radius:999px;
+  background:rgba(255,255,255,0.18);
+  font-size:11px;
+  font-weight:800;
+  text-transform:uppercase;
+  letter-spacing:.05em;
+}
+.toast h4{margin:12px 0 6px;font-size:20px;}
+.toast p{color:rgba(255,255,255,0.88);line-height:1.6;font-size:14px;}
+.toast-progress{
+  margin-top:14px;
+  height:5px;
+  border-radius:999px;
+  background:rgba(255,255,255,0.20);
+  overflow:hidden;
+}
+.toast-progress span{
+  display:block;
+  height:100%;
+  width:100%;
+  border-radius:inherit;
+  background:rgba(255,255,255,0.92);
+  transform-origin:left center;
+}
+.section-head{display:flex;justify-content:space-between;align-items:flex-end;gap:14px;flex-wrap:wrap;margin-bottom:16px;}
+.section-head h3{font-size:24px;color:var(--teal-deep);}
+.section-head p{color:var(--muted);font-size:14px;line-height:1.7;max-width:720px;}
+.table-card{padding:22px;}
+.mini-actions{display:flex;flex-wrap:wrap;gap:10px;margin-top:18px;}
+.mini-chip{display:inline-flex;align-items:center;gap:8px;padding:10px 14px;border-radius:999px;background:#eef7f7;border:1px solid #d7e9e8;color:#215756;font-size:13px;font-weight:800;}
+.mini-chip strong{font-size:14px;color:var(--teal-deep);}
+.toolbar{display:flex;justify-content:space-between;align-items:center;gap:14px;flex-wrap:wrap;margin-bottom:18px;}
+.toolbar-search{flex:1 1 280px;min-width:220px;}
+.toolbar-search input{width:100%;padding:12px 14px;border:1px solid #d7e8e7;border-radius:14px;background:#fff;font:inherit;color:#163434;outline:none;}
+.toolbar-search input:focus{border-color:var(--teal);box-shadow:0 0 0 4px rgba(15,143,140,0.08);}
+.filter-row{display:flex;flex-wrap:wrap;gap:10px;}
+.filter-btn{
+  border:none;
+  border-radius:999px;
+  padding:10px 14px;
+  background:#edf6f6;
+  color:#356564;
+  cursor:pointer;
+  font-size:13px;
+  font-weight:800;
+  transition:0.2s ease;
+}
+.filter-btn.active{
+  background:linear-gradient(135deg,#12a39f 0%,#0a7270 100%);
+  color:#fff;
+  box-shadow:0 10px 20px rgba(15,143,140,0.16);
+}
+.queue-grid,.inventory-grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(280px,1fr));
+  gap:16px;
+}
+.rx-card,.inventory-card,.movement-card{
+  border:1px solid var(--line);
+  border-radius:22px;
+  background:linear-gradient(180deg,#ffffff 0%,#f7fbfb 100%);
+  box-shadow:0 12px 24px rgba(8,63,63,0.05);
+}
+.rx-card{padding:18px;display:grid;gap:14px;}
+.rx-head,.inventory-head,.movement-head{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;}
+.rx-head h4,.inventory-head h4,.movement-head h4{font-size:19px;color:var(--teal-deep);}
+.rx-meta,.inventory-meta,.movement-meta{display:grid;gap:10px;}
+.meta-line{
+  display:flex;
+  justify-content:space-between;
+  gap:14px;
+  padding:10px 12px;
+  border-radius:14px;
+  background:#f4f9f9;
+  border:1px solid #e3eeee;
+}
+.meta-line span{color:var(--muted);font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:0.04em;}
+.meta-line strong{color:#1e4040;font-size:14px;text-align:right;}
+.rx-notes,.inventory-notes,.movement-note{
+  padding:12px 14px;
+  border-radius:16px;
+  background:#fbfefd;
+  border:1px solid #e7f0ef;
+  color:#486867;
+  font-size:13px;
+  line-height:1.7;
+}
+.rx-actions{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;}
+.stock-pill{
+  display:inline-flex;
+  align-items:center;
+  gap:8px;
+  padding:8px 12px;
+  border-radius:999px;
+  font-size:12px;
+  font-weight:800;
+}
+.stock-pill.ok{background:#eaf8ef;color:var(--ok);}
+.stock-pill.low{background:#fff3dc;color:var(--warn);}
+.stock-pill.out{background:#fff0f0;color:var(--danger);}
+.inventory-card{padding:18px;display:grid;gap:14px;}
+.inventory-topline{display:flex;flex-wrap:wrap;gap:8px;}
+.inventory-tag{
+  display:inline-flex;
+  align-items:center;
+  padding:7px 10px;
+  border-radius:999px;
+  background:#eef7f7;
+  border:1px solid #ddeceb;
+  color:#406766;
+  font-size:12px;
+  font-weight:800;
+}
+.inventory-progress{
+  height:10px;
+  border-radius:999px;
+  background:#e7f1f0;
+  overflow:hidden;
+}
+.inventory-progress span{display:block;height:100%;border-radius:inherit;background:linear-gradient(90deg,#12a39f 0%,#0a7270 100%);}
+.movement-list{display:grid;gap:14px;}
+.movement-card{padding:16px 18px;}
+.movement-type{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  border-radius:999px;
+  padding:7px 10px;
+  background:#eef7f7;
+  color:#2f605f;
+  font-size:12px;
+  font-weight:800;
+  text-transform:uppercase;
+}
+.movement-type.add{background:#eaf8ef;color:var(--ok);}
+.movement-type.dispense{background:#fff3dc;color:var(--warn);}
+.movement-type.adjust{background:#eef4ff;color:#1b5dbf;}
+.empty-panel{
+  padding:24px;
+  border:1px dashed #cfe0df;
+  border-radius:20px;
+  background:linear-gradient(180deg,#fbfefd 0%,#f4fbfa 100%);
+  color:#5d7a79;
+  text-align:center;
+  font-size:14px;
+}
+.table-wrap{overflow-x:auto;border:1px solid #e2eded;border-radius:18px;background:#fff;}
+table{width:100%;border-collapse:collapse;}
+th,td{text-align:left;padding:14px 12px;border-bottom:1px solid #e8f0ef;font-size:14px;vertical-align:top;}
+th{background:#eef6f5;color:#557170;font-size:12px;text-transform:uppercase;letter-spacing:0.04em;}
+.status{display:inline-flex;align-items:center;justify-content:center;border-radius:999px;padding:8px 12px;font-size:12px;font-weight:800;text-transform:uppercase;}
+.status.ok{background:#eaf8ef;color:var(--ok);}
+.status.low{background:#fff3dc;color:var(--warn);}
+.status.out{background:#fff0f0;color:var(--danger);}
+.status.pending{background:#eef4ff;color:#1b5dbf;}
+.status.dispensed{background:#eaf8ef;color:var(--ok);}
+.muted{color:var(--muted);}
+.logout{display:inline-flex;margin-top:18px;text-decoration:none;color:#0a5f5d;font-weight:800;}
+@media (max-width:1180px){.hero,.work-grid,.stats{grid-template-columns:1fr;}}
+@media (max-width:760px){.content{padding:16px;}.form-grid{grid-template-columns:1fr;}.topbar{padding:18px;}.shell{width:min(96vw,1380px);margin:14px auto;}}
+</style>
+</head>
+<body>
+<div class="shell">
+  <div class="topbar">
+    <div class="title-wrap">
+      <div class="brand">Rx</div>
+      <div>
+        <h1>Storage Dashboard</h1>
+        <p>Track medicine levels, catch low stock early, and keep a clean movement history for pharmacy operations.</p>
+      </div>
+    </div>
+    <div class="top-links">
+      <a href="#pending-prescriptions">Pending Rx</a>
+      <a href="#inventory">Inventory</a>
+      <a href="#add-medicine">Add Medicine</a>
+      <a href="#stock-actions">Stock Actions</a>
+      <a href="{{ url_for('logout') }}">Logout</a>
+    </div>
+  </div>
+
+  <div class="content">
+    {% if inventory_error %}
+      <div class="msg error">{{ inventory_error }}</div>
+    {% endif %}
+    {% if inventory_success %}
+      <div class="msg success">{{ inventory_success }}</div>
+    {% endif %}
+
+    <div class="hero">
+      <div class="panel hero-card">
+        <h2>Welcome, {{ name }}</h2>
+        <p>This section is built for medicine storage staff. It gives you a live view of what is available, what is running low, and every inventory movement recorded in the system.</p>
+        <div class="identity">{{ hashed_id|mask_hash }}</div>
+        <div class="mini-actions">
+          <div class="mini-chip"><strong>{{ pending_prescriptions|length }}</strong> waiting prescriptions</div>
+          <div class="mini-chip"><strong>{{ inventory_summary.low_stock_count }}</strong> low stock alerts</div>
+          <div class="mini-chip"><strong>{{ recent_movements|length }}</strong> recent movements tracked</div>
+        </div>
+      </div>
+
+      <div class="alert-box">
+        <h3>Low Stock Alarm</h3>
+        <p>{% if low_stock_items %}The following medicines need attention now.{% else %}All medicines are currently above their alert thresholds.{% endif %}</p>
+        <div class="alert-list">
+          {% if low_stock_items %}
+            {% for item in low_stock_items[:5] %}
+              <div class="alert-item">
+                <strong>{{ item.medicine_name }}</strong>
+                <span>{{ item.quantity_in_stock }} {{ item.unit }} left</span>
+              </div>
+            {% endfor %}
+          {% else %}
+            <div class="alert-item">
+              <strong>Healthy inventory</strong>
+              <span>No active low-stock alarms</span>
+            </div>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+
+    <div class="stats">
+      <div class="stat-card">
+        <h3>Total Medicines</h3>
+        <strong>{{ inventory_summary.medicine_count }}</strong>
+        <span>Distinct medicine entries tracked in storage.</span>
+      </div>
+      <div class="stat-card">
+        <h3>Total Units</h3>
+        <strong>{{ inventory_summary.total_units }}</strong>
+        <span>Combined quantity currently available across items.</span>
+      </div>
+      <div class="stat-card">
+        <h3>Low Stock</h3>
+        <strong>{{ inventory_summary.low_stock_count }}</strong>
+        <span>Medicines at or below the alert threshold.</span>
+      </div>
+      <div class="stat-card">
+        <h3>Out Of Stock</h3>
+        <strong>{{ inventory_summary.out_of_stock_count }}</strong>
+        <span>Medicines that need restocking immediately.</span>
+      </div>
+    </div>
+
+    <div class="work-grid">
+      <div class="panel" id="add-medicine">
+        <div class="section-head">
+          <div>
+            <h3>Add Medicine</h3>
+            <p>Create a new inventory item with its starting quantity and low-stock threshold.</p>
+          </div>
+        </div>
+        <form method="POST" action="{{ url_for('storage_add_inventory') }}">
+          <div class="form-grid">
+            <div class="field">
+              <label for="medicine_name">Medicine Name</label>
+              <input id="medicine_name" name="medicine_name" type="text" placeholder="Paracetamol" required>
+            </div>
+            <div class="field">
+              <label for="category">Category</label>
+              <select id="category" name="category">
+                <option value="" selected>Select category</option>
+                <option value="Pain relief">Pain relief</option>
+                <option value="Antibiotic">Antibiotic</option>
+                <option value="Antiviral">Antiviral</option>
+                <option value="Antifungal">Antifungal</option>
+                <option value="Allergy">Allergy</option>
+                <option value="Digestive care">Digestive care</option>
+                <option value="Respiratory care">Respiratory care</option>
+                <option value="Diabetes care">Diabetes care</option>
+                <option value="Heart health">Heart health</option>
+                <option value="Vitamin and supplements">Vitamin and supplements</option>
+              </select>
+            </div>
+            <div class="field">
+              <label for="quantity_in_stock">Starting Quantity</label>
+              <input id="quantity_in_stock" name="quantity_in_stock" type="number" min="0" placeholder="100" required>
+            </div>
+            <div class="field">
+              <label for="unit">Unit</label>
+              <select id="unit" name="unit">
+                <option value="units">Units</option>
+                <option value="tablets">Tablets</option>
+                <option value="capsules">Capsules</option>
+                <option value="boxes">Boxes</option>
+                <option value="bottles">Bottles</option>
+                <option value="vials">Vials</option>
+                <option value="ampoules">Ampoules</option>
+                <option value="sachets">Sachets</option>
+                <option value="tubes">Tubes</option>
+                <option value="packs">Packs</option>
+              </select>
+            </div>
+            <div class="field">
+              <label for="low_stock_threshold">Low-Stock Threshold</label>
+              <input id="low_stock_threshold" name="low_stock_threshold" type="number" min="0" placeholder="10" required>
+            </div>
+            <div class="field">
+              <label for="supplier_name">Supplier</label>
+              <input id="supplier_name" name="supplier_name" type="text" placeholder="Supplier name">
+            </div>
+            <div class="field">
+              <label for="expiry_date">Expiry Date</label>
+              <input id="expiry_date" name="expiry_date" type="date">
+            </div>
+            <div class="field">
+              <label for="notes">Notes</label>
+              <textarea id="notes" name="notes" placeholder="Optional handling notes"></textarea>
+            </div>
+          </div>
+          <button class="btn btn-primary" type="submit">Save Medicine</button>
+        </form>
+      </div>
+
+      <div class="panel" id="stock-actions">
+        <div class="section-head">
+          <div>
+            <h3>Update Stock</h3>
+            <p>Add new stock, dispense medicine, or directly adjust the current count after a check.</p>
+          </div>
+        </div>
+        <form method="POST" action="{{ url_for('storage_update_inventory') }}">
+          <div class="field">
+            <label for="inventory_id">Medicine</label>
+            <select id="inventory_id" name="inventory_id" required>
+              <option value="" disabled selected>Select medicine</option>
+              {% for item in inventory_items %}
+                <option value="{{ item.id }}">{{ item.medicine_name }} ({{ item.quantity_in_stock }} {{ item.unit }})</option>
+              {% endfor %}
+            </select>
+          </div>
+          <div class="form-grid">
+            <div class="field">
+              <label for="action_type">Action</label>
+              <select id="action_type" name="action_type" required>
+                <option value="add">Add stock</option>
+                <option value="dispense">Dispense</option>
+                <option value="adjust">Set exact quantity</option>
+              </select>
+            </div>
+            <div class="field">
+              <label for="quantity_changed">Quantity</label>
+              <input id="quantity_changed" name="quantity_changed" type="number" min="0" placeholder="25" required>
+            </div>
+          </div>
+          <div class="field">
+            <label for="note">Note</label>
+            <textarea id="note" name="note" placeholder="Reason for this stock movement"></textarea>
+          </div>
+          <button class="btn btn-secondary" type="submit">Apply Update</button>
+        </form>
+      </div>
+    </div>
+
+    <div class="table-card" id="pending-prescriptions" style="margin-bottom:20px;">
+      <div class="section-head">
+        <div>
+          <h3>Pending Prescriptions</h3>
+          <p>Prescriptions appear here after doctors create them. Stock is reduced only when storage confirms dispensing.</p>
+        </div>
+      </div>
+      <div class="toolbar">
+        <div class="toolbar-search">
+          <input id="rxSearch" type="search" placeholder="Search by patient, doctor, or medicine">
+        </div>
+        <div class="filter-row">
+          <button class="filter-btn active" type="button" data-rx-filter="all">All</button>
+          <button class="filter-btn" type="button" data-rx-filter="matched">Inventory matched</button>
+          <button class="filter-btn" type="button" data-rx-filter="unmatched">Needs review</button>
+        </div>
+      </div>
+      {% if pending_prescriptions %}
+        <div class="queue-grid" id="rxQueue">
+          {% for prescription in pending_prescriptions %}
+            <div
+              class="rx-card"
+              data-rx-card
+              data-rx-filter="{% if prescription.inventory_id %}matched{% else %}unmatched{% endif %}"
+              data-rx-search="{{ prescription.patient_name|lower }} {{ prescription.doctor_name|lower }} {{ prescription.medicine_name|lower }} {{ prescription.dosage|lower }} {{ prescription.instructions|lower }}"
+            >
+              <div class="rx-head">
+                <div>
+                  <h4>{{ prescription.medicine_name }}</h4>
+                  <div class="muted">{{ prescription.created_at }}</div>
+                </div>
+                <span class="status pending">{{ prescription.dispense_status }}</span>
+              </div>
+              <div class="rx-meta">
+                <div class="meta-line">
+                  <span>Patient</span>
+                  <strong>{{ prescription.patient_name }}</strong>
+                </div>
+                <div class="meta-line">
+                  <span>Doctor</span>
+                  <strong>{{ prescription.doctor_name }}</strong>
+                </div>
+                <div class="meta-line">
+                  <span>Dosage</span>
+                  <strong>{{ prescription.dosage }}</strong>
+                </div>
+              </div>
+              <div class="rx-notes">{{ prescription.instructions }}</div>
+              <div class="rx-actions">
+                {% if prescription.inventory_id %}
+                  {% set stock_state = 'ok' %}
+                  {% if prescription.quantity_in_stock <= 0 %}
+                    {% set stock_state = 'out' %}
+                  {% elif prescription.quantity_in_stock <= prescription.low_stock_threshold %}
+                    {% set stock_state = 'low' %}
+                  {% endif %}
+                  <span class="stock-pill {{ stock_state }}">
+                    {% if stock_state == 'ok' %}Ready{% elif stock_state == 'low' %}Low{% else %}Empty{% endif %}
+                    - {{ prescription.quantity_in_stock }} {{ prescription.unit }}
+                  </span>
+                {% else %}
+                  <span class="stock-pill out">No inventory match</span>
+                {% endif %}
+                <form
+                  method="POST"
+                  action="{{ url_for('storage_dispense_prescription', prescription_id=prescription.id) }}"
+                  data-dispense-form
+                >
+                  <button class="btn btn-secondary" type="submit">Dispense</button>
+                </form>
+              </div>
+            </div>
+          {% endfor %}
+        </div>
+        <div class="empty-panel" id="rxEmptyState" style="display:none;">No prescriptions match the current search or filter.</div>
+      {% else %}
+        <div class="empty-panel">No prescriptions are waiting for dispensing.</div>
+      {% endif %}
+    </div>
+
+    <div class="table-card" id="inventory">
+      <div class="section-head">
+        <div>
+          <h3>Current Inventory</h3>
+          <p>Medicines are automatically flagged when they reach or fall below their configured threshold.</p>
+        </div>
+      </div>
+      <div class="toolbar">
+        <div class="toolbar-search">
+          <input id="inventorySearch" type="search" placeholder="Search medicine, category, supplier, or note">
+        </div>
+        <div class="filter-row">
+          <button class="filter-btn active" type="button" data-inventory-filter="all">All</button>
+          <button class="filter-btn" type="button" data-inventory-filter="ok">Healthy</button>
+          <button class="filter-btn" type="button" data-inventory-filter="low">Low</button>
+          <button class="filter-btn" type="button" data-inventory-filter="out">Out</button>
+        </div>
+      </div>
+      {% if inventory_items %}
+        <div class="inventory-grid" id="inventoryGrid">
+          {% for item in inventory_items %}
+            {% set percent = 100 %}
+            {% if item.low_stock_threshold and item.quantity_in_stock >= 0 %}
+              {% set percent = ((item.quantity_in_stock / (item.low_stock_threshold * 2 if item.low_stock_threshold * 2 > 0 else 1)) * 100) | round(0, 'floor') %}
+            {% endif %}
+            <div
+              class="inventory-card"
+              data-inventory-card
+              data-inventory-filter="{{ item.stock_status }}"
+              data-inventory-search="{{ item.medicine_name|lower }} {{ (item.category or 'general')|lower }} {{ (item.supplier_name or 'n/a')|lower }} {{ (item.notes or '')|lower }}"
+            >
+              <div class="inventory-head">
+                <div>
+                  <h4>{{ item.medicine_name }}</h4>
+                  <div class="muted">{{ item.category or 'General' }}</div>
+                </div>
+                <span class="status {{ item.stock_status }}">
+                  {% if item.stock_status == 'out' %}Out{% elif item.stock_status == 'low' %}Low{% else %}OK{% endif %}
+                </span>
+              </div>
+              <div class="inventory-topline">
+                <span class="inventory-tag">{{ item.quantity_in_stock }} {{ item.unit }} on hand</span>
+                <span class="inventory-tag">Alert at {{ item.low_stock_threshold }} {{ item.unit }}</span>
+                <span class="inventory-tag">Expiry: {{ item.expiry_date or 'N/A' }}</span>
+              </div>
+              <div class="inventory-progress">
+                <span style="width:{% if percent < 0 %}0{% elif percent > 100 %}100{% else %}{{ percent }}{% endif %}%;"></span>
+              </div>
+              <div class="inventory-meta">
+                <div class="meta-line">
+                  <span>Supplier</span>
+                  <strong>{{ item.supplier_name or 'N/A' }}</strong>
+                </div>
+              </div>
+              <div class="inventory-notes">{{ item.notes or 'No notes added for this medicine yet.' }}</div>
+            </div>
+          {% endfor %}
+        </div>
+        <div class="empty-panel" id="inventoryEmptyState" style="display:none;">No medicines match the current search or filter.</div>
+      {% else %}
+        <div class="empty-panel">No medicines have been added yet.</div>
+      {% endif %}
+    </div>
+
+    <div class="table-card" style="margin-top:20px;">
+      <div class="section-head">
+        <div>
+          <h3>Recent Stock Movements</h3>
+          <p>Every add, dispense, or adjustment is recorded here for traceability.</p>
+        </div>
+      </div>
+      {% if recent_movements %}
+        <div class="movement-list">
+          {% for movement in recent_movements %}
+            <div class="movement-card">
+              <div class="movement-head">
+                <div>
+                  <h4>{{ movement.medicine_name }}</h4>
+                  <div class="muted">{{ movement.created_at }}</div>
+                </div>
+                <span class="movement-type {{ movement.action_type }}">{{ movement.action_type }}</span>
+              </div>
+              <div class="inventory-meta" style="margin-top:14px;">
+                <div class="meta-line">
+                  <span>Change</span>
+                  <strong>{{ movement.quantity_changed }}</strong>
+                </div>
+                <div class="meta-line">
+                  <span>Quantity After</span>
+                  <strong>{{ movement.quantity_after }}</strong>
+                </div>
+                <div class="meta-line">
+                  <span>Handled By</span>
+                  <strong>{{ movement.performed_by_name or 'System' }}</strong>
+                </div>
+              </div>
+              <div class="movement-note" style="margin-top:14px;">{{ movement.note or 'No note recorded for this movement.' }}</div>
+            </div>
+          {% endfor %}
+        </div>
+      {% else %}
+        <div class="empty-panel">No stock movements recorded yet.</div>
+      {% endif %}
+      <a class="logout" href="{{ url_for('logout') }}">Sign out</a>
+    </div>
+  </div>
+</div>
+<div class="toast" id="storageToast" aria-live="polite">
+  <span class="toast-badge" id="storageToastBadge">Updated</span>
+  <h4 id="storageToastTitle">Prescription Dispensed</h4>
+  <p id="storageToastMessage">The prescription was dispensed successfully.</p>
+  <div class="toast-progress"><span id="storageToastProgress"></span></div>
+</div>
+<script>
+  (function () {
+    const storageToast = document.getElementById("storageToast");
+    const storageToastBadge = document.getElementById("storageToastBadge");
+    const storageToastTitle = document.getElementById("storageToastTitle");
+    const storageToastMessage = document.getElementById("storageToastMessage");
+    const storageToastProgress = document.getElementById("storageToastProgress");
+    let storageToastTimer = null;
+
+    function showStorageToast(options) {
+      if (!storageToast) return;
+      const type = options.type || "success";
+      storageToast.classList.toggle("error", type === "error");
+      storageToastBadge.textContent = options.badge || (type === "error" ? "Issue" : "Dispensed");
+      storageToastTitle.textContent = options.title || (type === "error" ? "Dispense Not Completed" : "Prescription Dispensed");
+      storageToastMessage.textContent = options.message || "";
+      storageToast.classList.add("show");
+
+      storageToastProgress.style.transition = "none";
+      storageToastProgress.style.transform = "scaleX(1)";
+      void storageToastProgress.offsetWidth;
+      storageToastProgress.style.transition = "transform 5s linear";
+      storageToastProgress.style.transform = "scaleX(0)";
+
+      if (storageToastTimer) {
+        window.clearTimeout(storageToastTimer);
+      }
+
+      storageToastTimer = window.setTimeout(function () {
+        storageToast.classList.remove("show");
+      }, 5000);
+    }
+
+    function setupFilter(config) {
+      const cards = Array.from(document.querySelectorAll(config.cardSelector));
+      const searchInput = document.getElementById(config.searchId);
+      const buttons = Array.from(document.querySelectorAll(config.buttonSelector));
+      const emptyState = document.getElementById(config.emptyId);
+      let activeFilter = "all";
+
+      function apply() {
+        const query = (searchInput ? searchInput.value : "").trim().toLowerCase();
+        let visibleCount = 0;
+
+        cards.forEach((card) => {
+          const filterValue = card.dataset[config.filterDataKey] || "";
+          const haystack = card.dataset[config.searchDataKey] || "";
+          const filterMatch = activeFilter === "all" || filterValue === activeFilter;
+          const searchMatch = !query || haystack.includes(query);
+          const visible = filterMatch && searchMatch;
+          card.style.display = visible ? "" : "none";
+          if (visible) visibleCount += 1;
+        });
+
+        if (emptyState) {
+          emptyState.style.display = visibleCount ? "none" : "block";
+        }
+      }
+
+      buttons.forEach((button) => {
+        button.addEventListener("click", function () {
+          activeFilter = button.dataset[config.buttonDataKey] || "all";
+          buttons.forEach((item) => item.classList.toggle("active", item === button));
+          apply();
+        });
+      });
+
+      if (searchInput) {
+        searchInput.addEventListener("input", apply);
+      }
+
+      apply();
+    }
+
+    function refreshRxEmptyState() {
+      const cards = Array.from(document.querySelectorAll("[data-rx-card]"));
+      const visibleCards = cards.filter((card) => card.style.display !== "none");
+      const emptyState = document.getElementById("rxEmptyState");
+      if (!emptyState) return;
+
+      if (!cards.length) {
+        emptyState.style.display = "block";
+        emptyState.textContent = "No prescriptions are waiting for dispensing.";
+        return;
+      }
+
+      emptyState.style.display = visibleCards.length ? "none" : "block";
+      emptyState.textContent = "No prescriptions match the current search or filter.";
+    }
+
+    setupFilter({
+      cardSelector: "[data-rx-card]",
+      searchId: "rxSearch",
+      buttonSelector: "[data-rx-filter]",
+      buttonDataKey: "rxFilter",
+      filterDataKey: "rxFilter",
+      searchDataKey: "rxSearch",
+      emptyId: "rxEmptyState"
+    });
+
+    setupFilter({
+      cardSelector: "[data-inventory-card]",
+      searchId: "inventorySearch",
+      buttonSelector: "[data-inventory-filter]",
+      buttonDataKey: "inventoryFilter",
+      filterDataKey: "inventoryFilter",
+      searchDataKey: "inventorySearch",
+      emptyId: "inventoryEmptyState"
+    });
+
+    document.querySelectorAll("[data-dispense-form]").forEach((form) => {
+      form.addEventListener("submit", async function (event) {
+        event.preventDefault();
+        const submitButton = form.querySelector("button[type='submit']");
+        const card = form.closest("[data-rx-card]");
+        if (!submitButton || !card) return;
+
+        const originalLabel = submitButton.textContent;
+        submitButton.disabled = true;
+        submitButton.textContent = "Dispensing...";
+
+        try {
+          const response = await fetch(form.action, {
+            method: "POST",
+            headers: {
+              "X-Requested-With": "XMLHttpRequest"
+            }
+          });
+
+          const payload = await response.json();
+          if (!response.ok || !payload.ok) {
+            showStorageToast({
+              type: "error",
+              badge: "Issue",
+              title: "Dispense Not Completed",
+              message: payload.message || "The prescription could not be dispensed."
+            });
+            submitButton.disabled = false;
+            submitButton.textContent = originalLabel;
+            return;
+          }
+
+          card.remove();
+          refreshRxEmptyState();
+          showStorageToast({
+            type: "success",
+            badge: "Dispensed",
+            title: "Prescription Dispensed",
+            message: payload.message || "The prescription was dispensed successfully."
+          });
+        } catch (error) {
+          showStorageToast({
+            type: "error",
+            badge: "Issue",
+            title: "Connection Problem",
+            message: "We could not complete the dispense action. Please try again."
+          });
+          submitButton.disabled = false;
+          submitButton.textContent = originalLabel;
+        }
+      });
+    });
+  })();
+</script>
+</body>
+</html>
+

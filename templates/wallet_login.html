@@ -1,0 +1,946 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Wallet Login | E-Health</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+  <style>
+    *{
+      margin:0;
+      padding:0;
+      box-sizing:border-box;
+      font-family:"Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+    }
+
+    body{
+      background:linear-gradient(135deg, #edf7f6 0%, #e4f3f2 45%, #d7eceb 100%);
+      color:#163434;
+      min-height:100vh;
+      overflow-x:hidden;
+    }
+
+    .bg-shape{
+      position:fixed;
+      border-radius:50%;
+      background:rgba(0,77,77,0.08);
+      filter:blur(6px);
+      z-index:0;
+      animation:floatShape 7s ease-in-out infinite;
+    }
+
+    .shape1{
+      width:220px;
+      height:220px;
+      top:80px;
+      left:-70px;
+    }
+
+    .shape2{
+      width:260px;
+      height:260px;
+      top:180px;
+      right:-80px;
+      animation-delay:1.5s;
+    }
+
+    .shape3{
+      width:180px;
+      height:180px;
+      bottom:40px;
+      left:18%;
+      animation-delay:0.8s;
+    }
+
+    @keyframes floatShape{
+      0%,100%{transform:translateY(0);}
+      50%{transform:translateY(-16px);}
+    }
+
+    .page-shell{
+      position:relative;
+      z-index:2;
+    }
+
+    .top-bar{
+      background:linear-gradient(135deg, #0b6666 0%, #004D4D 100%);
+      border-bottom:1px solid rgba(255,255,255,0.08);
+    }
+
+    .container{
+      width:92%;
+      max-width:1280px;
+      margin:auto;
+    }
+
+    .top-nav{
+      display:flex;
+      justify-content:flex-end;
+      gap:24px;
+      padding:12px 0;
+      flex-wrap:wrap;
+    }
+
+    .top-nav a{
+      text-decoration:none;
+      color:#e4fbfb;
+      font-size:14px;
+      font-weight:600;
+      transition:0.25s ease;
+    }
+
+    .top-nav a:hover{
+      color:#aef0ec;
+    }
+
+    .main-header{
+      padding:18px 0;
+    }
+
+    .header-content{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:20px;
+      flex-wrap:wrap;
+    }
+
+    .logo{
+      text-decoration:none;
+      display:flex;
+      align-items:center;
+      gap:12px;
+    }
+
+    .logo-icon{
+      width:48px;
+      height:48px;
+      border-radius:14px;
+      background:linear-gradient(135deg, #0b6666 0%, #004D4D 100%);
+      color:white;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      position:relative;
+      font-size:0;
+      font-weight:900;
+      box-shadow:0 12px 24px rgba(0,77,77,0.16);
+    }
+    .logo-icon::before{
+      content:"";
+      width:24px;
+      height:24px;
+      display:block;
+      background-repeat:no-repeat;
+      background-position:center;
+      background-size:contain;
+      background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='1.9' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M12 3l7 3v5c0 5-3.4 8.6-7 10-3.6-1.4-7-5-7-10V6l7-3z'/%3E%3Cpath d='M12 8v8M8 12h8'/%3E%3C/svg%3E");
+    }
+
+    .logo-text{
+      font-size:28px;
+      font-weight:800;
+      color:#163434;
+    }
+
+    .wallet-hero{
+      width:92%;
+      max-width:1280px;
+      margin:18px auto 40px;
+      display:grid;
+      grid-template-columns:1.05fr 0.95fr;
+      gap:26px;
+      align-items:stretch;
+    }
+
+    .hero-panel{
+      background:linear-gradient(135deg, #0b6666 0%, #004D4D 100%);
+      color:white;
+      border-radius:30px;
+      padding:34px;
+      position:relative;
+      overflow:hidden;
+      box-shadow:0 24px 50px rgba(0,77,77,0.18);
+    }
+
+    .hero-panel::before{
+      content:"";
+      position:absolute;
+      width:240px;
+      height:240px;
+      border-radius:50%;
+      background:rgba(255,255,255,0.08);
+      top:-80px;
+      right:-60px;
+    }
+
+    .hero-badge{
+      display:inline-flex;
+      align-items:center;
+      gap:10px;
+      background:rgba(255,255,255,0.10);
+      border:1px solid rgba(255,255,255,0.14);
+      color:#d7f7f4;
+      padding:10px 16px;
+      border-radius:999px;
+      font-size:13px;
+      font-weight:800;
+      letter-spacing:0.2px;
+      margin-bottom:18px;
+    }
+
+    .hero-dot{
+      width:10px;
+      height:10px;
+      border-radius:50%;
+      background:#9ff2ea;
+      box-shadow:0 0 0 0 rgba(159,242,234,0.7);
+      animation:pulseDot 1.8s infinite;
+    }
+
+    @keyframes pulseDot{
+      0%{box-shadow:0 0 0 0 rgba(159,242,234,0.7);}
+      70%{box-shadow:0 0 0 12px rgba(159,242,234,0);}
+      100%{box-shadow:0 0 0 0 rgba(159,242,234,0);}
+    }
+
+    .hero-title{
+      font-size:46px;
+      line-height:1.08;
+      font-weight:900;
+      margin-bottom:16px;
+      max-width:540px;
+    }
+
+    .hero-title span{
+      color:#aef0ec;
+    }
+
+    .hero-sub{
+      color:#ddf8f6;
+      font-size:16px;
+      line-height:1.85;
+      max-width:560px;
+      margin-bottom:26px;
+    }
+
+    .trust-pills{
+      display:flex;
+      flex-wrap:wrap;
+      gap:12px;
+      margin-bottom:26px;
+    }
+
+    .trust-pill{
+      padding:10px 14px;
+      border-radius:999px;
+      background:rgba(255,255,255,0.10);
+      border:1px solid rgba(255,255,255,0.12);
+      color:#e8fffd;
+      font-size:13px;
+      font-weight:700;
+    }
+
+    .chain-visual{
+      display:grid;
+      grid-template-columns:repeat(3,1fr);
+      gap:14px;
+      margin-top:18px;
+    }
+
+    .chain-step{
+      background:rgba(255,255,255,0.10);
+      border:1px solid rgba(255,255,255,0.12);
+      border-radius:20px;
+      padding:18px 16px;
+      text-align:center;
+      transition:0.3s ease;
+      min-height:146px;
+    }
+
+    .chain-step.active{
+      background:rgba(174,240,236,0.16);
+      border-color:rgba(174,240,236,0.35);
+      transform:translateY(-3px);
+    }
+
+    .chain-icon{
+      width:56px;
+      height:56px;
+      margin:0 auto 12px;
+      border-radius:18px;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      position:relative;
+      font-size:0;
+      background:rgba(255,255,255,0.14);
+    }
+    .chain-icon::before{
+      content:"";
+      width:26px;
+      height:26px;
+      display:block;
+      background-repeat:no-repeat;
+      background-position:center;
+      background-size:contain;
+    }
+    .chain-step:nth-child(1) .chain-icon::before{
+      background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'%3E%3Crect x='3' y='5' width='18' height='14' rx='3'/%3E%3Ccircle cx='9' cy='12' r='2.2'/%3E%3Cpath d='M14 10h4M14 13h4'/%3E%3C/svg%3E");
+    }
+    .chain-step:nth-child(2) .chain-icon::before{
+      background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M5 17c1.6-4.8 6.2-7.8 10.8-7.1l1.2.2'/%3E%3Cpath d='M14.5 6.5l3 3-7.8 7.8H6.7v-3z'/%3E%3Cpath d='M15.8 5.2l3 3'/%3E%3C/svg%3E");
+    }
+    .chain-step:nth-child(3) .chain-icon::before{
+      background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='1.9' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M12 3l7 3v5c0 5-3.4 8.6-7 10-3.6-1.4-7-5-7-10V6l7-3z'/%3E%3Cpath d='M8.5 12.2l2.3 2.3 4.7-4.7'/%3E%3C/svg%3E");
+    }
+
+    .chain-step h4{
+      font-size:16px;
+      margin-bottom:8px;
+    }
+
+    .chain-step p{
+      color:#d7f7f4;
+      font-size:13px;
+      line-height:1.6;
+    }
+
+    .auth-panel{
+      background:#ffffff;
+      border:1px solid #dce8e6;
+      border-radius:30px;
+      padding:28px;
+      box-shadow:0 20px 42px rgba(0,77,77,0.10);
+    }
+
+    .auth-head{
+      display:flex;
+      align-items:flex-start;
+      justify-content:space-between;
+      gap:16px;
+      margin-bottom:20px;
+    }
+
+    .auth-title h2{
+      font-size:30px;
+      color:#163434;
+      margin-bottom:8px;
+    }
+
+    .auth-sub{
+      color:#567575;
+      font-size:15px;
+      line-height:1.75;
+      max-width:500px;
+    }
+
+    .security-chip{
+      background:linear-gradient(135deg, #e7f7f5 0%, #ddf3f1 100%);
+      color:#004D4D;
+      border:1px solid #cfe7e5;
+      padding:10px 14px;
+      border-radius:999px;
+      font-size:13px;
+      font-weight:800;
+      white-space:nowrap;
+    }
+
+    .wallet-card{
+      background:#f8fcfc;
+      border:1px solid #e1eded;
+      border-radius:20px;
+      padding:20px;
+      margin-bottom:18px;
+    }
+
+    .wallet-label{
+      font-size:13px;
+      font-weight:800;
+      color:#567575;
+      margin-bottom:8px;
+      text-transform:uppercase;
+      letter-spacing:0.4px;
+    }
+
+    .wallet-value{
+      min-height:48px;
+      display:flex;
+      align-items:center;
+      background:white;
+      border:1px solid #dce9e7;
+      border-radius:14px;
+      padding:12px 14px;
+      color:#234646;
+      font-weight:700;
+      word-break:break-all;
+    }
+
+    .steps-grid{
+      display:grid;
+      gap:14px;
+      margin-bottom:18px;
+    }
+
+    .action-step{
+      background:#fcffff;
+      border:1px solid #e4eeee;
+      border-radius:18px;
+      padding:18px;
+      transition:0.25s ease;
+    }
+
+    .action-step.active{
+      border-color:#a9d8d4;
+      box-shadow:0 8px 18px rgba(0,77,77,0.06);
+    }
+
+    .step-top{
+      display:flex;
+      align-items:center;
+      gap:12px;
+      margin-bottom:14px;
+    }
+
+    .step-number{
+      width:34px;
+      height:34px;
+      border-radius:50%;
+      background:linear-gradient(135deg, #0b6666 0%, #004D4D 100%);
+      color:white;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      font-weight:800;
+      font-size:14px;
+      flex-shrink:0;
+    }
+
+    .step-title{
+      font-size:17px;
+      font-weight:800;
+      color:#183838;
+    }
+
+    .step-text{
+      font-size:14px;
+      color:#587575;
+      line-height:1.7;
+      margin-bottom:14px;
+    }
+
+    .auth-btn{
+      position:relative;
+      overflow:hidden;
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      gap:10px;
+      background:linear-gradient(135deg, #0b6666 0%, #004D4D 100%);
+      color:white;
+      border:none;
+      border-radius:12px;
+      padding:13px 18px;
+      font-weight:800;
+      cursor:pointer;
+      transition:0.25s ease;
+      box-shadow:0 10px 20px rgba(0,77,77,0.14);
+    }
+
+    .auth-btn::before{
+      content:"";
+      position:absolute;
+      top:0;
+      left:-130%;
+      width:120%;
+      height:100%;
+      background:linear-gradient(90deg, transparent, rgba(255,255,255,0.25), transparent);
+      transition:0.55s ease;
+    }
+
+    .auth-btn:hover::before{
+      left:130%;
+    }
+
+    .auth-btn:hover{
+      transform:translateY(-2px);
+      box-shadow:0 14px 24px rgba(0,77,77,0.18);
+    }
+
+    .auth-btn:disabled{
+      background:#b8cccc;
+      cursor:not-allowed;
+      box-shadow:none;
+      transform:none;
+    }
+
+    .challenge-area{
+      margin-top:14px;
+    }
+
+    .challenge-area textarea{
+      width:100%;
+      min-height:110px;
+      resize:none;
+      border:1px solid #dbe8e6;
+      border-radius:14px;
+      background:#f7fbfb;
+      padding:14px;
+      color:#244646;
+      line-height:1.6;
+      font-size:14px;
+      outline:none;
+    }
+
+    .status-panel{
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      gap:14px;
+      margin-top:12px;
+    }
+
+    .mini-status{
+      background:#f7fcfb;
+      border:1px solid #e2eeec;
+      border-radius:16px;
+      padding:16px;
+    }
+
+    .mini-status-title{
+      font-size:13px;
+      font-weight:800;
+      color:#577575;
+      margin-bottom:8px;
+      text-transform:uppercase;
+      letter-spacing:0.3px;
+    }
+
+    .mini-status-value{
+      color:#163434;
+      font-weight:800;
+      font-size:15px;
+      line-height:1.6;
+      word-break:break-word;
+    }
+
+    .status-message{
+      margin-top:18px;
+      background:#f7fcfb;
+      border:1px solid #e1eded;
+      border-radius:16px;
+      padding:16px;
+      font-size:14px;
+      line-height:1.7;
+      min-height:58px;
+      color:#355555;
+    }
+
+    .status-good{
+      color:#0b6b2f !important;
+    }
+
+    .status-bad{
+      color:#b00020 !important;
+    }
+
+    .auth-timeline{
+      margin-top:18px;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:10px;
+      flex-wrap:wrap;
+    }
+
+    .timeline-node{
+      display:flex;
+      align-items:center;
+      gap:8px;
+      color:#638080;
+      font-size:13px;
+      font-weight:700;
+    }
+
+    .timeline-dot{
+      width:12px;
+      height:12px;
+      border-radius:50%;
+      background:#c8dddd;
+      transition:0.25s ease;
+    }
+
+    .timeline-node.done .timeline-dot,
+    .timeline-node.active .timeline-dot{
+      background:#0d8c8c;
+      box-shadow:0 0 0 6px rgba(13,140,140,0.10);
+    }
+
+    .timeline-node.done,
+    .timeline-node.active{
+      color:#004D4D;
+    }
+
+    @media (max-width: 1050px){
+      .wallet-hero{
+        grid-template-columns:1fr;
+      }
+    }
+
+    @media (max-width: 700px){
+      .hero-title{
+        font-size:34px;
+      }
+
+      .auth-head{
+        flex-direction:column;
+      }
+
+      .status-panel{
+        grid-template-columns:1fr;
+      }
+
+      .chain-visual{
+        grid-template-columns:1fr;
+      }
+
+      .top-nav{
+        justify-content:center;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="bg-shape shape1"></div>
+  <div class="bg-shape shape2"></div>
+  <div class="bg-shape shape3"></div>
+
+  <div class="page-shell">
+
+    <div class="top-bar">
+      <div class="container">
+        <nav class="top-nav">
+          <a href="{{ url_for('home') }}">Home</a>
+          <a href="{{ url_for('login') }}">Email Login</a>
+        </nav>
+      </div>
+    </div>
+
+    <header class="main-header">
+      <div class="container">
+        <div class="header-content">
+          <a href="{{ url_for('home') }}" class="logo">
+            <div class="logo-icon">⛓</div>
+            <span class="logo-text">E-Health</span>
+          </a>
+        </div>
+      </div>
+    </header>
+
+    <section class="wallet-hero">
+      <div class="hero-panel">
+        <div class="hero-badge">
+          <span class="hero-dot"></span>
+          Blockchain-secured identity verification
+        </div>
+
+        <h1 class="hero-title">
+          Wallet-based <span>authentication</span> for trusted healthcare access
+        </h1>
+
+        <p class="hero-sub">
+          This login method proves wallet ownership by requesting a one-time server challenge, having the user sign it with MetaMask, and verifying the signature before access is granted.
+        </p>
+
+        <div class="trust-pills">
+          <div class="trust-pill">Zero-Trust Login</div>
+          <div class="trust-pill">Nonce-based Challenge</div>
+          <div class="trust-pill">Signature Verification</div>
+        </div>
+
+        <div class="chain-visual">
+          <div class="chain-step active" id="visualStep1">
+            <div class="chain-icon">👛</div>
+            <h4>Connect Wallet</h4>
+            <p>Securely attach your MetaMask address to begin the challenge flow.</p>
+          </div>
+
+          <div class="chain-step" id="visualStep2">
+            <div class="chain-icon">🧾</div>
+            <h4>Sign Challenge</h4>
+            <p>Use your wallet to cryptographically sign the one-time nonce.</p>
+          </div>
+
+          <div class="chain-step" id="visualStep3">
+            <div class="chain-icon">✅</div>
+            <h4>Verify Access</h4>
+            <p>Server validates the signature and grants trusted access to the portal.</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="auth-panel">
+        <div class="auth-head">
+          <div class="auth-title">
+            <h2>Login with Wallet</h2>
+            <p class="auth-sub">Sign a server challenge to prove ownership of your blockchain wallet before entering the healthcare system.</p>
+          </div>
+          <div class="security-chip">Secure Wallet Flow</div>
+        </div>
+
+        <div class="wallet-card">
+          <div class="wallet-label">Connected Wallet</div>
+          <div class="wallet-value" id="walletText">Not connected</div>
+        </div>
+
+        <div class="steps-grid">
+          <div class="action-step active" id="step1Box">
+            <div class="step-top">
+              <div class="step-number">1</div>
+              <div class="step-title">Connect MetaMask</div>
+            </div>
+            <div class="step-text">
+              Connect your wallet so the system knows which blockchain address is requesting access.
+            </div>
+            <button class="auth-btn" id="connectBtn" type="button">Connect MetaMask</button>
+          </div>
+
+          <div class="action-step" id="step2Box">
+            <div class="step-top">
+              <div class="step-number">2</div>
+              <div class="step-title">Request Server Challenge</div>
+            </div>
+            <div class="step-text">
+              The server generates a one-time nonce that prevents replay and strengthens authentication.
+            </div>
+            <button class="auth-btn" id="nonceBtn" type="button" disabled>Get Challenge (Nonce)</button>
+
+            <div class="challenge-area">
+              <textarea id="challengeBox" placeholder="Challenge will appear here..." readonly></textarea>
+            </div>
+          </div>
+
+          <div class="action-step" id="step3Box">
+            <div class="step-top">
+              <div class="step-number">3</div>
+              <div class="step-title">Sign & Login</div>
+            </div>
+            <div class="step-text">
+              MetaMask opens a signing prompt. Once signed, the server verifies the signature and logs you in.
+            </div>
+            <button class="auth-btn" id="signBtn" type="button" disabled>Sign Challenge & Login</button>
+          </div>
+        </div>
+
+        <div class="status-panel">
+          <div class="mini-status">
+            <div class="mini-status-title">Authentication Method</div>
+            <div class="mini-status-value">Blockchain Signature Verification</div>
+          </div>
+
+          <div class="mini-status">
+            <div class="mini-status-title">Current Stage</div>
+            <div class="mini-status-value" id="stageText">Waiting for wallet connection</div>
+          </div>
+        </div>
+
+        <div class="auth-timeline">
+          <div class="timeline-node active" id="timeline1">
+            <span class="timeline-dot"></span>
+            <span>Connect</span>
+          </div>
+          <div class="timeline-node" id="timeline2">
+            <span class="timeline-dot"></span>
+            <span>Challenge</span>
+          </div>
+          <div class="timeline-node" id="timeline3">
+            <span class="timeline-dot"></span>
+            <span>Sign</span>
+          </div>
+          <div class="timeline-node" id="timeline4">
+            <span class="timeline-dot"></span>
+            <span>Verify</span>
+          </div>
+        </div>
+
+        <div class="status-message" id="status">
+          Ready to begin secure wallet authentication.
+        </div>
+      </div>
+    </section>
+
+  </div>
+
+<script>
+let walletAddress = "";
+let challenge = "";
+
+function setStatus(msg, isError=false){
+  const el = document.getElementById("status");
+  el.textContent = msg;
+  el.classList.remove("status-good", "status-bad");
+  el.classList.add(isError ? "status-bad" : "status-good");
+}
+
+function setStage(text){
+  document.getElementById("stageText").textContent = text;
+}
+
+function markTimeline(step){
+  const nodes = [
+    document.getElementById("timeline1"),
+    document.getElementById("timeline2"),
+    document.getElementById("timeline3"),
+    document.getElementById("timeline4")
+  ];
+
+  nodes.forEach((node, index) => {
+    node.classList.remove("done", "active");
+    if(index + 1 < step){
+      node.classList.add("done");
+    }else if(index + 1 === step){
+      node.classList.add("active");
+    }
+  });
+}
+
+function markVisual(step){
+  const visualSteps = [
+    document.getElementById("visualStep1"),
+    document.getElementById("visualStep2"),
+    document.getElementById("visualStep3")
+  ];
+
+  visualSteps.forEach((item, index) => {
+    item.classList.remove("active");
+    if(index + 1 === step){
+      item.classList.add("active");
+    }
+  });
+
+  document.getElementById("step1Box").classList.toggle("active", step === 1);
+  document.getElementById("step2Box").classList.toggle("active", step === 2);
+  document.getElementById("step3Box").classList.toggle("active", step === 3);
+}
+
+async function postJSON(url, body){
+  const res = await fetch(url, {
+    method: "POST",
+    headers: {"Content-Type":"application/json"},
+    body: JSON.stringify(body)
+  });
+  const data = await res.json().catch(()=> ({}));
+  if(!res.ok) throw new Error(data.error || ("HTTP " + res.status));
+  return data;
+}
+
+document.getElementById("connectBtn").addEventListener("click", async () => {
+  try{
+    if(!window.ethereum) {
+      setStatus("MetaMask not found. Please install the MetaMask extension.", true);
+      return;
+    }
+
+    setStatus("Opening MetaMask to connect wallet...");
+    const accounts = await window.ethereum.request({ method: "eth_requestAccounts" });
+    walletAddress = accounts[0];
+
+    document.getElementById("walletText").textContent = walletAddress;
+    document.getElementById("nonceBtn").disabled = false;
+
+    setStage("Wallet connected - ready to request challenge");
+    setStatus("Wallet connected successfully.");
+    markTimeline(2);
+    markVisual(2);
+  }catch(e){
+    setStatus(e.message, true);
+  }
+});
+
+document.getElementById("nonceBtn").addEventListener("click", async () => {
+  try{
+    setStatus("Requesting challenge from server...");
+    const data = await postJSON("/wallet-login/nonce", { wallet_address: walletAddress });
+    challenge = data.challenge;
+
+    document.getElementById("challengeBox").value = challenge;
+    document.getElementById("signBtn").disabled = false;
+
+    setStage("Challenge received - ready for signature");
+    setStatus("Challenge received. Review it and sign with MetaMask.");
+    markTimeline(3);
+    markVisual(2);
+    document.getElementById("step2Box").classList.add("active");
+    document.getElementById("step3Box").classList.add("active");
+  }catch(e){
+    setStatus(e.message, true);
+  }
+});
+
+document.getElementById("signBtn").addEventListener("click", async () => {
+  try{
+    if(!challenge){
+      setStatus("No challenge to sign.", true);
+      return;
+    }
+
+    setStatus("MetaMask popup opened. Please sign the message...");
+    setStage("Awaiting wallet signature");
+    markTimeline(3);
+    markVisual(3);
+
+    const signature = await window.ethereum.request({
+      method: "personal_sign",
+      params: [challenge, walletAddress]
+    });
+
+    setStatus("Signature received. Verifying on server...");
+    setStage("Verifying signature on server");
+    markTimeline(4);
+
+    const data = await postJSON("/wallet-login/verify", {
+      wallet_address: walletAddress,
+      signature: signature
+    });
+
+    setStage("Verification successful");
+    setStatus("Login success! Redirecting to your secure dashboard...");
+    setTimeout(() => {
+      window.location.href = data.redirect;
+    }, 800);
+  }catch(e){
+    setStatus(e.message, true);
+  }
+});
+
+if(window.ethereum){
+  window.ethereum.on("accountsChanged", (accounts) => {
+    if(accounts.length){
+      walletAddress = accounts[0];
+      document.getElementById("walletText").textContent = walletAddress;
+      document.getElementById("nonceBtn").disabled = false;
+      setStage("Wallet changed - request a new challenge");
+      setStatus("Wallet account changed. Please request a fresh challenge.");
+      markTimeline(2);
+      markVisual(2);
+      challenge = "";
+      document.getElementById("challengeBox").value = "";
+      document.getElementById("signBtn").disabled = true;
+    }else{
+      walletAddress = "";
+      challenge = "";
+      document.getElementById("walletText").textContent = "Not connected";
+      document.getElementById("challengeBox").value = "";
+      document.getElementById("nonceBtn").disabled = true;
+      document.getElementById("signBtn").disabled = true;
+      setStage("Waiting for wallet connection");
+      setStatus("Wallet disconnected.", true);
+      markTimeline(1);
+      markVisual(1);
+    }
+  });
+}
+</script>
+
+</body>
+</html>

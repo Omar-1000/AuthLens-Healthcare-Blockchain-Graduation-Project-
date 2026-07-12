@@ -1,0 +1,526 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Doctor Verification | E-Health</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <style>
+        *{box-sizing:border-box;margin:0;padding:0;font-family:"Segoe UI",Tahoma,Geneva,Verdana,sans-serif;}
+        body{
+            min-height:100vh;
+            background:linear-gradient(145deg,#eef8f7 0%, #e4f2f1 45%, #d8ebe9 100%);
+            color:#123536;
+        }
+        .top-bar{
+            background:#0b6767;
+            border-bottom:1px solid rgba(255,255,255,.08);
+        }
+        .container{width:min(1180px,94vw);margin:0 auto;}
+        .top-nav{
+            display:flex;
+            justify-content:flex-end;
+            gap:24px;
+            padding:14px 0;
+            flex-wrap:wrap;
+        }
+        .top-nav a{
+            text-decoration:none;
+            color:#efffff;
+            font-size:14px;
+            font-weight:600;
+        }
+        .top-nav a:hover{color:#b4f2ee;}
+        .main-header{
+            background:rgba(255,255,255,.76);
+            border-bottom:1px solid #d7e8e7;
+            backdrop-filter:blur(10px);
+        }
+        .header-content{
+            display:flex;
+            align-items:center;
+            justify-content:space-between;
+            padding:18px 0;
+        }
+        .logo{
+            display:flex;
+            align-items:center;
+            gap:14px;
+            text-decoration:none;
+        }
+        .logo-badge{
+            width:50px;
+            height:50px;
+            border-radius:16px;
+            display:flex;
+            align-items:center;
+            justify-content:center;
+            background:linear-gradient(135deg,#0ca4a0 0%, #0a6870 100%);
+            color:#fff;
+            font-size:22px;
+            box-shadow:0 12px 22px rgba(10,104,112,.14);
+        }
+        .logo-copy strong{
+            display:block;
+            color:#103e40;
+            font-size:28px;
+            line-height:1;
+        }
+        .logo-copy span{
+            display:block;
+            margin-top:6px;
+            color:#5f7a79;
+            font-size:13px;
+        }
+        .page{
+            width:min(1180px,94vw);
+            margin:28px auto 36px;
+            display:grid;
+            grid-template-columns:320px minmax(0,1fr);
+            gap:22px;
+            align-items:start;
+        }
+        .side-card,.form-card{
+            background:rgba(255,255,255,.86);
+            border:1px solid #d6e8e6;
+            border-radius:28px;
+            box-shadow:0 22px 48px rgba(5,54,53,.08);
+            backdrop-filter:blur(12px);
+        }
+        .side-card{
+            padding:30px;
+            background:
+                radial-gradient(circle at top right, rgba(168,244,232,.18), transparent 0 24%),
+                linear-gradient(150deg, rgba(8,95,95,.98) 0%, rgba(10,124,122,.96) 48%, rgba(21,76,96,.95) 100%);
+            color:#fff;
+            position:relative;
+            overflow:hidden;
+        }
+        .side-card::before{
+            content:"";
+            position:absolute;
+            width:240px;
+            height:240px;
+            right:-70px;
+            top:-90px;
+            border-radius:50%;
+            background:rgba(255,255,255,.08);
+        }
+        .side-kicker{
+            display:inline-flex;
+            align-items:center;
+            gap:8px;
+            padding:10px 14px;
+            border-radius:999px;
+            background:rgba(255,255,255,.10);
+            border:1px solid rgba(255,255,255,.14);
+            color:#dffdf7;
+            font-size:12px;
+            font-weight:800;
+            letter-spacing:.08em;
+            text-transform:uppercase;
+            margin-bottom:18px;
+            position:relative;
+            z-index:1;
+        }
+        .side-kicker-dot{
+            width:9px;
+            height:9px;
+            border-radius:50%;
+            background:#aef0ec;
+            box-shadow:0 0 0 0 rgba(174,240,236,.55);
+            animation:pulse 1.8s infinite;
+        }
+        @keyframes pulse{
+            0%{box-shadow:0 0 0 0 rgba(174,240,236,.55);}
+            70%{box-shadow:0 0 0 12px rgba(174,240,236,0);}
+            100%{box-shadow:0 0 0 0 rgba(174,240,236,0);}
+        }
+        .side-card h1{
+            font-size:44px;
+            line-height:1;
+            color:#fff;
+            margin-bottom:16px;
+            position:relative;
+            z-index:1;
+        }
+        .side-card h1 span{color:#9df2e8;}
+        .side-card p{
+            color:#dbfbf7;
+            font-size:14px;
+            line-height:1.85;
+            margin-bottom:22px;
+            position:relative;
+            z-index:1;
+        }
+        .step-list{
+            display:grid;
+            gap:12px;
+            position:relative;
+            z-index:1;
+        }
+        .step{
+            padding:14px 15px;
+            border-radius:18px;
+            background:rgba(255,255,255,.08);
+            border:1px solid rgba(255,255,255,.10);
+        }
+        .step strong{
+            display:block;
+            color:#fff;
+            font-size:14px;
+            margin-bottom:4px;
+        }
+        .step span{
+            display:block;
+            color:#dbfbf7;
+            font-size:13px;
+            line-height:1.6;
+        }
+        .pending-note{
+            margin-top:18px;
+            padding:14px 15px;
+            border-radius:18px;
+            background:rgba(255,255,255,.10);
+            border:1px solid rgba(255,255,255,.12);
+            color:#dbfbf7;
+            font-size:13px;
+            line-height:1.7;
+            position:relative;
+            z-index:1;
+        }
+        .form-card{
+            padding:30px;
+        }
+        .form-top{
+            margin-bottom:22px;
+        }
+        .form-top h2{
+            font-size:32px;
+            color:#103c3d;
+            margin-bottom:8px;
+        }
+        .form-top p{
+            color:#617c7b;
+            font-size:14px;
+            line-height:1.75;
+            max-width:62ch;
+        }
+        .error-box{
+            margin-bottom:18px;
+            padding:14px 16px;
+            border-radius:18px;
+            background:#fff2f2;
+            border:1px solid #efc8c8;
+            color:#b13c3c;
+            font-size:14px;
+            font-weight:700;
+            line-height:1.6;
+        }
+        .field{
+            margin-bottom:18px;
+        }
+        .field label{
+            display:block;
+            margin-bottom:9px;
+            color:#133b3d;
+            font-size:13px;
+            font-weight:800;
+            letter-spacing:.04em;
+            text-transform:uppercase;
+        }
+        .field input[type="text"]{
+            width:100%;
+            padding:16px 18px;
+            border:1px solid #d5e7e5;
+            border-radius:18px;
+            background:#fff;
+            font-size:15px;
+            color:#13373a;
+            outline:none;
+            transition:.22s ease;
+        }
+        .field input[type="text"]:focus{
+            border-color:#0ca4a0;
+            box-shadow:0 0 0 4px rgba(12,164,160,.10);
+        }
+        .upload-grid{
+            display:grid;
+            grid-template-columns:1fr 1fr;
+            gap:16px;
+            margin-bottom:18px;
+        }
+        .upload-card{
+            position:relative;
+            border:1px solid #d6e8e6;
+            border-radius:24px;
+            background:linear-gradient(180deg,#ffffff 0%, #f8fcfc 100%);
+            padding:18px;
+            min-height:218px;
+            display:flex;
+            flex-direction:column;
+            justify-content:space-between;
+            overflow:hidden;
+        }
+        .upload-card::before{
+            content:"";
+            position:absolute;
+            inset:0 auto auto 0;
+            width:100%;
+            height:5px;
+            background:linear-gradient(90deg,#0ca4a0 0%, #6ad0aa 100%);
+        }
+        .upload-card-head{
+            display:flex;
+            align-items:flex-start;
+            justify-content:space-between;
+            gap:12px;
+        }
+        .upload-card-head strong{
+            display:block;
+            color:#12383b;
+            font-size:18px;
+            margin-bottom:6px;
+        }
+        .upload-card-head span{
+            display:block;
+            color:#627d7c;
+            font-size:13px;
+            line-height:1.65;
+        }
+        .upload-mark{
+            width:54px;
+            height:54px;
+            border-radius:18px;
+            background:linear-gradient(135deg,#e9faf6 0%, #d8f2ea 100%);
+            display:flex;
+            align-items:center;
+            justify-content:center;
+            color:#16886d;
+            font-size:24px;
+            flex-shrink:0;
+        }
+        .upload-card input[type="file"]{
+            position:absolute;
+            inset:0;
+            opacity:0;
+            cursor:pointer;
+        }
+        .upload-drop{
+            position:relative;
+            z-index:1;
+            margin-top:18px;
+            min-height:110px;
+            border:1.5px dashed #bfdcda;
+            border-radius:18px;
+            background:#fbfefe;
+            display:grid;
+            place-items:center;
+            padding:16px;
+            text-align:center;
+            color:#62807f;
+        }
+        .upload-drop strong{
+            display:block;
+            color:#1b4a4c;
+            font-size:14px;
+            margin-bottom:6px;
+        }
+        .upload-drop small{
+            display:block;
+            font-size:12px;
+            line-height:1.6;
+        }
+        .file-name{
+            margin-top:12px;
+            color:#186f67;
+            font-size:13px;
+            font-weight:700;
+            word-break:break-word;
+        }
+        .submit-row{
+            display:flex;
+            align-items:center;
+            justify-content:space-between;
+            gap:16px;
+            flex-wrap:wrap;
+            margin-top:10px;
+        }
+        .submit-copy{
+            color:#5f7978;
+            font-size:13px;
+            line-height:1.7;
+            max-width:44ch;
+        }
+        .submit-btn{
+            border:none;
+            border-radius:18px;
+            padding:16px 24px;
+            min-width:240px;
+            background:linear-gradient(135deg,#0ca4a0 0%, #0a6870 100%);
+            color:#fff;
+            font-size:15px;
+            font-weight:900;
+            cursor:pointer;
+            box-shadow:0 16px 28px rgba(10,104,112,.16);
+            transition:.24s ease;
+        }
+        .submit-btn:hover{
+            transform:translateY(-2px);
+            box-shadow:0 20px 34px rgba(10,104,112,.22);
+        }
+        @media (max-width:980px){
+            .page{grid-template-columns:1fr;}
+        }
+        @media (max-width:760px){
+            .top-nav{justify-content:center;gap:16px;}
+            .page{width:min(96vw,1180px);margin:16px auto 22px;gap:16px;}
+            .side-card,.form-card{padding:22px;border-radius:22px;}
+            .side-card h1,.form-top h2{font-size:28px;}
+            .upload-grid{grid-template-columns:1fr;}
+            .submit-btn{width:100%;min-width:0;}
+        }
+    </style>
+</head>
+<body>
+    <div class="top-bar">
+        <div class="container">
+            <nav class="top-nav">
+                <a href="{{ url_for('home') }}">Home</a>
+                <a href="{{ url_for('login') }}">Login</a>
+                <a href="#">Contact Us</a>
+            </nav>
+        </div>
+    </div>
+
+    <header class="main-header">
+        <div class="container">
+            <div class="header-content">
+                <a href="{{ url_for('home') }}" class="logo">
+                    <div class="logo-badge">🩺</div>
+                    <div class="logo-copy">
+                        <strong>E-Health</strong>
+                        <span>Doctor verification</span>
+                    </div>
+                </a>
+            </div>
+        </div>
+    </header>
+
+    <section class="page">
+        <aside class="side-card">
+            <div class="side-kicker">
+                <span class="side-kicker-dot"></span>
+                Clinical verification lane
+            </div>
+            <h1>Finish <span>verification</span></h1>
+            <p>Complete this last step to send your doctor account for review.</p>
+
+            <div class="step-list">
+                <div class="step">
+                    <strong>1. Add medical ID number</strong>
+                    <span>Enter the same ID used in your professional registration.</span>
+                </div>
+                <div class="step">
+                    <strong>2. Upload ID card photo</strong>
+                    <span>Use a clear image that can be reviewed easily.</span>
+                </div>
+                <div class="step">
+                    <strong>3. Upload medical ID photo</strong>
+                    <span>Submit your medical identification or license image.</span>
+                </div>
+            </div>
+
+            <div class="pending-note">
+                After submission, your doctor account will stay pending until an admin approves it.
+            </div>
+        </aside>
+
+        <div class="form-card">
+            <div class="form-top">
+                <h2>Doctor Verification</h2>
+                <p>Upload the required details below. Keep the documents clear and readable.</p>
+            </div>
+
+            {% if error %}
+                <div class="error-box">{{ error }}</div>
+            {% endif %}
+
+            <form method="POST" action="{{ url_for('doctor_verification') }}" enctype="multipart/form-data">
+                <div class="field">
+                    <label for="medical_id_number">Medical ID Number</label>
+                    <input
+                        type="text"
+                        id="medical_id_number"
+                        name="medical_id_number"
+                        placeholder="Enter your medical ID number"
+                        value="{{ request.form.get('medical_id_number', '') }}"
+                        required
+                    >
+                </div>
+
+                <div class="upload-grid">
+                    <label class="upload-card">
+                        <input type="file" name="id_card_photo" id="idCardPhoto" accept="image/*" required>
+                        <div class="upload-card-head">
+                            <div>
+                                <strong>ID Card Photo</strong>
+                                <span>Upload a clear image of your government or national ID card.</span>
+                            </div>
+                            <div class="upload-mark">🪪</div>
+                        </div>
+                        <div>
+                            <div class="upload-drop">
+                                <div>
+                                    <strong>Choose or drop a file</strong>
+                                    <small>Front side, readable, and well lit for faster review.</small>
+                                </div>
+                            </div>
+                            <div class="file-name" id="idCardPhotoName">No file selected yet.</div>
+                        </div>
+                    </label>
+
+                    <label class="upload-card">
+                        <input type="file" name="medical_id_photo" id="medicalIdPhoto" accept="image/*" required>
+                        <div class="upload-card-head">
+                            <div>
+                                <strong>Medical ID Photo</strong>
+                                <span>Upload your medical identification or licensing image.</span>
+                            </div>
+                            <div class="upload-mark">📄</div>
+                        </div>
+                        <div>
+                            <div class="upload-drop">
+                                <div>
+                                    <strong>Choose or drop a file</strong>
+                                    <small>Keep the text visible and avoid cropped or blurred photos.</small>
+                                </div>
+                            </div>
+                            <div class="file-name" id="medicalIdPhotoName">No file selected yet.</div>
+                        </div>
+                    </label>
+                </div>
+
+                <div class="submit-row">
+                    <div class="submit-copy">
+                        Only image files are accepted: png, jpg, jpeg, and webp.
+                    </div>
+                    <button class="submit-btn" type="submit">Submit Verification</button>
+                </div>
+            </form>
+        </div>
+    </section>
+    <script>
+        function bindFileName(inputId, outputId) {
+            const input = document.getElementById(inputId);
+            const output = document.getElementById(outputId);
+            if (!input || !output) return;
+            input.addEventListener("change", function () {
+                output.textContent = input.files && input.files.length ? input.files[0].name : "No file selected yet.";
+            });
+        }
+        bindFileName("idCardPhoto", "idCardPhotoName");
+        bindFileName("medicalIdPhoto", "medicalIdPhotoName");
+    </script>
+</body>
+</html>

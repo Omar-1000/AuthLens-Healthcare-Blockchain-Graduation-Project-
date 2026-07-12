@@ -1,0 +1,1248 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Patient Dashboard | E-Health</title>
+<link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+<style>
+*{box-sizing:border-box;margin:0;padding:0;font-family:"Segoe UI",Tahoma,Geneva,Verdana,sans-serif;}
+html{scroll-behavior:smooth;}
+body{
+  min-height:100vh;
+  background:
+    radial-gradient(circle at top left, rgba(255,255,255,.94), transparent 24%),
+    radial-gradient(circle at 86% 8%, rgba(198,233,228,.42), transparent 18%),
+    radial-gradient(circle at 18% 88%, rgba(167,213,208,.25), transparent 22%),
+    linear-gradient(145deg,#f5fbfa 0%, #edf7f6 48%, #e3f0ef 100%);
+  color:#17393a;
+}
+a{text-decoration:none;color:inherit;}
+code{
+  background:#f1f8f7;
+  border:1px solid #dceaea;
+  border-radius:10px;
+  padding:2px 7px;
+  word-break:break-all;
+}
+.page{
+  width:calc(100vw - 24px);
+  max-width:none;
+  margin:12px auto 24px;
+}
+.topbar{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:16px;
+  padding:18px 22px;
+  border-radius:26px;
+  background:rgba(255,255,255,.8);
+  border:1px solid rgba(220,234,232,.94);
+  box-shadow:0 18px 38px rgba(0,77,77,.08);
+  backdrop-filter:blur(14px);
+  margin-bottom:18px;
+}
+.topbar-left{display:flex;align-items:center;gap:14px;min-width:0;}
+.brand{
+  width:50px;height:50px;border-radius:16px;display:flex;align-items:center;justify-content:center;
+  background:linear-gradient(135deg,#0d8c8c 0%, #0f5e6a 100%);
+  color:#fff;font-size:24px;font-weight:900;flex-shrink:0;
+  box-shadow:0 14px 30px rgba(13,108,112,.18);
+}
+.topbar-copy{min-width:0;}
+.topbar-copy h1{font-size:22px;line-height:1.1;margin-bottom:4px;}
+.topbar-copy p{color:#607a7a;font-size:13px;line-height:1.6;}
+.topbar-nav{
+  display:flex;
+  align-items:center;
+  gap:10px;
+  flex-wrap:wrap;
+  justify-content:flex-end;
+}
+.topbar-nav a{
+  padding:10px 14px;
+  border-radius:999px;
+  background:rgba(255,255,255,.92);
+  border:1px solid rgba(220,234,232,.95);
+  color:#27595b;
+  font-size:13px;
+  font-weight:800;
+  transition:transform .16s ease, box-shadow .16s ease, background .16s ease;
+}
+.topbar-nav a:hover{
+  transform:translateY(-1px);
+  box-shadow:0 8px 18px rgba(0,77,77,.08);
+}
+.hero{
+  display:grid;
+  grid-template-columns:minmax(0,1.15fr) minmax(320px,.85fr);
+  gap:18px;
+  align-items:stretch;
+  margin-bottom:18px;
+}
+.hero-card,.panel,.metric,.callout{
+  background:rgba(255,255,255,.84);
+  border:1px solid rgba(220,234,232,.92);
+  border-radius:28px;
+  box-shadow:0 18px 36px rgba(0,77,77,.07);
+  backdrop-filter:blur(12px);
+}
+.hero-copy{
+  padding:30px;
+  background:
+    radial-gradient(circle at top left, rgba(255,255,255,.92), transparent 28%),
+    linear-gradient(145deg, rgba(255,255,255,.96) 0%, rgba(237,248,247,.96) 58%, rgba(223,240,238,.98) 100%);
+}
+.eyebrow{
+  display:inline-flex;
+  padding:8px 12px;
+  border-radius:999px;
+  background:#edf7f6;
+  color:#416c6b;
+  font-size:11px;
+  font-weight:800;
+  letter-spacing:.12em;
+  text-transform:uppercase;
+  margin-bottom:16px;
+}
+.hero-copy h2{
+  font-size:46px;
+  line-height:.98;
+  margin-bottom:12px;
+  max-width:12ch;
+}
+.hero-copy p{
+  display:none;
+}
+.hero-actions{
+  display:flex;
+  gap:10px;
+  flex-wrap:wrap;
+  margin-top:18px;
+}
+.btn{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  gap:8px;
+  padding:12px 16px;
+  border:none;
+  border-radius:14px;
+  font-size:14px;
+  font-weight:800;
+  cursor:pointer;
+  transition:transform .16s ease, filter .16s ease, box-shadow .16s ease;
+}
+.btn:hover{transform:translateY(-1px);}
+.btn-primary{
+  background:linear-gradient(135deg,#4d9ea1 0%, #2b7b7e 100%);
+  color:#fff;
+  box-shadow:0 10px 22px rgba(43,123,126,.18);
+}
+.btn-secondary{
+  background:#f3f9f8;
+  color:#2f5c5d;
+  border:1px solid #d8e7e5;
+}
+.hero-side{
+  display:grid;
+  gap:12px;
+}
+.hero-summary{
+  padding:22px;
+}
+.summary-top{
+  display:flex;
+  align-items:flex-start;
+  justify-content:space-between;
+  gap:12px;
+  margin-bottom:16px;
+}
+.summary-top h3{
+  font-size:20px;
+  margin-bottom:5px;
+}
+.summary-top p{
+  display:none;
+}
+.summary-mask{
+  display:inline-flex;
+  align-items:center;
+  gap:8px;
+  margin-top:12px;
+  padding:10px 12px;
+  border-radius:14px;
+  background:linear-gradient(135deg, #eef9f3 0%, #e4f4ea 100%);
+  border:1px solid #cfe8d8;
+  color:#2d5c44;
+  font-size:13px;
+  font-weight:700;
+  word-break:break-all;
+}
+.summary-mask span{
+  color:#3f7a59;
+  font-size:11px;
+  font-weight:800;
+  letter-spacing:.08em;
+  text-transform:uppercase;
+}
+.summary-chip{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  min-width:56px;
+  height:56px;
+  padding:0 14px;
+  border-radius:18px;
+  background:linear-gradient(135deg,#eaf8ef 0%, #cfead8 100%);
+  color:#25613f;
+  font-size:18px;
+  font-weight:900;
+  box-shadow:0 8px 18px rgba(53,124,78,.12);
+}
+.summary-grid{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:10px;
+}
+.summary-stat{
+  padding:14px;
+  border-radius:18px;
+  background:linear-gradient(180deg, rgba(255,255,255,.98), rgba(240,248,243,.98));
+  border:1px solid #d6e9dd;
+  box-shadow:inset 0 3px 0 rgba(60,136,86,.12);
+}
+.summary-stat span{
+  display:block;
+  color:#5b8b69;
+  font-size:11px;
+  font-weight:800;
+  letter-spacing:.08em;
+  text-transform:uppercase;
+  margin-bottom:6px;
+}
+.summary-stat strong{
+  display:block;
+  color:#1f4630;
+  font-size:22px;
+  word-break:break-word;
+}
+.summary-stat small{
+  display:block;
+  margin-top:4px;
+  color:#60806c;
+  line-height:1.5;
+}
+.stats-grid{
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:14px;
+  margin-bottom:18px;
+}
+.metric{
+  padding:18px;
+  position:relative;
+  overflow:hidden;
+}
+.metric span{
+  display:block;
+  color:#5b8b69;
+  font-size:11px;
+  font-weight:800;
+  letter-spacing:.08em;
+  text-transform:uppercase;
+  margin-bottom:10px;
+}
+.metric strong{
+  display:block;
+  color:#1f4630;
+  font-size:36px;
+  line-height:1;
+  margin-bottom:6px;
+}
+.metric::after{
+  content:"";
+  position:absolute;
+  right:14px;
+  bottom:14px;
+  width:14px;
+  height:14px;
+  border-radius:50%;
+  background:rgba(79,158,161,.16);
+  box-shadow:0 0 0 8px rgba(79,158,161,.08);
+}
+.metric::before{
+  content:"";
+  position:absolute;
+  inset:0 auto auto 0;
+  width:100%;
+  height:5px;
+  background:linear-gradient(90deg, #5fc27a 0%, #7adf98 45%, #4d9ea1 100%);
+}
+.stats-grid .metric:nth-child(2)::before{
+  background:linear-gradient(90deg, #4d9ea1 0%, #79c5cf 45%, #8fd9a8 100%);
+}
+.stats-grid .metric:nth-child(3)::before{
+  background:linear-gradient(90deg, #79c26d 0%, #a6e08f 45%, #5bbf7f 100%);
+}
+.metric p{
+  display:none;
+}
+.section-grid{
+  display:grid;
+  grid-template-columns:1.1fr .9fr;
+  gap:18px;
+  margin-bottom:18px;
+}
+.card{
+  padding:22px;
+  border-radius:26px;
+  background:rgba(255,255,255,.84);
+  border:1px solid rgba(220,234,232,.92);
+  box-shadow:0 18px 36px rgba(0,77,77,.07);
+  backdrop-filter:blur(12px);
+}
+.card h3{
+  font-size:19px;
+  font-weight:800;
+  color:#214040;
+  margin-bottom:14px;
+  padding-bottom:12px;
+  border-bottom:1px solid #e8f0ef;
+}
+.health-grid{
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:12px;
+}
+.health-box{
+  background:linear-gradient(180deg,#f4fbf6 0%, #e8f6ec 100%);
+  border:1px solid #cfe6d7;
+  border-radius:16px;
+  padding:16px;
+}
+.health-box span{
+  display:block;
+  color:#4d7c57;
+  font-size:12px;
+  margin-bottom:6px;
+  font-weight:700;
+}
+.health-box strong{
+  color:#1f4630;
+  font-size:22px;
+  word-break:break-word;
+}
+.callout{
+  display:none;
+}
+.table-wrap{
+  overflow-x:auto;
+  border:1px solid #e2eceb;
+  border-radius:18px;
+  background:#ffffff;
+}
+table{
+  width:100%;
+  min-width:760px;
+  border-collapse:collapse;
+}
+th{
+  text-align:left;
+  padding:14px 16px;
+  background:linear-gradient(180deg,#eef8f5 0%, #e5f2eb 100%);
+  color:#315252;
+  font-size:12px;
+  font-weight:900;
+  border-bottom:1px solid #dbe7e6;
+  text-transform:uppercase;
+}
+td{
+  padding:14px 16px;
+  border-bottom:1px solid #edf3f2;
+  color:#496666;
+  font-size:14px;
+  vertical-align:middle;
+}
+tr:nth-child(even) td{background:#fbfdfc;}
+tr:nth-child(odd) td{background:#ffffff;}
+tr:hover td{background:#f8fcfb;}
+.status-badge{
+  display:inline-block;
+  padding:8px 13px;
+  border-radius:999px;
+  font-size:12px;
+  font-weight:800;
+  text-transform:capitalize;
+}
+.status-pending{background:linear-gradient(135deg,#fff0b8 0%, #ffe18e 100%);color:#7b4d00;box-shadow:0 6px 12px rgba(195,152,28,.12);}
+.status-approved{background:linear-gradient(135deg,#54cf77 0%, #2fa95e 100%);color:#fff;box-shadow:0 6px 14px rgba(47,169,94,.16);}
+.status-rejected{background:linear-gradient(135deg,#f18a8a 0%, #d85d5d 100%);color:#fff;box-shadow:0 6px 14px rgba(216,93,93,.16);}
+.status-patient{background:linear-gradient(135deg,#dff3ea 0%, #c8ead7 100%);color:#205a5c;box-shadow:0 6px 12px rgba(64,139,95,.12);}
+.empty-text{
+  font-size:13px;
+  line-height:1.7;
+  color:#688382;
+}
+.notice-list{list-style:none;}
+.notice-list li{
+  display:flex;
+  align-items:flex-start;
+  gap:10px;
+  padding:12px 0;
+  border-bottom:1px solid #edf3f2;
+  color:#456565;
+  font-size:14px;
+}
+.notice-list li:last-child{border-bottom:none;}
+.dot{
+  width:10px;
+  height:10px;
+  border-radius:50%;
+  margin-top:6px;
+  flex-shrink:0;
+  background:#c2d7d5;
+}
+.dot.red{background:#e06161;}
+.dot.green{background:#3aa46d;}
+.dot.teal{background:#0d8c8c;}
+.medicine-list{display:grid;gap:12px;}
+.medicine-item{
+  background:#fbfefe;
+  border:1px solid #e4eeee;
+  border-radius:16px;
+  padding:16px;
+}
+.medicine-item h4{
+  color:#183333;
+  font-size:16px;
+  margin-bottom:6px;
+}
+.medicine-item p{
+  color:#617d7d;
+  line-height:1.6;
+  font-size:14px;
+  margin-bottom:4px;
+}
+.verification-box{
+  background:#edf8f3;
+  border:1px solid #d6eadc;
+  border-radius:18px;
+  padding:16px;
+}
+.verification-box p{
+  color:#25553c;
+  margin-bottom:8px;
+  font-size:14px;
+  line-height:1.65;
+}
+.verification-box p:last-child{margin-bottom:0;}
+.chat-layout{
+  display:grid;
+  grid-template-columns:290px 1fr;
+  gap:18px;
+}
+.chat-panel{
+  padding:24px;
+}
+.chat-panel h3{
+  margin-bottom:8px;
+}
+.chat-panel .empty-text{
+  margin-bottom:14px;
+}
+.chat-panel-grid{
+  display:grid;
+  grid-template-columns:300px 1fr;
+  gap:16px;
+  align-items:stretch;
+}
+.chat-sidebar{
+  border:1px solid #d9e8e6;
+  border-radius:20px;
+  background:linear-gradient(180deg, rgba(248,252,252,.98), rgba(241,247,247,.98));
+  overflow:hidden;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.75);
+}
+.chat-contact{
+  display:block;
+  padding:14px 15px;
+  text-decoration:none;
+  color:#1e3333;
+  border-bottom:1px solid #e3eeed;
+}
+.chat-contact-head{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:10px;
+}
+.chat-contact:last-child{border-bottom:none;}
+.chat-contact.active{
+  background:linear-gradient(135deg,#eef9f8 0%, #e2f4ea 100%);
+  box-shadow:inset 3px 0 0 #0b7775;
+}
+.chat-contact strong{display:block;font-size:14px;}
+.chat-contact small{
+  display:block;
+  color:#668282;
+  margin-top:4px;
+  line-height:1.45;
+}
+.presence-badge{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  min-width:54px;
+  padding:5px 10px;
+  border-radius:999px;
+  font-size:11px;
+  font-weight:800;
+  letter-spacing:.04em;
+  text-transform:uppercase;
+}
+.presence-online{
+  background:linear-gradient(135deg,#54cf77 0%, #2fa95e 100%);
+  color:#fff;
+}
+.presence-offline{
+  background:linear-gradient(135deg,#edf3f2 0%, #dde8e6 100%);
+  color:#5d7675;
+}
+.chat-window{
+  border:1px solid #d9e8e6;
+  border-radius:20px;
+  background:linear-gradient(180deg, #ffffff 0%, #f9fcfb 100%);
+  padding:18px;
+  min-height:360px;
+}
+.chat-window h4{
+  font-size:18px;
+  margin-bottom:4px;
+}
+.chat-meta{
+  display:flex;
+  align-items:center;
+  gap:8px;
+  color:#648483;
+  font-size:12px;
+  margin-top:6px;
+}
+.chat-thread{
+  max-height:420px;
+  overflow-y:auto;
+  padding-right:6px;
+  margin:14px 0 16px;
+}
+.chat-empty{
+  height:100%;
+  display:grid;
+  place-items:center;
+  text-align:center;
+  padding:24px;
+}
+.message-row{display:flex;margin-bottom:12px;}
+.message-row.mine{justify-content:flex-end;}
+.message-bubble{
+  max-width:72%;
+  padding:12px 14px;
+  border-radius:18px;
+  background:#eef5f5;
+  color:#214040;
+  line-height:1.6;
+}
+.message-row.mine .message-bubble{
+  background:linear-gradient(135deg,#4d9ea1 0%, #2b7b7e 100%);
+  color:#fff;
+}
+.message-time{
+  display:block;
+  margin-top:6px;
+  font-size:11px;
+  opacity:0.72;
+}
+.chat-form textarea{
+  width:100%;
+  min-height:96px;
+  resize:vertical;
+  border:1px solid #d7e8e6;
+  border-radius:16px;
+  padding:14px 15px;
+  font:inherit;
+  outline:none;
+}
+.chat-form textarea:focus{
+  border-color:#0b7775;
+  box-shadow:0 0 0 3px rgba(0,77,77,0.08);
+}
+.chat-form .btn{margin-top:12px;}
+.chat-sending{
+  min-height:16px;
+  margin-top:8px;
+  font-size:12px;
+  font-weight:700;
+  color:#5b8b69;
+}
+.action-row{
+  display:flex;
+  gap:10px;
+  flex-wrap:wrap;
+}
+.logout-link{
+  display:inline-flex;
+  margin-top:18px;
+  padding:12px 16px;
+  border-radius:14px;
+  background:#fff;
+  border:1px solid #d8e7e5;
+  color:#2f5c5d;
+  font-weight:800;
+  box-shadow:0 10px 20px rgba(0,77,77,.05);
+}
+.logout-link:hover{transform:translateY(-1px);}
+.session-timer-popup{
+  position:fixed;
+  left:22px;
+  top:22px;
+  width:min(300px, calc(100vw - 32px));
+  background:linear-gradient(145deg, rgba(0,77,77,0.92), rgba(12,122,112,0.92));
+  color:#fff;
+  border-radius:18px;
+  padding:14px 16px;
+  transition:opacity 0.25s ease, transform 0.25s ease, visibility 0.25s ease;
+  opacity:0;
+  visibility:hidden;
+  transform:translateY(-6px);
+}
+.session-timer-popup.visible{
+  opacity:1;
+  visibility:visible;
+  transform:translateY(0);
+}
+.session-timer-popup h4{
+  margin:0 0 6px;
+  font-size:1rem;
+  letter-spacing:0.01em;
+}
+.session-timer-popup p{
+  margin:0;
+  font-size:0.92rem;
+  line-height:1.45;
+  color:rgba(255,255,255,0.88);
+}
+.session-timer-value{
+  display:inline-block;
+  margin-top:10px;
+  letter-spacing:0.04em;
+  font-weight:800;
+}
+.session-timer-popup.warning{
+  background:linear-gradient(145deg, rgba(133,54,18,0.96), rgba(194,92,27,0.96));
+}
+  @media (max-width:1180px){
+    .hero,.section-grid,.chat-layout{grid-template-columns:1fr;}
+    .chat-panel-grid{grid-template-columns:1fr;}
+    .stats-grid{grid-template-columns:repeat(2,1fr);}
+    .health-grid{grid-template-columns:repeat(2,1fr);}
+  }
+@media (max-width:760px){
+  .page{width:calc(100vw - 16px);margin:10px auto 20px;}
+  .topbar{padding:16px;border-radius:22px;align-items:flex-start;flex-direction:column;}
+  .topbar-nav{width:100%;justify-content:flex-start;}
+  .hero-copy{padding:22px;}
+  .hero-copy h2{font-size:32px;max-width:none;}
+  .hero-summary{padding:18px;}
+  .summary-grid,.stats-grid,.health-grid{grid-template-columns:1fr;}
+  .metric strong{font-size:30px;}
+    .card{padding:18px;}
+    .chat-window{padding:16px;}
+    .message-bubble{max-width:88%;}
+  }
+</style>
+</head>
+<body>
+  <div class="page">
+    <header class="topbar">
+      <div class="topbar-left">
+        <div class="brand">E</div>
+        <div class="topbar-copy">
+          <h1>Patient Dashboard</h1>
+        </div>
+      </div>
+      <nav class="topbar-nav">
+        <a href="#overview">Overview</a>
+        <a href="#requests-table">Requests</a>
+        <a href="#records-table">Records</a>
+        <a href="#chat-panel">Messages</a>
+        <a href="{{ url_for('patient_home') }}">Home</a>
+        <a href="{{ url_for('logout') }}">Logout</a>
+      </nav>
+    </header>
+
+    <section class="hero" id="overview">
+      <div class="hero-card hero-copy">
+        <div class="eyebrow">Patient Dashboard</div>
+        <h2>Welcome back, {{ name }}</h2>
+        <div class="hero-actions">
+          <a class="btn btn-primary" href="#requests-table">Review Requests</a>
+          <a class="btn btn-secondary" href="#chat-panel">Open Messages</a>
+          <a class="btn btn-secondary" href="#records-table">View Records</a>
+        </div>
+      </div>
+
+      <div class="hero-side">
+        <div class="hero-card hero-summary">
+          <div class="summary-top">
+            <div>
+              <div class="eyebrow" style="margin-bottom:10px;">Today</div>
+              <h3>{{ name }}</h3>
+              <div class="summary-mask"><span>Privacy ID</span>{{ hashed_id|mask_hash }}</div>
+            </div>
+            <div class="summary-chip">{{ requests_list | selectattr('status', 'equalto', 'pending') | list | length }}</div>
+          </div>
+          <div class="summary-grid">
+            <div class="summary-stat">
+              <span>Status</span>
+              <strong>{{ 'Approved' if requests_list else 'Active' }}</strong>
+            </div>
+            <div class="summary-stat">
+              <span>Messages</span>
+              <strong>{{ chat_contacts|length if chat_contacts else 0 }}</strong>
+            </div>
+            <div class="summary-stat">
+              <span>Appointments</span>
+              <strong>{{ appointments|length if appointments else 0 }}</strong>
+            </div>
+            <div class="summary-stat">
+              <span>Requests</span>
+              <strong>{{ requests_list|length if requests_list else 0 }}</strong>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="stats-grid">
+      <div class="metric">
+        <span>Appointments</span>
+        <strong>{{ appointments|length if appointments else 0 }}</strong>
+        <p>Approved visits and upcoming appointments.</p>
+      </div>
+      <div class="metric">
+        <span>Access Requests</span>
+        <strong>{{ requests_list|length if requests_list else 0 }}</strong>
+        <p>Doctor requests waiting for your approval.</p>
+      </div>
+      <div class="metric">
+        <span>Prescriptions</span>
+        <strong>{{ prescriptions|length if prescriptions else 0 }}</strong>
+        <p>Medicine notes from your doctors.</p>
+      </div>
+    </section>
+
+    <section class="section-grid">
+      <div class="card">
+        <h3>Health Snapshot</h3>
+        <div class="health-grid">
+          <div class="health-box">
+            <span>Upcoming Visits</span>
+            <strong>{{ appointments|selectattr('status', 'equalto', 'approved')|list|length if appointments else 0 }}</strong>
+          </div>
+          <div class="health-box">
+            <span>Doctor Chat</span>
+            <strong>{{ chat_contacts|length if chat_contacts else 0 }}</strong>
+          </div>
+          <div class="health-box">
+            <span>Pending Approvals</span>
+            <strong>{{ requests_list|selectattr('status', 'equalto', 'pending')|list|length if requests_list else 0 }}</strong>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <h3>What Needs Attention</h3>
+        {% if requests_list or appointments or prescriptions %}
+          <ul class="notice-list">
+            {% set pending_reqs = requests_list | selectattr('status', 'equalto', 'pending') | list if requests_list else [] %}
+            {% if pending_reqs %}
+              <li>
+                <span class="dot red"></span>
+                <span>{{ pending_reqs|length }} doctor access request{% if pending_reqs|length != 1 %}s{% endif %} waiting for your approval.</span>
+              </li>
+            {% endif %}
+
+            {% set approved_appts = appointments | selectattr('status', 'equalto', 'approved') | list if appointments else [] %}
+            {% if approved_appts %}
+              <li>
+                <span class="dot teal"></span>
+                <span>{{ approved_appts|length }} approved appointment{% if approved_appts|length != 1 %}s{% endif %} coming up.</span>
+              </li>
+            {% endif %}
+
+            {% if prescriptions %}
+              <li>
+                <span class="dot green"></span>
+                <span>{{ prescriptions|length }} prescription{% if prescriptions|length != 1 %}s{% endif %} available to review.</span>
+              </li>
+            {% endif %}
+          </ul>
+        {% else %}
+          <div class="callout" style="display:block;">
+            <p>No attention needed right now. Your dashboard is calm and up to date.</p>
+          </div>
+        {% endif %}
+      </div>
+    </section>
+
+  <section class="card" style="margin-bottom:18px;">
+    <h3>Upcoming Appointment Events</h3>
+      {% set approved_appointments = appointments | selectattr('status', 'equalto', 'approved') | list if appointments else [] %}
+      {% if approved_appointments %}
+        <div class="table-wrap">
+          <table>
+            <tr>
+              <th>Doctor</th>
+              <th>Date</th>
+              <th>Status</th>
+            </tr>
+            {% for appt in approved_appointments %}
+            <tr>
+              <td>{{ appt.doctor_name }}</td>
+              <td>{{ appt.appointment_date or 'To be scheduled' }}</td>
+              <td><span class="status-badge status-approved">approved</span></td>
+            </tr>
+            {% endfor %}
+          </table>
+        </div>
+      {% else %}
+        <p class="empty-text">No approved appointments yet.</p>
+      {% endif %}
+    </section>
+
+    <section class="card" style="margin-top:18px;">
+      <h3>Recent Activity</h3>
+      <ul class="notice-list">
+        {% if requests_list %}
+          {% set pending_reqs = requests_list | selectattr('status', 'equalto', 'pending') | list %}
+          {% if pending_reqs %}
+            <li>
+              <span class="dot red"></span>
+              <span>{{ pending_reqs|length }} access request{% if pending_reqs|length != 1 %}s{% endif %} waiting for your response.</span>
+            </li>
+          {% endif %}
+        {% endif %}
+
+        {% if records %}
+          <li>
+            <span class="dot teal"></span>
+            <span>Medical records are available in your file.</span>
+          </li>
+        {% endif %}
+
+        {% if prescriptions %}
+          <li>
+            <span class="dot green"></span>
+            <span>Prescriptions are ready to review.</span>
+          </li>
+        {% endif %}
+
+          {% if not requests_list and not records and not prescriptions %}
+            <li>
+              <span class="dot green"></span>
+              <span>No recent activity right now.</span>
+            </li>
+          {% endif %}
+        </ul>
+      </section>
+
+    <section class="card chat-panel" id="chat-panel" style="margin-top:18px;">
+      <h3>Doctor Chat</h3>
+      <p class="empty-text">Message your linked doctors here.</p>
+      <div class="chat-panel-grid" style="margin-top:14px;">
+        <div class="chat-sidebar">
+          {% if chat_contacts %}
+            {% for contact in chat_contacts %}
+              <a href="{{ url_for('dashboard', doctor_id=contact.id) }}#chat-panel" class="chat-contact {% if selected_chat_id == contact.id %}active{% endif %}">
+                <div class="chat-contact-head">
+                  <strong>{{ contact.name }}</strong>
+                  <span class="presence-badge {% if contact.is_online %}presence-online{% else %}presence-offline{% endif %}" id="presence-{{ contact.id }}">{{ 'online' if contact.is_online else 'offline' }}</span>
+                </div>
+                <small>{{ contact.email }}</small>
+              </a>
+            {% endfor %}
+          {% else %}
+            <div class="chat-empty">
+              <p class="empty-text">No linked doctors yet.</p>
+            </div>
+          {% endif %}
+        </div>
+
+        <div class="chat-window">
+          {% if selected_contact %}
+            <h4>{{ selected_contact.name }}</h4>
+            <div class="chat-meta">
+              <span class="presence-badge {% if selected_contact.is_online %}presence-online{% else %}presence-offline{% endif %}" id="selectedPresenceBadge">{{ 'online' if selected_contact.is_online else 'offline' }}</span>
+              <span>{{ selected_contact.email }}</span>
+            </div>
+            <div class="chat-thread">
+              {% if chat_messages %}
+                {% for msg in chat_messages %}
+                  <div class="message-row {% if msg.sender_role == 'patient' %}mine{% endif %}">
+                    <div class="message-bubble">
+                      {{ msg.message_text }}
+                      <span class="message-time">{{ msg.created_at }}</span>
+                    </div>
+                  </div>
+                {% endfor %}
+              {% else %}
+                <div class="chat-empty">
+                  <p class="empty-text">No messages yet. Start the conversation.</p>
+                </div>
+              {% endif %}
+            </div>
+            <form method="POST" action="{{ url_for('send_chat_message') }}#chat-panel" class="chat-form">
+              <input type="hidden" name="doctor_id" value="{{ selected_contact.id }}">
+              <textarea name="message_text" placeholder="Write your message to the doctor..." required></textarea>
+              <button class="btn btn-primary" type="submit">Send Message</button>
+              <div class="chat-sending" aria-live="polite"></div>
+            </form>
+          {% else %}
+            <div class="chat-empty">
+              <p class="empty-text">Select a doctor to open the chat.</p>
+            </div>
+          {% endif %}
+        </div>
+      </div>
+    </section>
+
+    <section class="section-grid">
+      <div class="card" id="medicines">
+        <h3>Medicines & Prescriptions</h3>
+        {% if prescriptions %}
+          <div class="medicine-list">
+            {% for prescription in prescriptions %}
+              <div class="medicine-item">
+                <h4>{{ prescription.medicine_name }}</h4>
+                <p><strong>Doctor:</strong> {{ prescription.doctor_name }}</p>
+                <p><strong>Dosage:</strong> {{ prescription.dosage }}</p>
+                <p>{{ prescription.instructions }}</p>
+                <p><strong>Dispense:</strong> {{ prescription.dispense_status }}{% if prescription.dispensed_at %} on {{ prescription.dispensed_at }}{% endif %}</p>
+              </div>
+            {% endfor %}
+          </div>
+        {% else %}
+          <p class="empty-text">No prescriptions have been written for you yet.</p>
+        {% endif %}
+      </div>
+
+      <div class="card">
+        <h3>Notifications</h3>
+        <ul class="notice-list">
+          {% if requests_list %}
+            {% for req in requests_list %}
+              {% if req.status == 'pending' %}
+                <li>
+                  <span class="dot red"></span>
+                  <span>Access request from {{ req.doctor_name }} is waiting for your approval.</span>
+                </li>
+              {% endif %}
+            {% endfor %}
+          {% endif %}
+
+          {% if records %}
+            <li>
+              <span class="dot teal"></span>
+              <span>A medical record is available in your file.</span>
+            </li>
+          {% endif %}
+
+          {% if not records and not requests_list %}
+            <li>
+              <span class="dot green"></span>
+              <span>No new notifications right now.</span>
+            </li>
+          {% endif %}
+        </ul>
+      </div>
+    </section>
+
+    <section class="card" id="requests-table">
+      <h3>Doctor Access Requests</h3>
+      {% if requests_list %}
+        <div class="table-wrap">
+          <table>
+            <tr>
+              <th>Doctor</th>
+              <th>Email</th>
+              <th>Request Scope</th>
+              <th>Status</th>
+              <th>Blockchain TX</th>
+              <th>Action</th>
+            </tr>
+            {% for req in requests_list %}
+            <tr>
+              <td>{{ req.doctor_name }}</td>
+              <td>{{ req.doctor_email }}</td>
+              <td>Past records + prescriptions + age/gender/email</td>
+              <td>
+                <span class="status-badge {% if req.status == 'pending' %}status-pending{% elif req.status == 'approved' %}status-approved{% else %}status-rejected{% endif %}">
+                  {{ req.status }}
+                </span>
+              </td>
+              <td>
+                {% if req.blockchain_tx_hash %}
+                  <code>{{ req.blockchain_tx_hash|mask_hash }}</code>
+                {% else %}
+                  -
+                {% endif %}
+              </td>
+              <td>
+                {% if req.status == 'pending' %}
+                  <div class="action-row">
+                    <form method="POST" action="{{ url_for('patient_approve', req_id=req.id) }}">
+                      <button class="btn btn-primary" type="submit">Approve</button>
+                    </form>
+                    <form method="POST" action="{{ url_for('patient_decline', req_id=req.id) }}">
+                      <button class="btn btn-secondary" type="submit" style="color:#8f3a3a;border-color:#e1b5b5;background:#fff5f5;">Decline</button>
+                    </form>
+                  </div>
+                {% else %}
+                  -
+                {% endif %}
+              </td>
+            </tr>
+            {% endfor %}
+          </table>
+        </div>
+      {% else %}
+        <p class="empty-text">No doctor access requests found.</p>
+      {% endif %}
+    </section>
+
+    <section class="card" id="records-table" style="margin-top:18px;">
+      <h3>My Medical Records</h3>
+      {% if records %}
+        <div class="table-wrap">
+          <table>
+            <tr>
+              <th>Record ID</th>
+              <th>Data Hash</th>
+              <th>Blockchain TX</th>
+              <th>Created</th>
+            </tr>
+            {% for r in records %}
+            <tr>
+              <td>{{ r.id }}</td>
+              <td><code>{{ r.data_hash|mask_hash }}</code></td>
+              <td>
+                {% if r.blockchain_tx_hash %}
+                  <code>{{ r.blockchain_tx_hash|mask_hash }}</code>
+                {% else %}
+                  -
+                {% endif %}
+              </td>
+              <td>{{ r.created_at }}</td>
+            </tr>
+            {% endfor %}
+          </table>
+        </div>
+      {% else %}
+        <p class="empty-text">No records available.</p>
+      {% endif %}
+    </section>
+
+    <a class="logout-link" href="{{ url_for('logout') }}">Logout</a>
+  </div>
+
+  <div class="session-timer-popup" id="sessionTimerPopup" aria-live="polite" data-timeout-seconds="{{ auth_idle_timeout_seconds }}">
+    <h4>Session sign out timer</h4>
+    <div class="session-timer-value" id="sessionTimerValue">10:00</div>
+  </div>
+
+  <script>
+    (function () {
+      const popup = document.getElementById("sessionTimerPopup");
+      const value = document.getElementById("sessionTimerValue");
+      if (!popup || !value) return;
+
+      const logoutUrl = "{{ url_for('logout') }}";
+      const idleTimeoutMs = Number(popup.dataset.timeoutSeconds || "600") * 1000;
+      let deadline = Date.now() + idleTimeoutMs;
+
+      function formatTime(totalSeconds) {
+        const minutes = Math.floor(totalSeconds / 60);
+        const seconds = totalSeconds % 60;
+        return String(minutes).padStart(2, "0") + ":" + String(seconds).padStart(2, "0");
+      }
+
+      function forceLogout() {
+        window.location.replace(logoutUrl);
+      }
+
+      window.resetSessionIdleCountdown = function () {
+        deadline = Date.now() + idleTimeoutMs;
+        renderTimer();
+      };
+
+      function renderTimer() {
+        const remainingSeconds = Math.max(0, Math.ceil((deadline - Date.now()) / 1000));
+        value.textContent = formatTime(remainingSeconds);
+        popup.classList.toggle("visible", remainingSeconds <= 30);
+        popup.classList.toggle("warning", remainingSeconds <= 15);
+        if (remainingSeconds <= 0) {
+          forceLogout();
+        }
+      }
+
+      renderTimer();
+
+      window.setInterval(function () {
+        renderTimer();
+      }, 1000);
+
+      document.addEventListener("visibilitychange", function () {
+        if (!document.hidden) {
+          renderTimer();
+        }
+      });
+
+      window.addEventListener("focus", renderTimer);
+    })();
+  </script>
+  <script>
+    (function () {
+      const panel = document.getElementById("chat-panel");
+      if (!panel) return;
+
+      const selectedChatId = {{ selected_chat_id if selected_chat_id else 'null' }};
+      const form = panel.querySelector(".chat-form");
+      const textarea = form ? form.querySelector("textarea[name='message_text']") : null;
+      const thread = panel.querySelector(".chat-thread");
+      const status = panel.querySelector(".chat-sending");
+      const submitBtn = form ? form.querySelector("button[type='submit']") : null;
+      const selectedPresenceBadge = panel.querySelector("#selectedPresenceBadge");
+
+      if (!form || !textarea || !thread || !submitBtn) return;
+
+      function scrollToBottom() {
+        thread.scrollTop = thread.scrollHeight;
+      }
+
+      scrollToBottom();
+
+      async function refreshPresence() {
+        try {
+          const response = await fetch("{{ url_for('patient_chat_presence') }}", {
+            headers: {"X-Requested-With": "fetch"}
+          });
+          const data = await response.json().catch(function () { return {}; });
+          if (!response.ok || !data.ok || !Array.isArray(data.contacts)) {
+            return;
+          }
+
+          const seenIds = new Set();
+          data.contacts.forEach(function (contact) {
+            seenIds.add(String(contact.id));
+            const badge = panel.querySelector("#presence-" + contact.id);
+            const isOnline = !!contact.is_online;
+            const label = isOnline ? "online" : "offline";
+
+            if (badge) {
+              badge.textContent = label;
+              badge.classList.toggle("presence-online", isOnline);
+              badge.classList.toggle("presence-offline", !isOnline);
+            }
+
+            if (selectedPresenceBadge && Number(selectedChatId) === Number(contact.id)) {
+              selectedPresenceBadge.textContent = label;
+              selectedPresenceBadge.classList.toggle("presence-online", isOnline);
+              selectedPresenceBadge.classList.toggle("presence-offline", !isOnline);
+            }
+          });
+
+          panel.querySelectorAll(".presence-badge[id^='presence-']").forEach(function (badge) {
+            const badgeId = badge.id.replace("presence-", "");
+            if (seenIds.has(String(badgeId))) {
+              return;
+            }
+            badge.textContent = "offline";
+            badge.classList.remove("presence-online");
+            badge.classList.add("presence-offline");
+          });
+
+          if (selectedPresenceBadge && selectedChatId !== null && !seenIds.has(String(selectedChatId))) {
+            selectedPresenceBadge.textContent = "offline";
+            selectedPresenceBadge.classList.remove("presence-online");
+            selectedPresenceBadge.classList.add("presence-offline");
+          }
+        } catch (error) {
+          return;
+        }
+      }
+
+      refreshPresence();
+      window.setInterval(refreshPresence, 20000);
+
+      form.addEventListener("submit", async function (event) {
+        event.preventDefault();
+
+        const message = textarea.value.trim();
+        if (!message) {
+          return;
+        }
+
+        const doctorIdInput = form.querySelector("input[name='doctor_id']");
+        const doctorId = doctorIdInput ? doctorIdInput.value : "";
+        const pendingBubble = document.createElement("div");
+        pendingBubble.className = "message-row mine";
+        pendingBubble.innerHTML = '<div class="message-bubble">' +
+          message.replace(/[&<>"']/g, function (ch) {
+            return {"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;"}[ch];
+          }) +
+          '<span class="message-time">sending...</span></div>';
+
+        submitBtn.disabled = true;
+        if (status) status.textContent = "Sending message...";
+
+        try {
+          const body = new FormData();
+          body.append("doctor_id", doctorId);
+          body.append("message_text", message);
+
+          const response = await fetch((form.action || "").replace(/#.*$/, ""), {
+            method: "POST",
+            body: body,
+            headers: {"X-Requested-With": "fetch"}
+          });
+
+          const payload = await response.json().catch(function () {
+            return {};
+          });
+
+          if (!response.ok) {
+            throw new Error(payload.error || "Message could not be sent.");
+          }
+
+          pendingBubble.querySelector(".message-time").textContent = payload.created_at || "just now";
+          thread.appendChild(pendingBubble);
+          textarea.value = "";
+          if (status) status.textContent = "Message sent.";
+          scrollToBottom();
+
+          window.setTimeout(function () {
+            if (status && status.textContent === "Message sent.") {
+              status.textContent = "";
+            }
+          }, 2000);
+        } catch (error) {
+          if (status) status.textContent = error.message || "Unable to send message.";
+        } finally {
+          submitBtn.disabled = false;
+          textarea.focus();
+        }
+      });
+    })();
+  </script>
+</body>
+</html>

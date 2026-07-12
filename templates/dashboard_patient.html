@@ -1,0 +1,869 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Patient Dashboard | E-Health</title>
+<link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+<style>
+*{box-sizing:border-box;margin:0;padding:0;font-family:"Segoe UI",Tahoma,Geneva,Verdana,sans-serif;}
+body{
+  background:#eef7f6;
+  color:#1f3535;
+  min-height:100vh;
+}
+.dashboard-shell{
+  max-width:1380px;
+  margin:24px auto;
+  background:#ffffff;
+  border:1px solid #dbe9e7;
+  border-radius:24px;
+  overflow:hidden;
+  box-shadow:0 12px 28px rgba(0,77,77,0.08);
+}
+.dashboard-topbar{
+  min-height:82px;
+  background:#ffffff;
+  border-bottom:1px solid #dde9e8;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  padding:18px 24px;
+  gap:16px;
+  flex-wrap:wrap;
+}
+.topbar-left{display:flex;align-items:center;gap:14px;}
+.brand-icon{
+  width:46px;
+  height:46px;
+  border-radius:14px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  background:#0d8c8c;
+  color:#fff;
+  font-size:24px;
+  font-weight:800;
+}
+.dashboard-title{
+  font-size:18px;
+  font-weight:800;
+  color:#1f3535;
+}
+.topbar-nav{
+  display:flex;
+  align-items:center;
+  gap:24px;
+  flex-wrap:wrap;
+}
+.topbar-nav a{
+  text-decoration:none;
+  color:#234f4e;
+  font-size:14px;
+  font-weight:700;
+}
+.topbar-nav a:hover{color:#0d8c8c;}
+.dashboard-layout{
+  display:grid;
+  grid-template-columns:88px 1fr;
+}
+.sidebar{
+  background:linear-gradient(180deg,#197b7b 0%,#0b6666 100%);
+  padding:14px 0;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  gap:10px;
+}
+.avatar-box{
+  width:48px;
+  height:48px;
+  border-radius:14px;
+  background:rgba(255,255,255,0.16);
+  border:1px solid rgba(255,255,255,0.20);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-size:24px;
+  color:#fff;
+  margin-bottom:6px;
+}
+.side-item{
+  width:100%;
+  padding:12px 6px;
+  text-decoration:none;
+  color:#e5fbfa;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  gap:6px;
+  font-size:11px;
+  font-weight:800;
+  border-left:3px solid transparent;
+}
+.side-item:hover,.side-item.active{
+  background:rgba(255,255,255,0.08);
+  border-left-color:#9fe6e1;
+}
+.side-icon{font-size:16px;}
+.main-content{
+  padding:22px;
+  background:#f5fbfb;
+}
+.welcome-hero{
+  background:linear-gradient(135deg,#1f8c8a 0%,#176f6d 100%);
+  color:#fff;
+  border-radius:22px;
+  padding:28px;
+  margin-bottom:18px;
+}
+.welcome-hero h2{
+  font-size:28px;
+  margin-bottom:10px;
+}
+.welcome-hero p{
+  line-height:1.8;
+  color:#e2f8f7;
+  margin-bottom:14px;
+  max-width:760px;
+}
+.privacy-id{
+  display:inline-block;
+  background:rgba(255,255,255,0.12);
+  border:1px solid rgba(255,255,255,0.18);
+  border-radius:12px;
+  padding:10px 14px;
+  color:#f1ffff;
+  font-size:13px;
+  word-break:break-all;
+}
+.stats-grid{
+  display:grid;
+  grid-template-columns:repeat(5,1fr);
+  gap:16px;
+  margin-bottom:18px;
+}
+.stat-card,.card{
+  background:#ffffff;
+  border:1px solid #dceaea;
+  border-radius:18px;
+  box-shadow:0 8px 20px rgba(0,77,77,0.05);
+}
+.stat-card{
+  padding:18px;
+}
+.stat-label{
+  font-size:14px;
+  font-weight:800;
+  color:#4f6f6d;
+  margin-bottom:10px;
+}
+.stat-value{
+  font-size:38px;
+  line-height:1;
+  font-weight:900;
+  color:#045d5d;
+  margin-bottom:8px;
+}
+.stat-note,.empty-text{
+  font-size:13px;
+  line-height:1.7;
+  color:#688382;
+}
+.content-grid{
+  display:grid;
+  grid-template-columns:1.2fr 1fr;
+  gap:18px;
+  margin-bottom:18px;
+}
+.bottom-grid{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:18px;
+  margin-bottom:18px;
+}
+.card{
+  padding:20px;
+}
+.card h3{
+  font-size:18px;
+  font-weight:800;
+  color:#214040;
+  margin-bottom:14px;
+  padding-bottom:12px;
+  border-bottom:1px solid #e8f0ef;
+}
+.health-grid{
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:12px;
+}
+.health-box{
+  background:#edf8f7;
+  border:1px solid #dbeeed;
+  border-radius:14px;
+  padding:16px;
+}
+.health-box span{
+  display:block;
+  color:#5a7575;
+  font-size:12px;
+  margin-bottom:6px;
+  font-weight:700;
+}
+.health-box strong{
+  color:#004d4d;
+  font-size:22px;
+}
+.table-wrap{
+  overflow-x:auto;
+  border:1px solid #e2eceb;
+  border-radius:14px;
+  background:#ffffff;
+}
+table{
+  width:100%;
+  min-width:760px;
+  border-collapse:collapse;
+}
+th{
+  text-align:left;
+  padding:14px 16px;
+  background:#eef5f4;
+  color:#315252;
+  font-size:12px;
+  font-weight:900;
+  border-bottom:1px solid #dbe7e6;
+  text-transform:uppercase;
+}
+td{
+  padding:14px 16px;
+  border-bottom:1px solid #edf3f2;
+  color:#496666;
+  font-size:14px;
+  vertical-align:middle;
+}
+tr:hover td{background:#f8fcfb;}
+.status-badge{
+  display:inline-block;
+  padding:8px 13px;
+  border-radius:999px;
+  font-size:12px;
+  font-weight:800;
+  text-transform:capitalize;
+}
+.status-pending{background:#ffe7a8;color:#7b4d00;}
+.status-approved{background:#45c76d;color:#fff;}
+.status-rejected{background:#e16464;color:#fff;}
+.dashboard-btn,.auth-btn{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  gap:8px;
+  background:#0d7c7a;
+  color:#fff;
+  border:none;
+  border-radius:10px;
+  padding:10px 16px;
+  font-weight:800;
+  text-decoration:none;
+  cursor:pointer;
+}
+.dashboard-btn:hover,.auth-btn:hover{background:#086968;}
+.notice-list{list-style:none;}
+.notice-list li{
+  display:flex;
+  align-items:flex-start;
+  gap:10px;
+  padding:12px 0;
+  border-bottom:1px solid #edf3f2;
+  color:#456565;
+  font-size:14px;
+}
+.notice-list li:last-child{border-bottom:none;}
+.dot{
+  width:10px;
+  height:10px;
+  border-radius:50%;
+  margin-top:6px;
+  flex-shrink:0;
+  background:#c2d7d5;
+}
+.dot.red{background:#e06161;}
+.dot.green{background:#3aa46d;}
+.dot.teal{background:#0d8c8c;}
+.medicine-list{display:grid;gap:12px;}
+.medicine-item{
+  background:#fbfefe;
+  border:1px solid #e4eeee;
+  border-radius:14px;
+  padding:16px;
+}
+.medicine-item h4{
+  color:#183333;
+  font-size:16px;
+  margin-bottom:6px;
+}
+.medicine-item p{
+  color:#617d7d;
+  line-height:1.6;
+  font-size:14px;
+}
+.verification-box{
+  background:#edf8f3;
+  border:1px solid #d6eadc;
+  border-radius:14px;
+  padding:16px;
+}
+.verification-box p{
+  color:#25553c;
+  margin-bottom:8px;
+  font-size:14px;
+  line-height:1.6;
+  word-break:break-word;
+}
+.verification-box p:last-child{margin-bottom:0;}
+code{
+  background:#f1f8f7;
+  border:1px solid #dceaea;
+  padding:4px 8px;
+  border-radius:8px;
+  color:#0a5555;
+  font-size:12px;
+  word-break:break-all;
+}
+.chat-layout{
+  display:grid;
+  grid-template-columns:280px 1fr;
+  gap:18px;
+  margin-top:18px;
+}
+.chat-sidebar{
+  border:1px solid #d9e8e6;
+  border-radius:16px;
+  background:#f8fcfc;
+  padding:14px;
+}
+.chat-contact{
+  display:block;
+  text-decoration:none;
+  color:#1e3333;
+  border:1px solid #dfeceb;
+  background:#fff;
+  border-radius:14px;
+  padding:12px 14px;
+  margin-bottom:10px;
+}
+.chat-contact.active{
+  border-color:#0b7775;
+  background:#eef9f8;
+}
+.chat-contact small{
+  display:block;
+  color:#668282;
+  margin-top:4px;
+}
+.chat-window{
+  border:1px solid #d9e8e6;
+  border-radius:16px;
+  background:#fff;
+  padding:16px;
+}
+.chat-thread{
+  max-height:420px;
+  overflow-y:auto;
+  padding-right:6px;
+  margin:16px 0;
+}
+.message-row{display:flex;margin-bottom:12px;}
+.message-row.mine{justify-content:flex-end;}
+.message-bubble{
+  max-width:72%;
+  padding:12px 14px;
+  border-radius:18px;
+  background:#eef5f5;
+  color:#214040;
+}
+.message-row.mine .message-bubble{
+  background:#004d4d;
+  color:#fff;
+}
+.message-time{
+  display:block;
+  margin-top:6px;
+  font-size:11px;
+  opacity:0.72;
+}
+.chat-form textarea{
+  width:100%;
+  min-height:96px;
+  resize:vertical;
+  border:1px solid #d7e8e6;
+  border-radius:14px;
+  padding:14px;
+  font:inherit;
+  outline:none;
+  background:#ffffff;
+}
+.chat-form textarea:focus{
+  border-color:#0b7775;
+  box-shadow:0 0 0 3px rgba(0,77,77,0.08);
+}
+.logout-link{
+  display:inline-flex;
+  margin-top:16px;
+  text-decoration:none;
+  color:#004d4d;
+  font-weight:800;
+}
+.session-timer-popup{
+  position:fixed;
+  left:22px;
+  top:22px;
+  width:min(320px, calc(100vw - 32px));
+  background:linear-gradient(145deg, rgba(0,77,77,0.96), rgba(11,111,110,0.96));
+  color:#fff;
+  border-radius:18px;
+  padding:16px 18px;
+  box-shadow:0 18px 40px rgba(0,0,0,0.22);
+  z-index:9999;
+  border:1px solid rgba(255,255,255,0.16);
+  backdrop-filter:blur(8px);
+  opacity:0;
+  visibility:hidden;
+  transform:translateY(18px);
+  transition:opacity 0.25s ease, transform 0.25s ease, visibility 0.25s ease;
+}
+.session-timer-popup.visible{
+  opacity:1;
+  visibility:visible;
+  transform:translateY(0);
+}
+.session-timer-popup h4{
+  margin:0 0 6px;
+  font-size:1rem;
+  letter-spacing:0.01em;
+}
+.session-timer-popup p{
+  margin:0;
+  font-size:0.92rem;
+  line-height:1.45;
+  color:rgba(255,255,255,0.88);
+}
+.session-timer-value{
+  display:inline-block;
+  margin-top:10px;
+  padding:7px 10px;
+  border-radius:999px;
+  background:rgba(255,255,255,0.14);
+  font-weight:800;
+  letter-spacing:0.04em;
+}
+.session-timer-popup.warning{
+  background:linear-gradient(145deg, rgba(133,54,18,0.96), rgba(194,92,27,0.96));
+}
+form{margin:0;}
+@media (max-width:1200px){
+  .stats-grid{grid-template-columns:repeat(2,1fr);}
+  .content-grid,.bottom-grid,.chat-layout{grid-template-columns:1fr;}
+  .health-grid{grid-template-columns:1fr 1fr;}
+}
+@media (max-width:850px){
+  .dashboard-layout{grid-template-columns:1fr;}
+  .sidebar{flex-direction:row;justify-content:flex-start;overflow-x:auto;padding:14px;gap:8px;}
+  .avatar-box{display:none;}
+  .side-item{min-width:90px;border-left:none;border-bottom:3px solid transparent;}
+  .side-item:hover,.side-item.active{border-left:none;border-bottom:3px solid #9fe6e1;}
+  .topbar-nav{display:none;}
+  .main-content{padding:18px;}
+  .health-grid{grid-template-columns:1fr;}
+}
+@media (max-width:620px){
+  .stats-grid{grid-template-columns:1fr;}
+}
+</style>
+</head>
+<body>
+<div class="dashboard-shell">
+  <div class="dashboard-topbar">
+    <div class="topbar-left">
+      <div class="brand-icon">+</div>
+      <div class="dashboard-title">Patient Dashboard</div>
+    </div>
+    <div class="topbar-nav">
+      <a href="{{ url_for('patient_home') }}">Home</a>
+      <a href="{{ url_for('integrity_dashboard') }}">Integrity</a>
+      <a href="#requests-table">Requests</a>
+      <a href="#chat-panel">Messages</a>
+      <a href="{{ url_for('logout') }}">Logout</a>
+    </div>
+  </div>
+
+  <div class="dashboard-layout">
+    <div class="sidebar">
+      <div class="avatar-box">P</div>
+      <a href="#top" class="side-item active"><div class="side-icon">O</div><span>Overview</span></a>
+      <a href="#records-table" class="side-item"><div class="side-icon">R</div><span>Records</span></a>
+      <a href="{{ url_for('integrity_dashboard') }}" class="side-item"><div class="side-icon">IV</div><span>Integrity</span></a>
+      <a href="#requests-table" class="side-item"><div class="side-icon">Q</div><span>Requests</span></a>
+      <a href="#chat-panel" class="side-item"><div class="side-icon">C</div><span>Chat</span></a>
+      <a href="#medicines" class="side-item"><div class="side-icon">Rx</div><span>Medicine</span></a>
+    </div>
+
+    <div class="main-content" id="top">
+      <div class="welcome-hero">
+        <h2>Welcome, {{ name }}</h2>
+        <p>Monitor your medical records, review doctor requests, follow your prescriptions, and keep full control over who can access your care information.</p>
+        <div class="privacy-id">{{ hashed_id|mask_hash }}</div>
+      </div>
+
+      <div class="stats-grid">
+        <div class="stat-card">
+          <div class="stat-label">My Records</div>
+          <div class="stat-value">{{ records|length if records else 0 }}</div>
+          <div class="stat-note">Protected medical records available in your profile.</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Pending Requests</div>
+          <div class="stat-value">{{ requests_list | selectattr('status', 'equalto', 'pending') | list | length if requests_list else 0 }}</div>
+          <div class="stat-note">Doctor requests waiting for your review and approval.</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Approved Access</div>
+          <div class="stat-value">{{ requests_list | selectattr('status', 'equalto', 'approved') | list | length if requests_list else 0 }}</div>
+          <div class="stat-note">Doctors who already have approved access to your care data.</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Appointments</div>
+          <div class="stat-value">{{ appointments | selectattr('status', 'equalto', 'approved') | list | length if appointments else 0 }}</div>
+          <div class="stat-note">Doctor-approved visits that now appear as your upcoming events.</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Prescriptions</div>
+          <div class="stat-value">{{ prescriptions|length if prescriptions else 0 }}</div>
+          <div class="stat-note">Prescriptions written after you approved medical access.</div>
+        </div>
+      </div>
+
+      <div class="content-grid">
+        <div class="card">
+          <h3>Health Snapshot</h3>
+          <div class="health-grid">
+            <div class="health-box">
+              <span>Blood Group</span>
+              <strong>O+</strong>
+            </div>
+            <div class="health-box">
+              <span>Heart Rate</span>
+              <strong>76 bpm</strong>
+            </div>
+            <div class="health-box">
+              <span>Blood Pressure</span>
+              <strong>120/80</strong>
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <h3>Latest Record Summary</h3>
+          {% if records %}
+            {% set latest_record = records[0] %}
+            <p class="empty-text"><strong>Record ID:</strong> #{{ latest_record.id }}</p>
+            <p class="empty-text"><strong>Created:</strong> {{ latest_record.created_at }}</p>
+            <p class="empty-text"><strong>Hash:</strong></p>
+            <p><code>{{ latest_record.data_hash|mask_hash }}</code></p>
+            <div style="margin-top:14px;">
+              <a href="#records-table" class="dashboard-btn">Open Records</a>
+            </div>
+          {% else %}
+            <p class="empty-text">No medical records available yet.</p>
+          {% endif %}
+        </div>
+      </div>
+
+      <div class="card" style="margin-bottom:18px;">
+        <h3>Upcoming Appointment Events</h3>
+        {% set approved_appointments = appointments | selectattr('status', 'equalto', 'approved') | list if appointments else [] %}
+        {% if approved_appointments %}
+          <div class="table-wrap">
+            <table>
+              <tr>
+                <th>Doctor</th>
+                <th>Specialty</th>
+                <th>Date & Time</th>
+                <th>Status</th>
+              </tr>
+              {% for appointment in approved_appointments %}
+              <tr>
+                <td>{{ appointment.doctor_name }}</td>
+                <td>{{ appointment.specialty or 'General Practice' }}</td>
+                <td>{{ appointment.appointment_date }}</td>
+                <td><span class="status-badge status-approved">{{ appointment.status }}</span></td>
+              </tr>
+              {% endfor %}
+            </table>
+          </div>
+        {% else %}
+          <p class="empty-text">No approved appointments yet. Request one from your patient home page and it will appear here once the doctor schedules it.</p>
+        {% endif %}
+      </div>
+
+      <div class="bottom-grid">
+        <div class="card" id="medicines">
+          <h3>Medicines & Prescriptions</h3>
+          {% if prescriptions %}
+            <div class="medicine-list">
+              {% for prescription in prescriptions %}
+                <div class="medicine-item">
+                  <h4>{{ prescription.medicine_name }}</h4>
+                  <p><strong>Doctor:</strong> {{ prescription.doctor_name }}</p>
+                  <p><strong>Dosage:</strong> {{ prescription.dosage }}</p>
+                  <p>{{ prescription.instructions }}</p>
+                  <p><strong>Dispense:</strong> {{ prescription.dispense_status }}{% if prescription.dispensed_at %} on {{ prescription.dispensed_at }}{% endif %}</p>
+                </div>
+              {% endfor %}
+            </div>
+          {% else %}
+            <p class="empty-text">No prescriptions have been written for you yet.</p>
+          {% endif %}
+        </div>
+
+        <div class="card">
+          <h3>Notifications</h3>
+          <ul class="notice-list">
+            {% if requests_list %}
+              {% for req in requests_list %}
+                {% if req.status == 'pending' %}
+                  <li>
+                    <span class="dot red"></span>
+                    <span>Access request from {{ req.doctor_name }} is waiting for your approval. Approving it lets the doctor view your past records, write prescriptions, and see your age, gender, and email.</span>
+                  </li>
+                {% endif %}
+              {% endfor %}
+            {% endif %}
+
+            {% if records %}
+              <li>
+                <span class="dot teal"></span>
+                <span>A medical record is available in your file.</span>
+              </li>
+            {% endif %}
+
+            {% if not records and not requests_list %}
+              <li>
+                <span class="dot green"></span>
+                <span>No new notifications right now.</span>
+              </li>
+            {% endif %}
+          </ul>
+        </div>
+      </div>
+
+      <div class="card" id="requests-table">
+        <h3>Doctor Access Requests</h3>
+        <p class="empty-text" style="margin-bottom:12px;">Approving a doctor request allows that doctor to view your past records, write prescriptions, and see your age, gender, and email.</p>
+        {% if requests_list %}
+          <div class="table-wrap">
+            <table>
+              <tr>
+                <th>Doctor</th>
+                <th>Email</th>
+                <th>Request Scope</th>
+                <th>Status</th>
+                <th>Blockchain TX</th>
+                <th>Action</th>
+              </tr>
+              {% for req in requests_list %}
+              <tr>
+                <td>{{ req.doctor_name }}</td>
+                <td>{{ req.doctor_email }}</td>
+                <td>Past records + prescriptions + age/gender/email</td>
+                <td>
+                  <span class="status-badge {% if req.status == 'pending' %}status-pending{% elif req.status == 'approved' %}status-approved{% else %}status-rejected{% endif %}">
+                    {{ req.status }}
+                  </span>
+                </td>
+                <td>
+                  {% if req.blockchain_tx_hash %}
+                    <code>{{ req.blockchain_tx_hash|mask_hash }}</code>
+                  {% else %}
+                    -
+                  {% endif %}
+                </td>
+                <td>
+                  {% if req.status == 'pending' %}
+                    <div style="display:flex; gap:8px; flex-wrap:wrap;">
+                      <form method="POST" action="{{ url_for('patient_approve', req_id=req.id) }}">
+                        <button class="auth-btn" type="submit">Approve</button>
+                      </form>
+                      <form method="POST" action="{{ url_for('patient_decline', req_id=req.id) }}">
+                        <button class="auth-btn" type="submit" style="background:#a33a3a;">Decline</button>
+                      </form>
+                    </div>
+                  {% else %}
+                    -
+                  {% endif %}
+                </td>
+              </tr>
+              {% endfor %}
+            </table>
+          </div>
+        {% else %}
+          <p class="empty-text">No doctor access requests found.</p>
+        {% endif %}
+      </div>
+
+      <div class="card" id="records-table" style="margin-top:18px;">
+        <h3>My Medical Records</h3>
+        {% if records %}
+          <div class="table-wrap">
+            <table>
+              <tr>
+                <th>Record ID</th>
+                <th>Data Hash</th>
+                <th>Blockchain TX</th>
+                <th>Created</th>
+              </tr>
+              {% for r in records %}
+              <tr>
+                <td>{{ r.id }}</td>
+                <td><code>{{ r.data_hash|mask_hash }}</code></td>
+                <td>
+                  {% if r.blockchain_tx_hash %}
+                    <code>{{ r.blockchain_tx_hash|mask_hash }}</code>
+                  {% else %}
+                    -
+                  {% endif %}
+                </td>
+                <td>{{ r.created_at }}</td>
+              </tr>
+              {% endfor %}
+            </table>
+          </div>
+        {% else %}
+          <p class="empty-text">No records available.</p>
+        {% endif %}
+      </div>
+
+      <div class="card" style="margin-top:18px;">
+        <h3>Access Verification</h3>
+        {% if records %}
+          {% set latest_record = records[0] %}
+          <div class="verification-box">
+            <p><strong>Integrity Status:</strong> Verified</p>
+            <p><strong>Latest TX Hash:</strong> {% if latest_record.blockchain_tx_hash %}{{ latest_record.blockchain_tx_hash|mask_hash }}{% else %}Not available{% endif %}</p>
+            <p><strong>Record Fingerprint:</strong> {{ latest_record.data_hash|mask_hash }}</p>
+          </div>
+        {% else %}
+          <p class="empty-text">No verified records yet.</p>
+        {% endif %}
+      </div>
+
+      <div class="card" id="chat-panel" style="margin-top:18px;">
+        <h3>Doctor Chat</h3>
+        <p class="empty-text" style="margin-top:6px;">Keep in touch with doctors directly from your patient dashboard.</p>
+        <div class="chat-layout">
+          <div class="chat-sidebar">
+            {% if chat_contacts %}
+              {% for contact in chat_contacts %}
+                <a href="{{ url_for('dashboard', doctor_id=contact.id) }}#chat-panel" class="chat-contact {% if selected_chat_id == contact.id %}active{% endif %}">
+                  <strong>{{ contact.name }}</strong>
+                  <small>{{ contact.email }}</small>
+                </a>
+              {% endfor %}
+            {% else %}
+              <p class="empty-text">No doctors are connected to your account yet.</p>
+            {% endif %}
+          </div>
+
+          <div class="chat-window">
+            {% if selected_contact %}
+              <h4>{{ selected_contact.name }}</h4>
+              <p class="empty-text">{{ selected_contact.email }}</p>
+              <div class="chat-thread">
+                {% if chat_messages %}
+                  {% for msg in chat_messages %}
+                    <div class="message-row {% if msg.sender_role == 'patient' %}mine{% endif %}">
+                      <div class="message-bubble">
+                        {{ msg.message_text }}
+                        <span class="message-time">{{ msg.created_at }}</span>
+                      </div>
+                    </div>
+                  {% endfor %}
+                {% else %}
+                  <p class="empty-text">No messages yet. Start the conversation.</p>
+                {% endif %}
+              </div>
+              <form method="POST" action="{{ url_for('send_chat_message') }}#chat-panel" class="chat-form">
+                <input type="hidden" name="doctor_id" value="{{ selected_contact.id }}">
+                <textarea name="message_text" placeholder="Write your message to the doctor..." required></textarea>
+                <button class="auth-btn" type="submit" style="margin-top:12px;">Send Message</button>
+              </form>
+            {% else %}
+              <p class="empty-text">Select a doctor to open the chat.</p>
+            {% endif %}
+          </div>
+        </div>
+      </div>
+
+      <a class="logout-link" href="{{ url_for('logout') }}">Logout</a>
+    </div>
+  </div>
+</div>
+<div class="session-timer-popup" id="sessionTimerPopup" aria-live="polite" data-timeout-seconds="{{ auth_idle_timeout_seconds }}">
+  <h4>Session sign out timer</h4>
+  <p>Your secure session ends after 10 minutes of inactivity.</p>
+  <div class="session-timer-value" id="sessionTimerValue">10:00</div>
+</div>
+<script>
+  (function () {
+    const popup = document.getElementById("sessionTimerPopup");
+    const value = document.getElementById("sessionTimerValue");
+    if (!popup || !value) return;
+
+    const logoutUrl = "{{ url_for('logout') }}";
+    const idleTimeoutMs = Number(popup.dataset.timeoutSeconds || "600") * 1000;
+    let deadline = Date.now() + idleTimeoutMs;
+
+    function formatTime(totalSeconds) {
+      const minutes = Math.floor(totalSeconds / 60);
+      const seconds = totalSeconds % 60;
+      return String(minutes).padStart(2, "0") + ":" + String(seconds).padStart(2, "0");
+    }
+
+    function forceLogout() {
+      window.location.replace(logoutUrl);
+    }
+
+    window.resetSessionIdleCountdown = function () {
+      deadline = Date.now() + idleTimeoutMs;
+      renderTimer();
+    };
+
+    function renderTimer() {
+      const remainingSeconds = Math.max(0, Math.ceil((deadline - Date.now()) / 1000));
+      value.textContent = formatTime(remainingSeconds);
+      popup.classList.toggle("visible", remainingSeconds <= 30);
+      popup.classList.toggle("warning", remainingSeconds <= 15);
+      if (remainingSeconds <= 0) {
+        forceLogout();
+      }
+    }
+
+    renderTimer();
+
+    window.setInterval(function () {
+      renderTimer();
+    }, 1000);
+
+    document.addEventListener("visibilitychange", function () {
+      if (!document.hidden) {
+        renderTimer();
+      }
+    });
+
+    window.addEventListener("focus", renderTimer);
+  })();
+</script>
+</body>
+</html>

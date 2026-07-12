@@ -1,0 +1,1099 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Login | E-Health</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+
+  <style>
+    *{
+      margin:0;
+      padding:0;
+      box-sizing:border-box;
+      font-family:"Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+    }
+
+    body{
+      min-height:100vh;
+      background: linear-gradient(135deg, #eaf8f8 0%, #dff6f5 35%, #c8efed 100%);
+      position:relative;
+      overflow-x:hidden;
+      color:#003b3a;
+    }
+
+    body.keyboard-open{
+      padding-bottom:320px;
+    }
+
+    .bg-shape{
+      position:absolute;
+      border-radius:50%;
+      background:rgba(0,169,165,0.10);
+      animation: float 8s ease-in-out infinite;
+      z-index:0;
+      filter: blur(2px);
+    }
+
+    .shape1{
+      width:260px;
+      height:260px;
+      top:70px;
+      left:-70px;
+    }
+
+    .shape2{
+      width:220px;
+      height:220px;
+      bottom:50px;
+      right:-60px;
+      animation-delay:2s;
+    }
+
+    .shape3{
+      width:180px;
+      height:180px;
+      top:180px;
+      right:120px;
+      animation-delay:1s;
+    }
+
+    @keyframes float{
+      0%,100%{transform:translateY(0px);}
+      50%{transform:translateY(-18px);}
+    }
+
+    .page-shell{
+      position:relative;
+      z-index:2;
+    }
+
+    .top-bar{
+      background:#ffffff;
+      border-bottom:1px solid #dfeaea;
+    }
+
+    .container{
+      width:92%;
+      max-width:1200px;
+      margin:0 auto;
+    }
+
+    .top-nav{
+      display:flex;
+      justify-content:flex-end;
+      gap:24px;
+      padding:12px 0;
+      flex-wrap:wrap;
+    }
+
+    .top-nav a{
+      text-decoration:none;
+      color:#245f5d;
+      font-size:14px;
+      font-weight:500;
+    }
+
+    .top-nav a:hover{
+      color:#00a9a5;
+    }
+
+    .main-header{
+      padding:18px 0;
+    }
+
+    .header-content{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+    }
+
+    .logo{
+      display:flex;
+      align-items:center;
+      gap:12px;
+      text-decoration:none;
+    }
+
+    .logo-icon{
+      width:42px;
+      height:42px;
+    }
+
+    .logo-text{
+      font-size:24px;
+      font-weight:700;
+      color:#003b3a;
+    }
+
+    .login-section{
+      min-height:calc(100vh - 120px);
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      padding:30px 16px 80px;
+    }
+
+    .login-card{
+      width:100%;
+      max-width:760px;
+      background:#ffffff;
+      border:1px solid #dcebea;
+      border-radius:28px;
+      padding:38px 34px;
+      box-shadow:0 20px 60px rgba(0, 59, 58, 0.12);
+      animation: fadeUp 0.8s ease;
+    }
+
+    @keyframes fadeUp{
+      from{
+        opacity:0;
+        transform:translateY(18px);
+      }
+      to{
+        opacity:1;
+        transform:translateY(0);
+      }
+    }
+
+    .login-top{
+      text-align:center;
+      margin-bottom:26px;
+    }
+
+    .small-icon{
+      width:78px;
+      height:78px;
+      margin:0 auto 15px;
+      border-radius:22px;
+      background:linear-gradient(135deg, #00a9a5, #008e8b);
+      color:white;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      font-size:34px;
+      box-shadow:0 12px 30px rgba(0,169,165,0.22);
+    }
+
+    .login-top h2{
+      font-size:34px;
+      color:#003b3a;
+      margin-bottom:8px;
+    }
+
+    .login-top p{
+      color:#5a7776;
+      font-size:14px;
+      line-height:1.6;
+      max-width:560px;
+      margin:0 auto;
+    }
+
+    .mini-badges{
+      display:flex;
+      justify-content:center;
+      gap:10px;
+      flex-wrap:wrap;
+      margin-top:18px;
+    }
+
+    .mini-badge{
+      background:#f4fbfb;
+      border:1px solid #d9eeee;
+      color:#256664;
+      padding:8px 12px;
+      border-radius:999px;
+      font-size:12px;
+      font-weight:600;
+    }
+
+    .error-box{
+      background:#fff1f3;
+      color:#b42318;
+      border:1px solid #f3c7cf;
+      padding:12px 14px;
+      border-radius:14px;
+      font-size:14px;
+      margin-bottom:18px;
+      text-align:center;
+    }
+
+    .signup-notice{
+      position:fixed;
+      left:50%;
+      top:24px;
+      transform:translateX(-50%) translateY(-18px) scale(.97);
+      width:min(460px, calc(100vw - 24px));
+      padding:18px 18px 16px;
+      border-radius:22px;
+      background:linear-gradient(145deg, rgba(255,255,255,.96), rgba(241,252,249,.98));
+      border:1px solid #cfe7de;
+      box-shadow:0 24px 48px rgba(0,59,58,0.18);
+      z-index:10020;
+      opacity:0;
+      visibility:hidden;
+      transition:opacity .25s ease, transform .25s ease, visibility .25s ease;
+      overflow:hidden;
+      backdrop-filter:blur(10px);
+    }
+
+    .signup-notice.visible{
+      opacity:1;
+      visibility:visible;
+      transform:translateX(-50%) translateY(0) scale(1);
+    }
+
+    .signup-notice::before{
+      content:"";
+      position:absolute;
+      inset:0 auto 0 0;
+      width:7px;
+      background:linear-gradient(180deg,#00a9a5 0%, #6ad0aa 100%);
+    }
+
+    .signup-notice-head{
+      display:flex;
+      align-items:flex-start;
+      justify-content:space-between;
+      gap:14px;
+    }
+
+    .signup-notice-mark{
+      width:52px;
+      height:52px;
+      border-radius:18px;
+      background:linear-gradient(135deg,#e8faf5 0%, #d6f3eb 100%);
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      flex-shrink:0;
+      box-shadow:inset 0 1px 0 rgba(255,255,255,.9);
+    }
+
+    .signup-notice-mark svg{
+      width:28px;
+      height:28px;
+      stroke:#10896e;
+    }
+
+    .signup-notice-copy{
+      flex:1;
+      min-width:0;
+    }
+
+    .signup-notice-badge{
+      display:inline-flex;
+      align-items:center;
+      padding:6px 10px;
+      border-radius:999px;
+      background:#edf8f5;
+      color:#21715f;
+      font-size:11px;
+      font-weight:800;
+      letter-spacing:.08em;
+      text-transform:uppercase;
+      margin-bottom:8px;
+    }
+
+    .signup-notice-copy strong{
+      display:block;
+      font-size:20px;
+      color:#103b3a;
+      margin-bottom:6px;
+      line-height:1.2;
+    }
+
+    .signup-notice-copy span{
+      display:block;
+      color:#587574;
+      font-size:14px;
+      line-height:1.7;
+    }
+
+    .signup-notice-close{
+      width:38px;
+      height:38px;
+      border:none;
+      border-radius:12px;
+      background:#f1f8f7;
+      color:#3d6665;
+      cursor:pointer;
+      font-size:20px;
+      line-height:1;
+      flex-shrink:0;
+    }
+
+    .signup-notice-bar{
+      margin-top:14px;
+      height:6px;
+      border-radius:999px;
+      background:#e6f3ef;
+      overflow:hidden;
+    }
+
+    .signup-notice-bar span{
+      display:block;
+      width:100%;
+      height:100%;
+      border-radius:inherit;
+      background:linear-gradient(90deg,#00a9a5 0%, #6ad0aa 100%);
+      transform-origin:left center;
+    }
+
+    .signup-notice-bar span.running{
+      animation:signup-notice-shrink 5s linear forwards;
+    }
+
+    @keyframes signup-notice-shrink{
+      from{transform:scaleX(1);}
+      to{transform:scaleX(0);}
+    }
+
+    .section-note{
+      background:#f7fcfc;
+      border:1px solid #dceeee;
+      color:#4f6e6d;
+      border-radius:16px;
+      padding:14px 16px;
+      font-size:13px;
+      line-height:1.6;
+      margin-bottom:20px;
+      text-align:center;
+    }
+
+    .input-group{
+      margin-bottom:16px;
+    }
+
+    .input-group label{
+      display:block;
+      margin-bottom:8px;
+      color:#003b3a;
+      font-weight:600;
+      font-size:14px;
+    }
+
+    .input-wrap{
+      position:relative;
+    }
+
+    .input-wrap input{
+      width:100%;
+      padding:15px 48px 15px 16px;
+      border:1px solid #d7eceb;
+      border-radius:14px;
+      background:#ffffff;
+      font-size:15px;
+      color:#003b3a;
+      transition:0.25s ease;
+      outline:none;
+      box-shadow:0 4px 12px rgba(0,0,0,0.02);
+    }
+
+    .input-wrap input:focus{
+      border-color:#00a9a5;
+      box-shadow:0 0 0 4px rgba(0,169,165,0.10);
+      transform:translateY(-1px);
+    }
+
+    .input-icon{
+      position:absolute;
+      right:15px;
+      top:50%;
+      transform:translateY(-50%);
+      font-size:18px;
+      color:#6e8e8d;
+      user-select:none;
+    }
+
+    .toggle-password{
+      cursor:pointer;
+    }
+
+    .captcha-block{
+      margin-bottom:16px;
+    }
+
+    .captcha-wrapper{
+      display:flex;
+      align-items:center;
+      gap:12px;
+      background:#ffffff;
+      border:1px solid #d7eceb;
+      border-radius:14px;
+      padding:10px 12px;
+      box-shadow:0 4px 12px rgba(0,0,0,0.02);
+    }
+
+    .captcha-image{
+      height:58px;
+      border-radius:10px;
+      border:1px solid #dbecec;
+      background:#f8ffff;
+      max-width:100%;
+    }
+
+    .captcha-refresh{
+      border:none;
+      background:linear-gradient(135deg, #00a9a5, #008e8b);
+      color:white;
+      width:42px;
+      height:42px;
+      border-radius:12px;
+      cursor:pointer;
+      font-size:20px;
+      box-shadow:0 10px 20px rgba(0,169,165,0.18);
+      flex-shrink:0;
+      transition:0.2s ease;
+    }
+
+    .captcha-refresh:hover{
+      transform:translateY(-1px);
+    }
+
+    .options-row{
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      margin:6px 0 22px;
+      gap:10px;
+      flex-wrap:wrap;
+    }
+
+    .remember{
+      display:flex;
+      align-items:center;
+      gap:8px;
+      font-size:14px;
+      color:#4f6b6b;
+    }
+
+    .remember input{
+      accent-color:#00a9a5;
+      width:16px;
+      height:16px;
+    }
+
+    .options-row a{
+      color:#00a9a5;
+      text-decoration:none;
+      font-size:14px;
+      font-weight:600;
+    }
+
+    .options-row a:hover{
+      text-decoration:underline;
+    }
+
+    .login-btn{
+      width:100%;
+      padding:15px;
+      border:none;
+      border-radius:14px;
+      background:linear-gradient(135deg, #00a9a5 0%, #008e8b 100%);
+      color:white;
+      font-size:16px;
+      font-weight:700;
+      cursor:pointer;
+      box-shadow:0 14px 28px rgba(0,169,165,0.20);
+      transition:0.25s ease;
+      margin-top:4px;
+      margin-bottom:14px;
+    }
+
+    .login-btn:hover{
+      transform:translateY(-2px);
+      box-shadow:0 18px 34px rgba(0,169,165,0.28);
+    }
+
+    .secondary-btn{
+      width:100%;
+      padding:14px;
+      border:none;
+      border-radius:14px;
+      background:#004d4d;
+      color:white;
+      font-size:15px;
+      font-weight:700;
+      cursor:pointer;
+      transition:0.25s ease;
+      margin-bottom:18px;
+    }
+
+    .secondary-btn:hover{
+      background:#003b3a;
+      transform:translateY(-1px);
+    }
+
+    .divider{
+      display:flex;
+      align-items:center;
+      gap:12px;
+      color:#7d9594;
+      font-size:13px;
+      margin-bottom:18px;
+    }
+
+    .divider::before,
+    .divider::after{
+      content:"";
+      flex:1;
+      height:1px;
+      background:#d9eceb;
+    }
+
+    .quick-links{
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      gap:12px;
+      margin-bottom:14px;
+    }
+
+    .quick-box{
+      text-decoration:none;
+      background:#ffffff;
+      border:1px solid #dceeee;
+      border-radius:14px;
+      padding:14px 12px;
+      text-align:center;
+      color:#003b3a;
+      transition:0.25s ease;
+      font-size:14px;
+      font-weight:600;
+    }
+
+    .quick-box:hover{
+      border-color:#00a9a5;
+      transform:translateY(-2px);
+      box-shadow:0 10px 20px rgba(0,169,165,0.08);
+    }
+
+    .wallet-link{
+      display:block;
+      text-align:center;
+      text-decoration:none;
+      background:#f4fbfb;
+      border:1px solid #dceeee;
+      color:#006b69;
+      padding:14px;
+      border-radius:14px;
+      font-weight:700;
+      margin-bottom:16px;
+      transition:0.25s ease;
+    }
+
+    .wallet-link:hover{
+      background:#ebf9f8;
+      border-color:#00a9a5;
+    }
+
+    .signup{
+      text-align:center;
+      margin-top:10px;
+      color:#5d7a79;
+      font-size:14px;
+    }
+
+    .signup a{
+      color:#00a9a5;
+      text-decoration:none;
+      font-weight:700;
+    }
+
+    .signup a:hover{
+      text-decoration:underline;
+    }
+
+    .security-note{
+      margin-top:18px;
+      background:#f2fbfb;
+      border:1px solid #d9eeee;
+      color:#54706f;
+      border-radius:14px;
+      padding:14px 15px;
+      font-size:13px;
+      line-height:1.6;
+      text-align:center;
+    }
+
+    .vk-panel{
+      display:none;
+      position:fixed;
+      left:50%;
+      transform:translateX(-50%);
+      bottom:18px;
+      width:min(980px, calc(100% - 20px));
+      background:#ffffff;
+      border:1px solid #d8eceb;
+      border-radius:22px;
+      box-shadow:0 18px 40px rgba(0, 59, 58, 0.18);
+      z-index:9999;
+      padding:16px;
+    }
+
+    .vk-header{
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      margin-bottom:14px;
+      color:#003b3a;
+      font-weight:700;
+    }
+
+    .vk-close{
+      border:none;
+      background:#eaf8f8;
+      color:#003b3a;
+      width:36px;
+      height:36px;
+      border-radius:10px;
+      cursor:pointer;
+      font-size:18px;
+    }
+
+    .vk-layout{
+      display:flex;
+      flex-direction:column;
+      gap:10px;
+    }
+
+    .vk-row{
+      display:flex;
+      justify-content:center;
+      gap:8px;
+      flex-wrap:wrap;
+    }
+
+    .vk-key{
+      min-width:52px;
+      height:48px;
+      padding:0 14px;
+      border:none;
+      border-radius:12px;
+      background:#f4fbfb;
+      color:#003b3a;
+      font-size:16px;
+      font-weight:600;
+      cursor:pointer;
+      transition:0.2s ease;
+      border:1px solid #d9eceb;
+    }
+
+    .vk-key:hover{
+      background:#eaf8f8;
+      transform:translateY(-1px);
+    }
+
+    .vk-action{
+      background:linear-gradient(135deg, #00a9a5, #008e8b);
+      color:white;
+      border:none;
+    }
+
+    .vk-space{
+      min-width:220px;
+    }
+
+    @media (max-width: 700px){
+      .top-nav{
+        justify-content:center;
+        gap:16px;
+      }
+
+      .login-section{
+        padding:16px 10px 90px;
+      }
+
+      .login-card{
+        padding:28px 20px;
+        border-radius:22px;
+      }
+
+      .login-top h2{
+        font-size:28px;
+      }
+
+      .quick-links{
+        grid-template-columns:1fr;
+      }
+
+      .captcha-wrapper{
+        flex-direction:column;
+        align-items:stretch;
+      }
+
+      .captcha-image{
+        width:100%;
+        height:auto;
+      }
+
+      .vk-panel{
+        width:calc(100% - 12px);
+        bottom:8px;
+        padding:12px;
+      }
+
+      .vk-key{
+        min-width:42px;
+        height:44px;
+        font-size:14px;
+      }
+
+      .vk-space{
+        min-width:150px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="bg-shape shape1"></div>
+  <div class="bg-shape shape2"></div>
+  <div class="bg-shape shape3"></div>
+
+  {% if signup_notice and signup_notice_message %}
+  <div class="signup-notice" id="signupNotice" aria-live="polite">
+    <div class="signup-notice-head">
+      <div class="signup-notice-mark" aria-hidden="true">
+        <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M12 3l7 3v5c0 5-3.4 8.6-7 10-3.6-1.4-7-5-7-10V6l7-3z" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"/>
+          <path d="M8.5 12.2l2.3 2.3 4.7-4.7" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </div>
+      <div class="signup-notice-copy">
+        <div class="signup-notice-badge">Ready to sign in</div>
+        <strong>{{ signup_notice_title or 'Account Created' }}</strong>
+        <span>{{ signup_notice_message }}</span>
+      </div>
+      <button type="button" class="signup-notice-close" id="signupNoticeClose" aria-label="Dismiss notice">&times;</button>
+    </div>
+    <div class="signup-notice-bar">
+      <span id="signupNoticeBar"></span>
+    </div>
+  </div>
+  {% endif %}
+
+  <div class="page-shell">
+
+    <div class="top-bar">
+      <div class="container">
+        <nav class="top-nav">
+          <a href="{{ url_for('home') }}">Home</a>
+          <a href="{{ url_for('signup') }}">Sign Up</a>
+          <a href="#">Contact Us</a>
+        </nav>
+      </div>
+    </div>
+
+    <header class="main-header">
+      <div class="container">
+        <div class="header-content">
+          <a href="{{ url_for('home') }}" class="logo">
+            <svg class="logo-icon" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M20 5C12 5 8 12 8 18C8 24 12 28 16 30C16 30 14 34 10 36C10 36 18 35 22 30C22 30 23 30 24 30C32 30 36 23 36 17C36 11 32 5 20 5Z" fill="#00A9A5"/>
+              <path d="M20 10C16 10 14 14 14 18C14 22 16 24 18 25C18 25 17 27 15 28C15 28 19 27 21 25C21 25 22 25 22 25C26 25 28 21 28 17C28 13 26 10 20 10Z" fill="white"/>
+            </svg>
+            <span class="logo-text">E-Health</span>
+          </a>
+        </div>
+      </div>
+    </header>
+
+    <section class="login-section">
+      <div class="login-card">
+        <div class="login-top">
+          <div class="small-icon">❤</div>
+          <h2>Welcome Back</h2>
+          <p>Sign in to continue to your secure healthcare portal.</p>
+
+          <div class="mini-badges">
+            <span class="mini-badge">CAPTCHA Protected</span>
+            <span class="mini-badge">Wallet Login Ready</span>
+            <span class="mini-badge">Virtual Keyboard</span>
+          </div>
+        </div>
+
+        {% if error %}
+          <div class="error-box">{{ error }}</div>
+        {% endif %}
+
+        <div class="section-note">
+          Sign in with your account credentials to access your healthcare dashboard, secure verification flow, and digital care services.
+        </div>
+
+        <form method="POST" action="{{ url_for('login') }}">
+          <div class="input-group">
+            <label for="emailInput">Email</label>
+            <div class="input-wrap">
+              <input type="email" name="email" id="emailInput" placeholder="ali@demo.com" required onclick="setActiveInput(this)" onfocus="setActiveInput(this)">
+              <span class="input-icon">✉</span>
+            </div>
+          </div>
+
+          <div class="input-group">
+            <label for="passwordInput">Password</label>
+            <div class="input-wrap">
+              <input type="password" name="password" id="passwordInput" placeholder="test123" required onclick="setActiveInput(this)" onfocus="setActiveInput(this)">
+              <span class="input-icon toggle-password" onclick="togglePassword()">👁</span>
+            </div>
+          </div>
+
+          <div class="captcha-block">
+            <label>Security Check</label>
+            <div class="captcha-wrapper">
+              <img src="{{ url_for('captcha_image') }}" alt="CAPTCHA" id="captchaImage" class="captcha-image">
+              <button type="button" class="captcha-refresh" onclick="refreshCaptcha()">↻</button>
+            </div>
+          </div>
+
+          <div class="input-group">
+            <label for="captchaInput">Enter CAPTCHA</label>
+            <div class="input-wrap">
+              <input type="text" name="captcha_input" id="captchaInput" placeholder="Enter the code shown above" required onclick="setActiveInput(this)" onfocus="setActiveInput(this)">
+              <span class="input-icon">🛡</span>
+            </div>
+          </div>
+
+          <div class="options-row">
+            <label class="remember">
+              <input type="checkbox" name="remember">
+              Remember me
+            </label>
+            <a href="#">Forgot Password?</a>
+          </div>
+
+          <button class="login-btn" type="submit">Sign In Securely</button>
+
+          <button type="button" class="secondary-btn" onclick="toggleKeyboard()">
+            Show Virtual Keyboard
+          </button>
+
+          <div class="divider">Quick access</div>
+
+          <div class="quick-links">
+            <a href="{{ url_for('home') }}" class="quick-box">← Back Home</a>
+            <a href="{{ url_for('signup') }}" class="quick-box">Create Account</a>
+          </div>
+
+          <a href="{{ url_for('wallet_login_page') }}" class="wallet-link">
+            Login with Wallet (MetaMask)
+          </a>
+
+          <div class="signup">
+            Don’t have an account? <a href="{{ url_for('signup') }}">Sign up</a>
+          </div>
+
+          <div class="security-note">
+            Secure access to healthcare information with layered protection and a trusted digital experience.
+          </div>
+        </form>
+      </div>
+    </section>
+  </div>
+
+  <div id="virtualKeyboard" class="vk-panel">
+    <div class="vk-header">
+      <span>Virtual Keyboard</span>
+      <button type="button" class="vk-close" onclick="hideKeyboard()">✕</button>
+    </div>
+
+    <div class="vk-layout">
+      <div class="vk-row">
+        <button type="button" class="vk-key" onclick="addKey('1')">1</button>
+        <button type="button" class="vk-key" onclick="addKey('2')">2</button>
+        <button type="button" class="vk-key" onclick="addKey('3')">3</button>
+        <button type="button" class="vk-key" onclick="addKey('4')">4</button>
+        <button type="button" class="vk-key" onclick="addKey('5')">5</button>
+        <button type="button" class="vk-key" onclick="addKey('6')">6</button>
+        <button type="button" class="vk-key" onclick="addKey('7')">7</button>
+        <button type="button" class="vk-key" onclick="addKey('8')">8</button>
+        <button type="button" class="vk-key" onclick="addKey('9')">9</button>
+        <button type="button" class="vk-key" onclick="addKey('0')">0</button>
+        <button type="button" class="vk-key vk-action" onclick="backspaceKey()">⌫</button>
+      </div>
+
+      <div class="vk-row">
+        <button type="button" class="vk-key" onclick="addKey('q')">q</button>
+        <button type="button" class="vk-key" onclick="addKey('w')">w</button>
+        <button type="button" class="vk-key" onclick="addKey('e')">e</button>
+        <button type="button" class="vk-key" onclick="addKey('r')">r</button>
+        <button type="button" class="vk-key" onclick="addKey('t')">t</button>
+        <button type="button" class="vk-key" onclick="addKey('y')">y</button>
+        <button type="button" class="vk-key" onclick="addKey('u')">u</button>
+        <button type="button" class="vk-key" onclick="addKey('i')">i</button>
+        <button type="button" class="vk-key" onclick="addKey('o')">o</button>
+        <button type="button" class="vk-key" onclick="addKey('p')">p</button>
+      </div>
+
+      <div class="vk-row">
+        <button type="button" class="vk-key" onclick="addKey('a')">a</button>
+        <button type="button" class="vk-key" onclick="addKey('s')">s</button>
+        <button type="button" class="vk-key" onclick="addKey('d')">d</button>
+        <button type="button" class="vk-key" onclick="addKey('f')">f</button>
+        <button type="button" class="vk-key" onclick="addKey('g')">g</button>
+        <button type="button" class="vk-key" onclick="addKey('h')">h</button>
+        <button type="button" class="vk-key" onclick="addKey('j')">j</button>
+        <button type="button" class="vk-key" onclick="addKey('k')">k</button>
+        <button type="button" class="vk-key" onclick="addKey('l')">l</button>
+        <button type="button" class="vk-key" onclick="addKey('@')">@</button>
+      </div>
+
+      <div class="vk-row">
+        <button type="button" class="vk-key" onclick="addKey('z')">z</button>
+        <button type="button" class="vk-key" onclick="addKey('x')">x</button>
+        <button type="button" class="vk-key" onclick="addKey('c')">c</button>
+        <button type="button" class="vk-key" onclick="addKey('v')">v</button>
+        <button type="button" class="vk-key" onclick="addKey('b')">b</button>
+        <button type="button" class="vk-key" onclick="addKey('n')">n</button>
+        <button type="button" class="vk-key" onclick="addKey('m')">m</button>
+        <button type="button" class="vk-key" onclick="addKey('.')">.</button>
+        <button type="button" class="vk-key" onclick="addKey('_')">_</button>
+        <button type="button" class="vk-key" onclick="addKey('-')">-</button>
+      </div>
+
+      <div class="vk-row">
+        <button type="button" class="vk-key vk-space" onclick="addKey(' ')">Space</button>
+        <button type="button" class="vk-key vk-action" onclick="clearInput()">Clear</button>
+        <button type="button" class="vk-key vk-action" onclick="hideKeyboard()">Hide</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const signupNotice = document.getElementById("signupNotice");
+    const signupNoticeClose = document.getElementById("signupNoticeClose");
+    const signupNoticeBar = document.getElementById("signupNoticeBar");
+
+    if (signupNotice) {
+      let signupNoticeTimeout = null;
+
+      function closeSignupNotice() {
+        signupNotice.classList.remove("visible");
+        if (signupNoticeBar) {
+          signupNoticeBar.classList.remove("running");
+        }
+        if (signupNoticeTimeout) {
+          clearTimeout(signupNoticeTimeout);
+          signupNoticeTimeout = null;
+        }
+      }
+
+      requestAnimationFrame(() => {
+        signupNotice.classList.add("visible");
+        if (signupNoticeBar) {
+          signupNoticeBar.classList.add("running");
+        }
+      });
+
+      if (window.history && typeof window.history.replaceState === "function") {
+        const currentUrl = new URL(window.location.href);
+        currentUrl.searchParams.delete("signup_notice");
+        currentUrl.searchParams.delete("signup_notice_title");
+        currentUrl.searchParams.delete("signup_notice_message");
+        window.history.replaceState({}, document.title, currentUrl.pathname + currentUrl.search + currentUrl.hash);
+      }
+
+      signupNoticeTimeout = setTimeout(closeSignupNotice, 5000);
+      if (signupNoticeClose) {
+        signupNoticeClose.addEventListener("click", closeSignupNotice);
+      }
+    }
+
+    let activeInput = null;
+
+    function setActiveInput(inputElement) {
+      activeInput = inputElement;
+    }
+
+    function scrollToActiveInput() {
+      if (!activeInput) return;
+
+      const extraOffset = 220;
+      const inputTop = activeInput.getBoundingClientRect().top + window.pageYOffset;
+      const targetY = inputTop - extraOffset;
+
+      window.scrollTo({
+        top: targetY,
+        behavior: "smooth"
+      });
+    }
+
+    function toggleKeyboard() {
+      const keyboard = document.getElementById("virtualKeyboard");
+
+      if (keyboard.style.display === "none" || keyboard.style.display === "") {
+        keyboard.style.display = "block";
+        document.body.classList.add("keyboard-open");
+
+        setTimeout(() => {
+          scrollToActiveInput();
+        }, 250);
+      } else {
+        keyboard.style.display = "none";
+        document.body.classList.remove("keyboard-open");
+      }
+    }
+
+    function hideKeyboard() {
+      document.getElementById("virtualKeyboard").style.display = "none";
+      document.body.classList.remove("keyboard-open");
+    }
+
+    function addKey(char) {
+      if (activeInput) {
+        activeInput.value += char;
+        activeInput.focus();
+        scrollToActiveInput();
+      }
+    }
+
+    function backspaceKey() {
+      if (activeInput) {
+        activeInput.value = activeInput.value.slice(0, -1);
+        activeInput.focus();
+        scrollToActiveInput();
+      }
+    }
+
+    function clearInput() {
+      if (activeInput) {
+        activeInput.value = "";
+        activeInput.focus();
+        scrollToActiveInput();
+      }
+    }
+
+    async function refreshCaptcha() {
+      const img = document.getElementById("captchaImage");
+      try {
+        const res = await fetch("/refresh-captcha");
+        const data = await res.json();
+        if (data.ok) {
+          img.src = data.captcha_url;
+        }
+      } catch (e) {
+        console.error("Captcha refresh failed", e);
+      }
+    }
+
+    function togglePassword() {
+      const password = document.getElementById("passwordInput");
+      const eye = document.querySelector(".toggle-password");
+
+      if (password.type === "password") {
+        password.type = "text";
+        eye.textContent = "🙈";
+      } else {
+        password.type = "password";
+        eye.textContent = "👁";
+      }
+    }
+
+    window.addEventListener("load", () => {
+      const emailInput = document.getElementById("emailInput");
+      if (emailInput) {
+        setActiveInput(emailInput);
+      }
+    });
+  </script>
+</body>
+</html>

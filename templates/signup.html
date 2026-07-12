@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Sign Up | E-Health</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+  <style>
+    *{margin:0;padding:0;box-sizing:border-box;font-family:"Segoe UI",Tahoma,Geneva,Verdana,sans-serif;}
+    body{min-height:100vh;background:linear-gradient(135deg,#eaf8f8 0%,#dff6f5 35%,#c8efed 100%);position:relative;overflow-x:hidden;color:#003b3a;}
+    .bg-shape{position:absolute;border-radius:50%;background:rgba(0,169,165,0.10);animation:float 8s ease-in-out infinite;z-index:0;filter:blur(2px);}
+    .shape1{width:260px;height:260px;top:70px;left:-70px;}
+    .shape2{width:220px;height:220px;bottom:50px;right:-60px;animation-delay:2s;}
+    .shape3{width:180px;height:180px;top:180px;right:120px;animation-delay:1s;}
+    @keyframes float{0%,100%{transform:translateY(0px);}50%{transform:translateY(-18px);}}
+    .page-shell{position:relative;z-index:2;}
+    .top-bar{background:#ffffff;border-bottom:1px solid #dfeaea;}
+    .container{width:92%;max-width:1200px;margin:0 auto;}
+    .top-nav{display:flex;justify-content:flex-end;gap:24px;padding:12px 0;flex-wrap:wrap;}
+    .top-nav a{text-decoration:none;color:#245f5d;font-size:14px;font-weight:500;}
+    .top-nav a:hover{color:#00a9a5;}
+    .main-header{padding:18px 0;}
+    .header-content{display:flex;align-items:center;justify-content:space-between;}
+    .logo{display:flex;align-items:center;gap:12px;text-decoration:none;}
+    .logo-icon{width:42px;height:42px;}
+    .logo-text{font-size:24px;font-weight:700;color:#003b3a;}
+    .signup-section{min-height:calc(100vh - 120px);display:flex;align-items:center;justify-content:center;padding:24px 16px 48px;}
+    .signup-card{width:min(1180px,100%);max-width:none;background:#ffffff;border:1px solid #dcebea;border-radius:28px;padding:42px 42px 38px;box-shadow:0 20px 60px rgba(0,59,58,0.12);}
+    .signup-top{text-align:center;margin-bottom:26px;}
+    .small-icon{width:78px;height:78px;margin:0 auto 15px;border-radius:22px;background:linear-gradient(135deg,#00a9a5,#008e8b);color:white;display:flex;align-items:center;justify-content:center;font-size:34px;box-shadow:0 12px 30px rgba(0,169,165,0.22);}
+    .signup-top h2{font-size:34px;color:#003b3a;margin-bottom:8px;}
+    .signup-top p{color:#5a7776;font-size:14px;line-height:1.6;max-width:560px;margin:0 auto;}
+    .mini-badges{display:flex;justify-content:center;gap:10px;flex-wrap:wrap;margin-top:18px;}
+    .mini-badge{background:#f4fbfb;border:1px solid #d9eeee;color:#256664;padding:8px 12px;border-radius:999px;font-size:12px;font-weight:600;}
+    .error-box{background:#fff1f3;color:#b42318;border:1px solid #f3c7cf;padding:12px 14px;border-radius:14px;font-size:14px;margin-bottom:18px;text-align:center;}
+    .section-note{background:#f7fcfc;border:1px solid #dceeee;color:#4f6e6d;border-radius:16px;padding:14px 16px;font-size:13px;line-height:1.6;margin-bottom:20px;}
+    .form-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px;}
+    .input-group,.full-width{margin-bottom:16px;}
+    .input-group label,.full-width label{display:block;margin-bottom:8px;color:#003b3a;font-weight:600;font-size:14px;}
+    .input-wrap{position:relative;}
+    .input-wrap input,.input-wrap select,.full-input,.full-select,.full-textarea{width:100%;padding:15px 16px;border:1px solid #d7eceb;border-radius:14px;background:#ffffff;font-size:15px;color:#003b3a;transition:0.25s ease;outline:none;box-shadow:0 4px 12px rgba(0,0,0,0.02);}
+    .input-wrap input{padding-right:48px;}
+    .full-textarea{min-height:120px;resize:vertical;}
+    .input-wrap input:focus,.input-wrap select:focus,.full-input:focus,.full-select:focus,.full-textarea:focus{border-color:#00a9a5;box-shadow:0 0 0 4px rgba(0,169,165,0.10);}
+    .field-invalid{border-color:#e49a9a !important;box-shadow:0 0 0 4px rgba(196,67,67,0.10) !important;}
+    .field-hint{margin-top:8px;color:#b42318;font-size:13px;font-weight:600;line-height:1.5;}
+    .field-suggestions{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px;}
+    .field-suggestion{
+      display:inline-flex;
+      align-items:center;
+      padding:7px 11px;
+      border-radius:999px;
+      background:#eef8f8;
+      border:1px solid #d7eceb;
+      color:#215f5d;
+      font-size:12px;
+      font-weight:700;
+    }
+    .input-icon{position:absolute;right:15px;top:50%;transform:translateY(-50%);font-size:18px;color:#6e8e8d;user-select:none;}
+    .toggle-password{cursor:pointer;}
+    .info-box{background:#f4fbfb;border:1px solid #d9eeee;color:#416968;padding:14px 16px;border-radius:14px;line-height:1.6;font-size:14px;margin:8px 0 18px;}
+    .doctor-fields{display:none;padding:18px;border-radius:18px;background:#f7fcfc;border:1px solid #dceeee;margin-bottom:18px;}
+    .doctor-fields.active{display:block;}
+    .signup-btn{width:100%;padding:15px;border:none;border-radius:14px;background:linear-gradient(135deg,#00a9a5 0%,#008e8b 100%);color:white;font-size:16px;font-weight:700;cursor:pointer;box-shadow:0 14px 28px rgba(0,169,165,0.20);transition:0.25s ease;margin-top:4px;margin-bottom:16px;}
+    .signup-btn:hover{transform:translateY(-2px);}
+    .quick-links{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:14px;}
+    .quick-box{text-decoration:none;background:#ffffff;border:1px solid #dceeee;border-radius:14px;padding:14px 12px;text-align:center;color:#003b3a;transition:0.25s ease;font-size:14px;font-weight:600;}
+    .quick-box:hover{border-color:#00a9a5;}
+    .signin{text-align:center;margin-top:10px;color:#5d7a79;font-size:14px;}
+    .signin a{color:#00a9a5;text-decoration:none;font-weight:700;}
+    .security-note{margin-top:18px;background:#f2fbfb;border:1px solid #d9eeee;color:#54706f;border-radius:14px;padding:14px 15px;font-size:13px;line-height:1.6;text-align:center;}
+    @media (max-width:700px){.top-nav{justify-content:center;gap:16px;}.signup-section{padding:16px 10px 32px;}.signup-card{padding:28px 20px;border-radius:22px;}.signup-top h2{font-size:28px;}.form-grid,.quick-links{grid-template-columns:1fr;}}
+  </style>
+</head>
+<body>
+  <div class="bg-shape shape1"></div>
+  <div class="bg-shape shape2"></div>
+  <div class="bg-shape shape3"></div>
+
+  <div class="page-shell">
+    <div class="top-bar">
+      <div class="container">
+        <nav class="top-nav">
+          <a href="{{ url_for('home') }}">Home</a>
+          <a href="{{ url_for('login') }}">Login</a>
+          <a href="#">Contact Us</a>
+        </nav>
+      </div>
+    </div>
+
+    <header class="main-header">
+      <div class="container">
+        <div class="header-content">
+          <a href="{{ url_for('home') }}" class="logo">
+            <svg class="logo-icon" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M20 5C12 5 8 12 8 18C8 24 12 28 16 30C16 30 14 34 10 36C10 36 18 35 22 30C22 30 23 30 24 30C32 30 36 23 36 17C36 11 32 5 20 5Z" fill="#00A9A5"/>
+              <path d="M20 10C16 10 14 14 14 18C14 22 16 24 18 25C18 25 17 27 15 28C15 28 19 27 21 25C21 25 22 25 22 25C26 25 28 21 28 17C28 13 26 10 20 10Z" fill="white"/>
+            </svg>
+            <span class="logo-text">E-Health</span>
+          </a>
+        </div>
+      </div>
+    </header>
+
+    <section class="signup-section">
+      <div class="signup-card">
+        <div class="signup-top">
+          <div class="small-icon">🩺</div>
+          <h2>Create Account</h2>
+          <p>Register as a patient, doctor, or storage staff member to access the E-Health platform.</p>
+          <div class="mini-badges">
+            <span class="mini-badge">Patient Registration</span>
+            <span class="mini-badge">Doctor Onboarding</span>
+            <span class="mini-badge">Storage Access</span>
+            <span class="mini-badge">Wallet Address Ready</span>
+          </div>
+        </div>
+
+        {% if error %}
+          <div class="error-box">{{ error }}</div>
+        {% endif %}
+
+        <div class="section-note">
+          Create your secure healthcare profile with role-based access and blockchain wallet support.
+          Doctor accounts continue to verification after signup, while storage accounts can manage medicine stock and alerts.
+        </div>
+
+        <form method="POST" action="{{ url_for('signup') }}">
+          <div class="form-grid">
+            <div class="input-group">
+              <label for="first_name">First Name</label>
+              <div class="input-wrap">
+                <input type="text" id="first_name" name="first_name" placeholder="First name" value="{{ form_data.first_name }}" class="{% if field_errors.first_name %}field-invalid{% endif %}" required>
+                <span class="input-icon">U</span>
+              </div>
+              {% if field_errors.first_name %}<div class="field-hint">{{ field_errors.first_name }}</div>{% endif %}
+            </div>
+
+            <div class="input-group">
+              <label for="last_name">Last Name</label>
+              <div class="input-wrap">
+                <input type="text" id="last_name" name="last_name" placeholder="Last name" value="{{ form_data.last_name }}" class="{% if field_errors.last_name %}field-invalid{% endif %}" required>
+                <span class="input-icon">U</span>
+              </div>
+              {% if field_errors.last_name %}<div class="field-hint">{{ field_errors.last_name }}</div>{% endif %}
+            </div>
+
+            <div class="input-group">
+              <label for="email">Email</label>
+              <div class="input-wrap">
+                <input type="email" id="email" name="email" placeholder="name@example.com" value="{{ form_data.email }}" class="{% if field_errors.email %}field-invalid{% endif %}" required>
+                <span class="input-icon">@</span>
+              </div>
+              {% if field_errors.email %}<div class="field-hint">{{ field_errors.email }}</div>{% endif %}
+              {% if field_suggestions.email %}
+                <div class="field-suggestions">
+                  {% for suggestion in field_suggestions.email %}
+                    <span class="field-suggestion">{{ suggestion }}</span>
+                  {% endfor %}
+                </div>
+              {% endif %}
+            </div>
+
+            <div class="input-group">
+              <label for="password">Password</label>
+              <div class="input-wrap">
+                <input type="password" id="password" name="password" placeholder="********" class="{% if field_errors.password %}field-invalid{% endif %}" required>
+                <span class="input-icon toggle-password" onclick="togglePassword()">O</span>
+              </div>
+              {% if field_errors.password %}<div class="field-hint">{{ field_errors.password }}</div>{% endif %}
+            </div>
+
+            <div class="input-group">
+              <label for="age">Age</label>
+              <div class="input-wrap">
+                <input type="number" id="age" name="age" min="1" max="120" placeholder="Age" value="{{ form_data.age }}" class="{% if field_errors.age %}field-invalid{% endif %}" required>
+                <span class="input-icon">#</span>
+              </div>
+              {% if field_errors.age %}<div class="field-hint">{{ field_errors.age }}</div>{% endif %}
+            </div>
+
+            <div class="input-group">
+              <label for="gender">Gender</label>
+              <div class="input-wrap">
+                <select id="gender" name="gender" class="{% if field_errors.gender %}field-invalid{% endif %}" required>
+                  <option value="" disabled {% if not form_data.gender %}selected{% endif %}>Select gender</option>
+                  <option value="male" {% if form_data.gender == 'male' %}selected{% endif %}>Male</option>
+                  <option value="female" {% if form_data.gender == 'female' %}selected{% endif %}>Female</option>
+                </select>
+              </div>
+              {% if field_errors.gender %}<div class="field-hint">{{ field_errors.gender }}</div>{% endif %}
+            </div>
+          </div>
+
+          <div class="full-width">
+            <label for="phone">Phone</label>
+            <input class="full-input {% if field_errors.phone %}field-invalid{% endif %}" type="text" id="phone" name="phone" placeholder="+962 ..." value="{{ form_data.phone }}">
+            {% if field_errors.phone %}<div class="field-hint">{{ field_errors.phone }}</div>{% endif %}
+          </div>
+
+          <div class="full-width">
+            <label for="wallet_address">Blockchain Wallet Address</label>
+            <input class="full-input {% if field_errors.wallet_address %}field-invalid{% endif %}" type="text" id="wallet_address" name="wallet_address" placeholder="0x..." value="{{ form_data.wallet_address }}" required>
+            {% if field_errors.wallet_address %}<div class="field-hint">{{ field_errors.wallet_address }}</div>{% endif %}
+          </div>
+
+          <div class="full-width">
+            <label for="roleSelect">Role</label>
+            <select class="full-select {% if field_errors.role %}field-invalid{% endif %}" name="role" id="roleSelect" required onchange="toggleDoctorFields()">
+              <option value="" disabled {% if not form_data.role %}selected{% endif %}>Select role</option>
+              <option value="patient" {% if form_data.role == 'patient' %}selected{% endif %}>Patient</option>
+              <option value="doctor" {% if form_data.role == 'doctor' %}selected{% endif %}>Doctor</option>
+              <option value="storage" {% if form_data.role == 'storage' %}selected{% endif %}>Storage</option>
+            </select>
+            {% if field_errors.role %}<div class="field-hint">{{ field_errors.role }}</div>{% endif %}
+          </div>
+
+          <div id="doctorNote" class="info-box" style="display:none;">
+            Doctors will be asked to upload verification documents on the next step.
+            Doctor accounts will remain <strong>pending</strong> until admin approval.
+          </div>
+
+          <div id="doctorFields" class="doctor-fields">
+            <div class="full-width">
+              <label for="specialty">Specialty</label>
+              <input class="full-input {% if field_errors.specialty %}field-invalid{% endif %}" type="text" id="specialty" name="specialty" placeholder="Cardiology" value="{{ form_data.specialty }}">
+              {% if field_errors.specialty %}<div class="field-hint">{{ field_errors.specialty }}</div>{% endif %}
+            </div>
+            <div class="full-width">
+              <label for="bio">Doctor Bio</label>
+              <textarea class="full-textarea {% if field_errors.bio %}field-invalid{% endif %}" id="bio" name="bio" placeholder="Tell patients about your expertise, focus area, and experience.">{{ form_data.bio }}</textarea>
+              {% if field_errors.bio %}<div class="field-hint">{{ field_errors.bio }}</div>{% endif %}
+            </div>
+          </div>
+
+          <button class="signup-btn" type="submit">Create Account</button>
+
+          <div class="quick-links">
+            <a href="{{ url_for('home') }}" class="quick-box">&larr; Back Home</a>
+            <a href="{{ url_for('login') }}" class="quick-box">Go to Login</a>
+          </div>
+
+          <div class="signin">
+            Already have an account? <a href="{{ url_for('login') }}">Login</a>
+          </div>
+
+          <div class="security-note">
+            Your registration information is handled in a secure healthcare environment designed for trusted digital access.
+          </div>
+        </form>
+      </div>
+    </section>
+  </div>
+
+  <script>
+    function toggleDoctorFields() {
+      const role = document.getElementById("roleSelect").value;
+      const note = document.getElementById("doctorNote");
+      const doctorFields = document.getElementById("doctorFields");
+      const specialty = document.getElementById("specialty");
+      const bio = document.getElementById("bio");
+      const isDoctor = role === "doctor";
+      note.style.display = isDoctor ? "block" : "none";
+      doctorFields.classList.toggle("active", isDoctor);
+      specialty.required = isDoctor;
+      bio.required = isDoctor;
+    }
+
+    function togglePassword() {
+      const password = document.getElementById("password");
+      const icon = document.querySelector(".toggle-password");
+      if (password.type === "password") {
+        password.type = "text";
+        icon.textContent = "-";
+      } else {
+        password.type = "password";
+        icon.textContent = "O";
+      }
+    }
+
+    toggleDoctorFields();
+  </script>
+</body>
+</html>

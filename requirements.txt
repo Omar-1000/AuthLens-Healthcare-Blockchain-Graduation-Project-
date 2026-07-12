@@ -1,0 +1,9 @@
+Flask
+mysql-connector-python
+Flask-Mail
+Werkzeug
+web3
+eth-account
+Pillow
+py-solc-x
+pycryptodome

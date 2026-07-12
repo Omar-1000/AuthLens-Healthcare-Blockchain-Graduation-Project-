@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Doctor Approval | E-Health</title>
+<link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+<style>
+:root{--teal:#004D4D;--teal-soft:#0f8f8c;--mint:#8df0d8;--glass:rgba(255,255,255,0.72);--line:rgba(0,77,77,0.10);--shadow:0 28px 60px rgba(0,77,77,0.14);--text:#143534;--muted:#5d7a79;--ok:#29b36a;--danger:#d45757;}
+*{box-sizing:border-box;margin:0;padding:0;font-family:"Segoe UI",Tahoma,Geneva,Verdana,sans-serif;}
+body{min-height:100vh;color:var(--text);background:radial-gradient(circle at top left, rgba(141,240,216,0.30), transparent 18%),radial-gradient(circle at bottom right, rgba(0,77,77,0.12), transparent 24%),linear-gradient(135deg,#f3fbfb 0%,#e7f3f2 55%,#deefee 100%);}
+.shell{width:min(1600px,96vw);min-height:calc(100vh - 24px);margin:12px auto;background:rgba(255,255,255,0.46);border:1px solid rgba(255,255,255,0.52);backdrop-filter:blur(18px);border-radius:28px;box-shadow:var(--shadow);overflow:hidden;}
+.topbar{padding:18px 24px;display:flex;align-items:center;justify-content:space-between;gap:14px;border-bottom:1px solid var(--line);background:rgba(255,255,255,0.34);flex-wrap:wrap;}
+.brand{display:flex;align-items:center;gap:14px;}
+.brand-mark{width:54px;height:54px;border-radius:18px;display:grid;place-items:center;color:#fff;font-size:23px;font-weight:900;background:linear-gradient(135deg,#0b6d6a 0%,#004D4D 100%);box-shadow:0 16px 30px rgba(0,77,77,0.18);}
+.brand h1{font-size:24px;color:#113534;}
+.brand p{color:var(--muted);font-size:14px;margin-top:4px;}
+.top-links{display:flex;gap:12px;flex-wrap:wrap;}
+.top-links a{text-decoration:none;color:#1c4d4c;font-weight:800;padding:11px 15px;border-radius:999px;background:rgba(255,255,255,0.55);border:1px solid rgba(0,77,77,0.08);}
+.top-links a:hover{background:rgba(255,255,255,0.8);}
+.body{padding:22px;display:grid;gap:18px;}
+.panel{background:var(--glass);border:1px solid rgba(255,255,255,0.52);border-radius:24px;padding:22px;box-shadow:0 16px 30px rgba(0,77,77,0.08);backdrop-filter:blur(14px);}
+.panel h2{font-size:28px;color:#123b39;margin-bottom:10px;}
+.panel p{color:var(--muted);line-height:1.7;}
+.auth-grid{display:grid;grid-template-columns:minmax(320px,480px) 1fr;gap:18px;align-items:start;}
+.field{display:grid;gap:8px;margin-top:16px;}
+.field label{font-size:13px;font-weight:800;letter-spacing:.05em;text-transform:uppercase;color:#285554;}
+.field input{width:100%;padding:15px 16px;border-radius:16px;border:1px solid rgba(0,77,77,0.12);background:#fff;font:inherit;outline:none;}
+.field input:focus{border-color:var(--teal-soft);box-shadow:0 0 0 4px rgba(15,143,140,0.10);}
+.btn{border:none;border-radius:16px;padding:14px 18px;font-weight:800;font-size:14px;cursor:pointer;transition:.22s ease;}
+.btn:hover{transform:translateY(-1px);}
+.btn-primary{background:linear-gradient(135deg,#0b6d6a 0%,#004D4D 100%);color:#fff;box-shadow:0 16px 28px rgba(0,77,77,0.16);}
+.msg{padding:14px 16px;border-radius:16px;font-size:14px;font-weight:700;margin-bottom:14px;}
+.msg.error{background:#fff0f0;color:#a13636;border:1px solid #efcaca;}
+.msg.success{background:#eefaf2;color:#1f6e42;border:1px solid #cfe8d8;}
+.doctor-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(340px,1fr));gap:18px;}
+.doctor-card{background:rgba(255,255,255,0.72);border:1px solid rgba(0,77,77,0.08);border-radius:24px;padding:20px;box-shadow:0 12px 24px rgba(0,77,77,0.06);}
+.doctor-head{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:14px;}
+.doctor-head h3{font-size:22px;color:#123b39;}
+.badge{display:inline-flex;align-items:center;justify-content:center;padding:8px 12px;border-radius:999px;font-size:12px;font-weight:800;text-transform:uppercase;}
+.badge.pending{background:#fff2cb;color:#7e5c00;}
+.meta{display:grid;gap:10px;margin-bottom:14px;}
+.meta-row{padding:12px 14px;border-radius:16px;background:#f6fbfb;border:1px solid rgba(0,77,77,0.08);}
+.meta-row span{display:block;color:#5f7b7a;font-size:11px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;margin-bottom:5px;}
+.meta-row strong{display:block;color:#1c4645;font-size:14px;line-height:1.6;word-break:break-word;}
+.docs{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px;}
+.doc-card{padding:12px;border-radius:18px;background:#fbfefe;border:1px solid rgba(0,77,77,0.08);}
+.doc-card img{width:100%;height:180px;object-fit:cover;border-radius:14px;background:#edf6f5;}
+.doc-card strong{display:block;margin-top:10px;color:#153f40;font-size:14px;}
+.doc-card a{display:inline-block;margin-top:8px;color:#0b6d6a;font-weight:700;text-decoration:none;}
+.doc-card a:hover{text-decoration:underline;}
+.actions{display:flex;justify-content:flex-end;}
+.empty{padding:28px;border-radius:22px;text-align:center;color:var(--muted);line-height:1.8;background:rgba(255,255,255,0.65);border:1px dashed rgba(0,77,77,0.12);}
+@media (max-width:980px){.auth-grid{grid-template-columns:1fr;}.docs{grid-template-columns:1fr;}}
+@media (max-width:760px){.topbar{padding:18px;}.body{padding:16px;}.brand h1{font-size:22px;}}
+</style>
+</head>
+<body>
+<div class="shell">
+  <div class="topbar">
+    <div class="brand">
+      <div class="brand-mark">DR</div>
+      <div>
+        <h1>Doctor Approval</h1>
+        <p>Approve pending doctor registrations after a fresh password confirmation.</p>
+      </div>
+    </div>
+    <div class="top-links">
+      <a href="{{ url_for('integrity_dashboard') }}">Admin Integrity</a>
+      <a href="{{ url_for('admin_doctor_review') }}">Doctor Approval</a>
+      <a href="{{ url_for('logout') }}">Logout</a>
+    </div>
+  </div>
+
+  <div class="body">
+    {% if not verified %}
+      <div class="auth-grid">
+        <div class="panel">
+          <h2>Admin Verification</h2>
+          <p>Re-enter your password to open the doctor approval queue. This verification is required each time you open Doctor Approval.</p>
+          {% if error %}
+            <div class="msg error">{{ error }}</div>
+          {% endif %}
+          <form method="POST" action="{{ url_for('admin_doctor_review') }}">
+            <div class="field">
+              <label for="password">Password</label>
+              <input id="password" name="password" type="password" placeholder="Enter admin password" required>
+            </div>
+            <button class="btn btn-primary" type="submit" style="margin-top:16px;">Open Approval Queue</button>
+          </form>
+        </div>
+        <div class="panel">
+          <h2>What You Can Review</h2>
+          <p>This screen lets you approve doctor registrations after checking:</p>
+          <div class="meta" style="margin-top:16px;">
+            <div class="meta-row"><span>Identity</span><strong>Medical ID number and uploaded ID card photo</strong></div>
+            <div class="meta-row"><span>Professional Proof</span><strong>Medical ID image, specialty, and doctor bio</strong></div>
+            <div class="meta-row"><span>Account Access</span><strong>Only approved doctors can complete login and appear as available in the patient directory</strong></div>
+          </div>
+        </div>
+      </div>
+    {% else %}
+      <div class="panel">
+        <h2>Pending Doctor Accounts</h2>
+        <p>Review submitted documents and approve doctors who should be activated in the system.</p>
+      </div>
+
+      {% if error %}
+        <div class="msg error">{{ error }}</div>
+      {% endif %}
+      {% if success %}
+        <div class="msg success">{{ success }}</div>
+      {% endif %}
+
+      {% if pending_doctors %}
+        <div class="doctor-grid">
+          {% for doctor in pending_doctors %}
+            <div class="doctor-card">
+              <div class="doctor-head">
+                <div>
+                  <h3>{{ doctor.name }}</h3>
+                  <div style="color:#5f7b7a;font-size:14px;margin-top:4px;">{{ doctor.email }}</div>
+                </div>
+                <span class="badge pending">Pending</span>
+              </div>
+
+              <div class="meta">
+                <div class="meta-row"><span>Specialty</span><strong>{{ doctor.specialty or 'Not provided' }}</strong></div>
+                <div class="meta-row"><span>Phone</span><strong>{{ doctor.phone or 'Not provided' }}</strong></div>
+                <div class="meta-row"><span>Medical ID</span><strong>{{ doctor.doctor_medical_id or 'Not provided' }}</strong></div>
+                <div class="meta-row"><span>Wallet Address</span><strong>{{ doctor.wallet_address }}</strong></div>
+                <div class="meta-row"><span>Bio</span><strong>{{ doctor.bio or 'Not provided' }}</strong></div>
+              </div>
+
+              <div class="docs">
+                <div class="doc-card">
+                  <img src="/{{ doctor.doctor_id_card_path.replace('\\', '/') if doctor.doctor_id_card_path else '' }}" alt="ID card photo">
+                  <strong>ID Card Photo</strong>
+                  {% if doctor.doctor_id_card_path %}
+                    <a href="/{{ doctor.doctor_id_card_path.replace('\\', '/') }}" target="_blank">Open full image</a>
+                  {% endif %}
+                </div>
+                <div class="doc-card">
+                  <img src="/{{ doctor.doctor_medical_id_photo_path.replace('\\', '/') if doctor.doctor_medical_id_photo_path else '' }}" alt="Medical ID photo">
+                  <strong>Medical ID Photo</strong>
+                  {% if doctor.doctor_medical_id_photo_path %}
+                    <a href="/{{ doctor.doctor_medical_id_photo_path.replace('\\', '/') }}" target="_blank">Open full image</a>
+                  {% endif %}
+                </div>
+              </div>
+
+              <div class="actions">
+                <form method="POST" action="{{ url_for('admin_approve_doctor', doctor_id=doctor.id) }}">
+                  <button class="btn btn-primary" type="submit">Approve Doctor</button>
+                </form>
+              </div>
+            </div>
+          {% endfor %}
+        </div>
+      {% else %}
+        <div class="empty">No pending doctor accounts are waiting for review right now.</div>
+      {% endif %}
+    {% endif %}
+  </div>
+</div>
+</body>
+</html>

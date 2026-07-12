@@ -1,0 +1,1912 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Doctor Dashboard | E-Health</title>
+<link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+<style>
+*{box-sizing:border-box;margin:0;padding:0;font-family:"Segoe UI",Tahoma,Geneva,Verdana,sans-serif;}
+html{scroll-behavior:smooth;}
+body{
+  min-height:100vh;
+  background:
+    radial-gradient(circle at top left, rgba(255,255,255,.94), transparent 24%),
+    radial-gradient(circle at 86% 8%, rgba(198,233,228,.42), transparent 18%),
+    radial-gradient(circle at 18% 88%, rgba(167,213,208,.25), transparent 22%),
+    linear-gradient(145deg,#f5fbfa 0%, #edf7f6 48%, #e3f0ef 100%);
+  color:#17393a;
+}
+a{text-decoration:none;color:inherit;}
+code{
+  background:#f1f8f7;
+  border:1px solid #dceaea;
+  border-radius:10px;
+  padding:2px 7px;
+  word-break:break-all;
+}
+.page{
+  width:calc(100vw - 24px);
+  max-width:none;
+  margin:12px auto 24px;
+}
+.topbar{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:16px;
+  padding:18px 22px;
+  border-radius:26px;
+  background:rgba(255,255,255,.82);
+  border:1px solid rgba(220,234,232,.92);
+  box-shadow:0 18px 36px rgba(0,77,77,.07);
+  backdrop-filter:blur(12px);
+  margin-bottom:18px;
+}
+.topbar-left{display:flex;align-items:center;gap:14px;min-width:0;}
+.brand{
+  width:50px;height:50px;border-radius:16px;display:flex;align-items:center;justify-content:center;
+  background:linear-gradient(135deg,#0d8c8c 0%, #0f5e6a 100%);
+  color:#fff;font-size:24px;font-weight:900;flex-shrink:0;
+  box-shadow:0 14px 30px rgba(13,108,112,.18);
+}
+.topbar-copy{min-width:0;}
+.topbar-copy h1{font-size:22px;line-height:1.1;margin-bottom:4px;}
+.topbar-copy p{color:#607a7a;font-size:13px;line-height:1.6;}
+.topbar-nav{
+  display:flex;
+  align-items:center;
+  gap:10px;
+  flex-wrap:wrap;
+  justify-content:flex-end;
+}
+.topbar-nav a{
+  padding:10px 14px;
+  border-radius:999px;
+  background:rgba(255,255,255,.92);
+  border:1px solid rgba(220,234,232,.95);
+  color:#27595b;
+  font-size:13px;
+  font-weight:800;
+  transition:transform .16s ease, box-shadow .16s ease, background .16s ease;
+}
+.topbar-nav a:hover{
+  transform:translateY(-1px);
+  box-shadow:0 8px 18px rgba(0,77,77,.08);
+}
+.hero{
+  display:grid;
+  grid-template-columns:minmax(0,1.15fr) minmax(320px,.85fr);
+  gap:18px;
+  align-items:stretch;
+  margin-bottom:18px;
+}
+.hero-card,.panel,.metric{
+  background:rgba(255,255,255,.84);
+  border:1px solid rgba(220,234,232,.92);
+  border-radius:28px;
+  box-shadow:0 18px 36px rgba(0,77,77,.07);
+  backdrop-filter:blur(12px);
+}
+.hero-copy{
+  padding:30px;
+  background:
+    radial-gradient(circle at top left, rgba(255,255,255,.92), transparent 28%),
+    linear-gradient(145deg, rgba(255,255,255,.96) 0%, rgba(237,248,247,.96) 58%, rgba(223,240,238,.98) 100%);
+}
+.eyebrow{
+  display:inline-flex;
+  padding:8px 12px;
+  border-radius:999px;
+  background:#edf7f6;
+  color:#416c6b;
+  font-size:11px;
+  font-weight:800;
+  letter-spacing:.12em;
+  text-transform:uppercase;
+  margin-bottom:16px;
+}
+.hero-copy h2{
+  font-size:46px;
+  line-height:.98;
+  margin-bottom:12px;
+  max-width:12ch;
+}
+.hero-copy p{
+  max-width:56ch;
+  color:#5e7978;
+  line-height:1.75;
+  font-size:14px;
+}
+.hero-actions{
+  display:flex;
+  gap:10px;
+  flex-wrap:wrap;
+  margin-top:18px;
+}
+.btn{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  gap:8px;
+  padding:12px 16px;
+  border:none;
+  border-radius:14px;
+  font-size:14px;
+  font-weight:800;
+  cursor:pointer;
+  transition:transform .16s ease, filter .16s ease, box-shadow .16s ease;
+}
+.btn:hover{transform:translateY(-1px);}
+.btn-primary{
+  background:linear-gradient(135deg,#4d9ea1 0%, #2b7b7e 100%);
+  color:#fff;
+  box-shadow:0 10px 22px rgba(43,123,126,.18);
+}
+.btn-secondary{
+  background:#f3f9f8;
+  color:#2f5c5d;
+  border:1px solid #d8e7e5;
+}
+.hero-side{
+  display:grid;
+  gap:12px;
+}
+.hero-summary{
+  padding:22px;
+}
+.summary-top{
+  display:flex;
+  align-items:flex-start;
+  justify-content:space-between;
+  gap:12px;
+  margin-bottom:16px;
+}
+.summary-top h3{
+  font-size:20px;
+  margin-bottom:5px;
+}
+.summary-mask{
+  display:inline-flex;
+  align-items:center;
+  gap:8px;
+  margin-top:12px;
+  padding:10px 12px;
+  border-radius:14px;
+  background:linear-gradient(135deg, #eef9f3 0%, #e4f4ea 100%);
+  border:1px solid #cfe8d8;
+  color:#2d5c44;
+  font-size:13px;
+  font-weight:700;
+  word-break:break-all;
+}
+.summary-mask span{
+  color:#3f7a59;
+  font-size:11px;
+  font-weight:800;
+  letter-spacing:.08em;
+  text-transform:uppercase;
+}
+.summary-chip{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  min-width:56px;
+  height:56px;
+  padding:0 14px;
+  border-radius:18px;
+  background:linear-gradient(135deg,#eaf8ef 0%, #cfead8 100%);
+  color:#25613f;
+  font-size:18px;
+  font-weight:900;
+  box-shadow:0 8px 18px rgba(53,124,78,.12);
+}
+.summary-grid{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:10px;
+}
+.summary-stat{
+  padding:14px;
+  border-radius:18px;
+  background:linear-gradient(180deg, rgba(255,255,255,.98), rgba(240,248,243,.98));
+  border:1px solid #d6e9dd;
+  box-shadow:inset 0 3px 0 rgba(60,136,86,.12);
+}
+.summary-stat span{
+  display:block;
+  color:#5b8b69;
+  font-size:11px;
+  font-weight:800;
+  letter-spacing:.08em;
+  text-transform:uppercase;
+  margin-bottom:6px;
+}
+.summary-stat strong{
+  display:block;
+  color:#1f4630;
+  font-size:22px;
+  word-break:break-word;
+}
+.stats-grid{
+  display:grid;
+  grid-template-columns:repeat(4,1fr);
+  gap:14px;
+  margin-bottom:18px;
+}
+.metric{
+  padding:18px;
+  position:relative;
+  overflow:hidden;
+}
+.metric::before{
+  content:"";
+  position:absolute;
+  inset:0 auto auto 0;
+  width:100%;
+  height:5px;
+  background:linear-gradient(90deg, #5fc27a 0%, #7adf98 45%, #4d9ea1 100%);
+}
+.metric:nth-child(2)::before{background:linear-gradient(90deg, #4d9ea1 0%, #79c5cf 45%, #8fd9a8 100%);}
+.metric:nth-child(3)::before{background:linear-gradient(90deg, #79c26d 0%, #a6e08f 45%, #5bbf7f 100%);}
+.metric:nth-child(4)::before{background:linear-gradient(90deg, #88d9d2 0%, #5fc27a 50%, #4d9ea1 100%);}
+.metric::after{
+  content:"";
+  position:absolute;
+  right:14px;
+  bottom:14px;
+  width:14px;
+  height:14px;
+  border-radius:50%;
+  background:rgba(79,158,161,.16);
+  box-shadow:0 0 0 8px rgba(79,158,161,.08);
+}
+.metric span{
+  display:block;
+  color:#5b8b69;
+  font-size:11px;
+  font-weight:800;
+  letter-spacing:.08em;
+  text-transform:uppercase;
+  margin-bottom:10px;
+}
+.metric strong{
+  display:block;
+  color:#1f4630;
+  font-size:36px;
+  line-height:1;
+  margin-bottom:6px;
+}
+.metric p{display:none;}
+.section-grid{
+  display:grid;
+  grid-template-columns:1.1fr .9fr;
+  gap:18px;
+  margin-bottom:18px;
+}
+.card{
+  padding:22px;
+  border-radius:26px;
+  background:rgba(255,255,255,.84);
+  border:1px solid rgba(220,234,232,.92);
+  box-shadow:0 18px 36px rgba(0,77,77,.07);
+  backdrop-filter:blur(12px);
+}
+.card h3{
+  font-size:19px;
+  font-weight:800;
+  color:#214040;
+  margin-bottom:14px;
+  padding-bottom:12px;
+  border-bottom:1px solid #e8f0ef;
+}
+.callout{
+  padding:16px;
+  border-radius:20px;
+  background:linear-gradient(180deg,#eef8f7 0%, #e6f2f1 100%);
+  border:1px solid #d8e8e6;
+}
+.callout p{
+  color:#5a7777;
+  line-height:1.75;
+  font-size:13px;
+}
+.table-wrap{
+  overflow-x:auto;
+  margin-top:14px;
+  border:1px solid #e2eceb;
+  border-radius:18px;
+  background:#ffffff;
+}
+table{
+  width:100%;
+  min-width:760px;
+  border-collapse:collapse;
+}
+th{
+  text-align:left;
+  padding:14px 16px;
+  background:linear-gradient(180deg,#eef8f5 0%, #e5f2eb 100%);
+  color:#315252;
+  font-size:12px;
+  font-weight:900;
+  border-bottom:1px solid #dbe7e6;
+  text-transform:uppercase;
+}
+td{
+  padding:14px 16px;
+  border-bottom:1px solid #edf3f2;
+  color:#496666;
+  font-size:14px;
+  vertical-align:middle;
+}
+tr:nth-child(even) td{background:#fbfdfc;}
+tr:hover td{background:#f8fcfb;}
+code{
+  display:inline-block;
+  background:#f1f7f7;
+  border:1px solid #dceaea;
+  padding:4px 8px;
+  border-radius:8px;
+  color:#0a5555;
+  font-size:12px;
+  word-break:break-all;
+}
+.status-badge{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  border-radius:999px;
+  padding:8px 12px;
+  font-size:12px;
+  font-weight:800;
+  text-transform:capitalize;
+}
+.status-pending{background:linear-gradient(135deg,#fff0b8 0%, #ffe18e 100%);color:#7b4d00;}
+.status-approved,.status-completed{background:linear-gradient(135deg,#54cf77 0%, #2fa95e 100%);color:#fff;}
+.status-rejected,.status-cancelled{background:linear-gradient(135deg,#f18a8a 0%, #d85d5d 100%);color:#fff;}
+.auth-btn{
+  border:none;
+  border-radius:12px;
+  background:linear-gradient(135deg,#4d9ea1 0%, #2b7b7e 100%);
+  color:#fff;
+  padding:10px 14px;
+  font-weight:800;
+  cursor:pointer;
+  box-shadow:0 10px 20px rgba(43,123,126,.16);
+  transition:0.25s ease;
+}
+.auth-btn:hover{transform:translateY(-2px);box-shadow:0 14px 24px rgba(43,123,126,.22);}
+.danger-btn{background:linear-gradient(135deg,#f18a8a 0%, #d85d5d 100%);}
+.auth-btn.primary-neon{
+  background:linear-gradient(135deg,#72e3df 0%, #3f9fa4 52%, #235f86 100%);
+  box-shadow:0 14px 26px rgba(35,95,134,.22), inset 0 1px 0 rgba(255,255,255,.25);
+}
+.auth-btn.primary-neon:hover{box-shadow:0 18px 30px rgba(35,95,134,.28), inset 0 1px 0 rgba(255,255,255,.25);}
+.auth-btn.reject-neon{
+  background:linear-gradient(135deg,rgba(255,255,255,.96) 0%, rgba(254,229,229,.96) 100%);
+  color:#9b4750;
+  border:1px solid rgba(236,147,147,.42);
+  box-shadow:0 12px 22px rgba(236,147,147,.12), inset 0 1px 0 rgba(255,255,255,.75);
+}
+.auth-btn.reject-neon:hover{
+  background:linear-gradient(135deg,#fff 0%, #ffe4e4 100%);
+  box-shadow:0 16px 26px rgba(236,147,147,.18), inset 0 1px 0 rgba(255,255,255,.75);
+}
+.request-console{
+  display:grid;
+  gap:12px;
+  min-width:260px;
+  padding:14px;
+  border-radius:18px;
+  background:linear-gradient(180deg,rgba(255,255,255,.98) 0%, rgba(240,249,248,.92) 100%);
+  border:1px solid rgba(77,158,161,.16);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.82), 0 16px 28px rgba(27,70,71,.08);
+  position:relative;
+  overflow:hidden;
+}
+.request-console::before{
+  content:"";
+  position:absolute;
+  inset:0;
+  background:linear-gradient(135deg,rgba(114,227,223,.16) 0%, rgba(255,255,255,0) 35%, rgba(35,95,134,.06) 100%);
+  pointer-events:none;
+}
+.request-console-head,
+.request-actions{
+  position:relative;
+  z-index:1;
+}
+.request-console-head{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:10px;
+}
+.request-chip{
+  display:inline-flex;
+  align-items:center;
+  gap:6px;
+  padding:7px 11px;
+  border-radius:999px;
+  background:rgba(114,227,223,.12);
+  border:1px solid rgba(77,158,161,.18);
+  color:#245d60;
+  font-size:11px;
+  font-weight:800;
+  letter-spacing:.08em;
+  text-transform:uppercase;
+}
+.request-chip.reject{
+  background:rgba(255,232,232,.7);
+  border-color:rgba(236,147,147,.22);
+  color:#9b4750;
+}
+.request-mini{
+  font-size:11px;
+  color:#5f7f80;
+  font-weight:700;
+}
+.request-grid{
+  display:grid;
+  gap:10px;
+  position:relative;
+  z-index:1;
+}
+.request-split{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:10px;
+}
+.request-date-row{
+  display:grid;
+  grid-template-columns:1.25fr .9fr .75fr;
+  gap:10px;
+}
+.request-date-shell{
+  display:grid;
+  gap:10px;
+  padding:12px;
+  border-radius:18px;
+  background:linear-gradient(180deg,rgba(255,255,255,.95) 0%, rgba(236,247,246,.96) 100%);
+  border:1px solid rgba(77,158,161,.18);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.75);
+}
+.request-date-shell-head{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:10px;
+}
+.request-date-shell-title{
+  display:flex;
+  align-items:center;
+  gap:8px;
+  color:#2b595c;
+  font-size:12px;
+  font-weight:800;
+  letter-spacing:.08em;
+  text-transform:uppercase;
+}
+.request-date-shell-title::before{
+  content:"";
+  width:10px;
+  height:10px;
+  border-radius:50%;
+  background:linear-gradient(135deg,#72e3df 0%, #3f9fa4 100%);
+  box-shadow:0 0 0 5px rgba(63,159,164,.1);
+}
+.request-date-shell-tip{
+  color:#6a8585;
+  font-size:11px;
+  font-weight:700;
+}
+.request-select-grid{
+  display:grid;
+  grid-template-columns:1.15fr .95fr .8fr;
+  gap:10px;
+}
+.request-select-wrap{
+  position:relative;
+}
+.request-select-wrap::after{
+  content:"▾";
+  position:absolute;
+  right:12px;
+  top:50%;
+  transform:translateY(-50%);
+  color:#4d9ea1;
+  font-size:13px;
+  pointer-events:none;
+}
+.request-field{
+  display:grid;
+  gap:6px;
+  font-size:12px;
+  color:#456567;
+  font-weight:700;
+}
+.request-field span{
+  display:flex;
+  align-items:center;
+  gap:6px;
+}
+.request-field small{
+  color:#6f8a8a;
+  font-size:11px;
+  font-weight:600;
+}
+.request-input,
+.request-textarea{
+  width:100%;
+  border:1px solid rgba(77,158,161,.22);
+  border-radius:14px;
+  padding:11px 12px;
+  font:inherit;
+  outline:none;
+  background:rgba(255,255,255,.84);
+  color:#13393d;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.8);
+  transition:0.22s ease;
+}
+.request-select{
+  width:100%;
+  border:1px solid rgba(77,158,161,.22);
+  border-radius:14px;
+  padding:11px 34px 11px 12px;
+  font:inherit;
+  outline:none;
+  background:linear-gradient(180deg,#ffffff 0%, #f3fbfb 100%);
+  color:#13393d;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.8);
+  appearance:none;
+  -webkit-appearance:none;
+  -moz-appearance:none;
+  transition:0.22s ease;
+}
+.request-select:focus{
+  border-color:#3f9fa4;
+  box-shadow:0 0 0 4px rgba(63,159,164,.10), inset 0 1px 0 rgba(255,255,255,.8);
+}
+.request-input::-webkit-calendar-picker-indicator{
+  filter:sepia(1) saturate(5) hue-rotate(150deg);
+  opacity:.9;
+  cursor:pointer;
+}
+.request-input[type="date"],
+.request-input[type="time"]{
+  min-height:46px;
+}
+.request-input:focus,
+.request-textarea:focus{
+  border-color:#3f9fa4;
+  box-shadow:0 0 0 4px rgba(63,159,164,.10), inset 0 1px 0 rgba(255,255,255,.8);
+}
+.request-textarea{
+  min-height:78px;
+  resize:vertical;
+}
+.request-input.time-part{
+  text-align:center;
+}
+.request-ampm{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:8px;
+}
+.request-ampm button{
+  border:1px solid rgba(77,158,161,.18);
+  border-radius:12px;
+  background:rgba(255,255,255,.86);
+  color:#2e6265;
+  font-weight:800;
+  padding:11px 10px;
+  cursor:pointer;
+  transition:0.2s ease;
+}
+.request-ampm button.active{
+  background:linear-gradient(135deg,#72e3df 0%, #3f9fa4 100%);
+  color:#fff;
+  box-shadow:0 10px 18px rgba(63,159,164,.18);
+}
+.request-actions{
+  display:flex;
+  flex-wrap:wrap;
+  gap:10px;
+}
+.request-actions .auth-btn{
+  flex:1 1 180px;
+}
+.request-actions .auth-btn.secondary-glow{
+  background:linear-gradient(135deg,rgba(255,255,255,.96) 0%, rgba(239,246,246,.98) 100%);
+  color:#2c6668;
+  border:1px solid rgba(77,158,161,.2);
+  box-shadow:0 12px 22px rgba(43,123,126,.10), inset 0 1px 0 rgba(255,255,255,.8);
+}
+.request-actions .auth-btn.secondary-glow:hover{
+  box-shadow:0 16px 26px rgba(43,123,126,.14), inset 0 1px 0 rgba(255,255,255,.8);
+}
+.field{margin-bottom:12px;}
+.field label{display:block;margin-bottom:6px;color:#305555;font-size:13px;font-weight:700;}
+.field input,.field select,.field textarea{
+  width:100%;
+  border:1px solid #d7e8e6;
+  border-radius:14px;
+  padding:12px;
+  font:inherit;
+  outline:none;
+  background:#fff;
+}
+.field textarea{min-height:90px;resize:vertical;}
+.field input:focus,.field select:focus,.field textarea:focus{border-color:#0b7775;box-shadow:0 0 0 4px rgba(0,77,77,0.08);}
+.medicine-select{
+  transition:background .2s ease, border-color .2s ease, box-shadow .2s ease, color .2s ease;
+}
+.medicine-select.status-ok{
+  background:linear-gradient(135deg,#f1fcf5 0%, #e3f6e9 100%);
+  border-color:#cfe8d8;
+  color:#1f5c36;
+}
+.medicine-select.status-low{
+  background:linear-gradient(135deg,#fff8e7 0%, #ffefbf 100%);
+  border-color:#f2d98b;
+  color:#7a5b09;
+}
+.medicine-select.status-out{
+  background:linear-gradient(135deg,#fff1f1 0%, #ffdede 100%);
+  border-color:#efb6b6;
+  color:#8a2c2c;
+}
+.medicine-stock-note{
+  margin-top:8px;
+  border-radius:12px;
+  padding:10px 12px;
+  font-size:12px;
+  font-weight:700;
+  line-height:1.5;
+  border:1px solid #d7e8e6;
+  background:#f7fbfb;
+  color:#456566;
+}
+.medicine-stock-note.is-hidden{
+  display:none;
+}
+.medicine-stock-note.status-ok{
+  background:#eef9f1;
+  border-color:#cee7d6;
+  color:#2b6842;
+}
+.medicine-stock-note.status-low{
+  background:#fff7e6;
+  border-color:#f0d48a;
+  color:#7b5b09;
+}
+.medicine-stock-note.status-out{
+  background:#fff0f0;
+  border-color:#ebb5b5;
+  color:#8f3030;
+}
+.pill-list{display:flex;flex-wrap:wrap;gap:10px;margin-top:12px;}
+.pill{
+  display:inline-flex;
+  align-items:center;
+  background:#eef7f7;
+  border:1px solid #d4e7e5;
+  border-radius:999px;
+  padding:9px 13px;
+  color:#245454;
+  font-size:12px;
+  font-weight:800;
+  text-decoration:none;
+  transition:0.25s ease;
+}
+.pill:hover{transform:translateY(-2px);box-shadow:0 10px 18px rgba(0,77,77,0.08);}
+.notice-list{list-style:none;}
+.notice-list li{
+  display:flex;
+  align-items:flex-start;
+  gap:10px;
+  padding:12px 0;
+  border-bottom:1px solid #edf3f2;
+  color:#456565;
+  font-size:14px;
+}
+.notice-list li:last-child{border-bottom:none;}
+.dot{
+  width:10px;
+  height:10px;
+  border-radius:50%;
+  margin-top:6px;
+  flex-shrink:0;
+  background:#c2d7d5;
+}
+.dot.red{background:#e06161;}
+.dot.green{background:#3aa46d;}
+.dot.teal{background:#0d8c8c;}
+.chat-panel{
+  padding:24px;
+}
+.chat-panel h3{margin-bottom:8px;}
+.chat-panel .empty-text{margin-bottom:14px;}
+.chat-panel-grid{
+  display:grid;
+  grid-template-columns:300px 1fr;
+  gap:16px;
+  align-items:stretch;
+}
+.chat-sidebar{
+  border:1px solid #d9e8e6;
+  border-radius:20px;
+  background:linear-gradient(180deg, rgba(248,252,252,.98), rgba(241,247,247,.98));
+  padding:14px;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.75);
+}
+.chat-contact{
+  display:block;
+  text-decoration:none;
+  color:#1e3333;
+  border:1px solid #dfeceb;
+  background:#fff;
+  border-radius:16px;
+  padding:12px 14px;
+  margin-bottom:10px;
+  transition:0.25s ease;
+}
+.chat-contact:hover{transform:translateY(-2px);box-shadow:0 10px 18px rgba(0,77,77,.06);}
+.chat-contact.active{border-color:#0b7775;box-shadow:0 8px 18px rgba(0,77,77,.08);background:linear-gradient(135deg,#eef9f8 0%, #e2f4ea 100%);}
+.chat-contact-head{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:10px;
+}
+.chat-contact strong{display:block;font-size:14px;}
+.chat-contact small{display:block;color:#668282;margin-top:4px;line-height:1.45;}
+.presence-badge{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  min-width:54px;
+  padding:5px 10px;
+  border-radius:999px;
+  font-size:11px;
+  font-weight:800;
+  letter-spacing:.04em;
+  text-transform:uppercase;
+}
+.presence-online{background:linear-gradient(135deg,#54cf77 0%, #2fa95e 100%);color:#fff;}
+.presence-offline{background:linear-gradient(135deg,#edf3f2 0%, #dde8e6 100%);color:#5d7675;}
+.chat-window{
+  border:1px solid #d9e8e6;
+  border-radius:20px;
+  background:linear-gradient(180deg, #ffffff 0%, #f9fcfb 100%);
+  padding:18px;
+  min-height:360px;
+}
+.chat-window h4{font-size:18px;margin-bottom:4px;}
+.chat-meta{
+  display:flex;
+  align-items:center;
+  gap:8px;
+  color:#648483;
+  font-size:12px;
+  margin-top:6px;
+}
+.chat-thread{
+  max-height:420px;
+  overflow-y:auto;
+  padding-right:6px;
+  margin:14px 0 16px;
+}
+.chat-empty{
+  height:100%;
+  display:grid;
+  place-items:center;
+  text-align:center;
+  padding:24px;
+  opacity:0.72;
+}
+.message-row{display:flex;margin-bottom:12px;}
+.message-row.mine{justify-content:flex-end;}
+.message-bubble{
+  max-width:72%;
+  padding:12px 14px;
+  border-radius:18px;
+  background:#eef5f5;
+  color:#214040;
+  line-height:1.6;
+  box-shadow:0 8px 16px rgba(0,77,77,.06);
+}
+.message-row.mine .message-bubble{background:linear-gradient(135deg,#4d9ea1 0%, #2b7b7e 100%);color:#fff;}
+.message-time{display:block;margin-top:6px;font-size:11px;opacity:0.72;}
+.chat-form textarea{
+  width:100%;
+  min-height:96px;
+  resize:vertical;
+  border:1px solid #d7e8e6;
+  border-radius:16px;
+  padding:14px 15px;
+  font:inherit;
+  outline:none;
+}
+.chat-form textarea:focus{border-color:#0b7775;box-shadow:0 0 0 3px rgba(0,77,77,0.08);}
+.chat-form .btn{margin-top:12px;}
+.chat-sending{
+  min-height:16px;
+  margin-top:8px;
+  font-size:12px;
+  font-weight:700;
+  color:#5b8b69;
+}
+.chat-sending.error{color:#b54444;}
+.logout-link{
+  display:inline-flex;
+  margin-top:18px;
+  padding:12px 16px;
+  border-radius:14px;
+  background:#fff;
+  border:1px solid #d8e7e5;
+  color:#2f5c5d;
+  font-weight:800;
+  box-shadow:0 10px 20px rgba(0,77,77,.05);
+}
+.logout-link:hover{transform:translateY(-1px);}
+.page-popup{
+  position:fixed;
+  right:22px;
+  top:22px;
+  width:min(360px, calc(100vw - 32px));
+  padding:18px;
+  border-radius:20px;
+  border:1px solid rgba(255,255,255,.16);
+  box-shadow:0 20px 44px rgba(0,0,0,.18);
+  backdrop-filter:blur(10px);
+  z-index:10001;
+  opacity:0;
+  visibility:hidden;
+  transform:translateY(-12px);
+  transition:opacity .25s ease, transform .25s ease, visibility .25s ease;
+}
+.page-popup.visible{opacity:1;visibility:visible;transform:translateY(0);}
+.page-popup-success{
+  background:linear-gradient(145deg, rgba(14,113,93,.96), rgba(34,156,116,.96));
+  color:#fff;
+}
+.page-popup-error{
+  background:linear-gradient(145deg, rgba(142,44,44,.96), rgba(194,84,84,.96));
+  color:#fff;
+}
+.page-popup-top{display:flex;align-items:flex-start;justify-content:space-between;gap:14px;}
+.page-popup-copy strong{display:block;font-size:18px;line-height:1.2;}
+.page-popup-copy span{display:block;margin-top:6px;font-size:14px;line-height:1.6;color:rgba(255,255,255,.88);}
+.page-popup-badge{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  margin-bottom:8px;
+  padding:6px 10px;
+  border-radius:999px;
+  background:rgba(255,255,255,.14);
+  font-size:11px;
+  font-weight:800;
+  letter-spacing:.08em;
+  text-transform:uppercase;
+}
+.page-popup-actions{display:flex;align-items:center;gap:10px;}
+.page-popup-timer{
+  min-width:38px;
+  height:38px;
+  border-radius:999px;
+  background:rgba(255,255,255,.14);
+  display:grid;
+  place-items:center;
+  font-size:13px;
+  font-weight:900;
+}
+.page-popup-dismiss{
+  width:38px;
+  height:38px;
+  border:none;
+  border-radius:999px;
+  background:rgba(255,255,255,.14);
+  color:#fff;
+  cursor:pointer;
+  font-size:20px;
+  line-height:1;
+}
+.page-popup-progress{
+  margin-top:14px;
+  height:6px;
+  border-radius:999px;
+  background:rgba(255,255,255,.14);
+  overflow:hidden;
+}
+.page-popup-progress-bar{
+  width:100%;
+  height:100%;
+  border-radius:inherit;
+  background:rgba(255,255,255,.88);
+  transform-origin:left center;
+}
+.page-popup-progress-bar.running{
+  animation:doctor-popup-progress linear forwards;
+}
+@keyframes doctor-popup-progress{
+  from{transform:scaleX(1);}
+  to{transform:scaleX(0);}
+}
+.session-timer-popup{
+  position:fixed;
+  left:22px;
+  top:22px;
+  width:min(300px, calc(100vw - 32px));
+  background:linear-gradient(145deg, rgba(0,77,77,0.92), rgba(12,122,112,0.92));
+  color:#fff;
+  border-radius:18px;
+  padding:14px 16px;
+  box-shadow:0 18px 40px rgba(0,0,0,0.22);
+  z-index:9999;
+  border:1px solid rgba(255,255,255,0.16);
+  backdrop-filter:blur(8px);
+  opacity:0;
+  visibility:hidden;
+  transform:translateY(18px);
+  transition:opacity 0.25s ease, transform 0.25s ease, visibility 0.25s ease;
+}
+.session-timer-popup.visible{opacity:1;visibility:visible;transform:translateY(0);}
+.session-timer-popup h4{margin:0 0 6px;font-size:1rem;letter-spacing:0.01em;}
+.session-timer-popup p{margin:0;font-size:0.92rem;line-height:1.45;color:rgba(255,255,255,0.88);}
+.session-timer-value{
+  display:inline-block;
+  margin-top:10px;
+  padding:7px 10px;
+  border-radius:999px;
+  background:rgba(255,255,255,0.14);
+  font-weight:800;
+  letter-spacing:0.04em;
+}
+.session-timer-popup.warning{background:linear-gradient(145deg, rgba(133,54,18,0.96), rgba(194,92,27,0.96));}
+form{margin:0;}
+@media (max-width:1180px){
+  .hero,.section-grid,.chat-panel-grid{grid-template-columns:1fr;}
+  .stats-grid{grid-template-columns:repeat(2,1fr);}
+}
+@media (max-width:760px){
+  .page{width:calc(100vw - 16px);margin:10px auto 20px;}
+  .topbar{padding:16px;border-radius:22px;align-items:flex-start;flex-direction:column;}
+  .topbar-nav{width:100%;justify-content:flex-start;}
+  .hero-copy{padding:22px;}
+  .hero-copy h2{font-size:32px;max-width:none;}
+  .hero-summary{padding:18px;}
+  .summary-grid,.stats-grid{grid-template-columns:1fr;}
+  .metric strong{font-size:30px;}
+  .card{padding:18px;}
+  .chat-window{padding:16px;}
+  .message-bubble{max-width:88%;}
+}
+</style>
+</head>
+<body>
+  {% if doctor_feedback %}
+  <div class="page-popup page-popup-{{ doctor_feedback_type }}" id="doctorPopup" aria-live="polite" data-seconds="{{ doctor_feedback_seconds or 5 }}">
+    <div class="page-popup-top">
+      <div class="page-popup-copy">
+        <div class="page-popup-badge">{{ doctor_feedback_badge or ('Action blocked' if doctor_feedback_type == 'error' else 'Request updated') }}</div>
+        <strong>{{ doctor_feedback_title or ('Doctor Notice' if doctor_feedback_type == 'error' else 'Action Complete') }}</strong>
+        <span>{{ doctor_feedback }}</span>
+      </div>
+      <div class="page-popup-actions">
+        <div class="page-popup-timer" id="doctorPopupTimer">{{ doctor_feedback_seconds or 5 }}</div>
+        <button type="button" class="page-popup-dismiss" id="doctorPopupDismiss" aria-label="Dismiss popup">&times;</button>
+      </div>
+    </div>
+    <div class="page-popup-progress">
+      <div class="page-popup-progress-bar" id="doctorPopupProgress"></div>
+    </div>
+  </div>
+  {% endif %}
+  <div class="page">
+    <header class="topbar">
+      <div class="topbar-left">
+        <div class="brand">E</div>
+        <div class="topbar-copy">
+          <h1>Doctor Dashboard</h1>
+          <p>Requests, schedules, access, prescriptions, and patient chat in one calm workspace.</p>
+        </div>
+      </div>
+      <nav class="topbar-nav">
+        <a href="#overview">Overview</a>
+        <a href="#appointment-requests">Requests</a>
+        <a href="#scheduled-appointments">Visits</a>
+        <a href="#prescription-panel">Prescriptions</a>
+        <a href="#chat-panel">Chat</a>
+        <a href="{{ url_for('logout') }}">Logout</a>
+      </nav>
+    </header>
+
+    <section class="hero" id="overview">
+      <div class="hero-card hero-copy">
+        <div class="eyebrow">Doctor Workspace</div>
+        <h2>Welcome back, Dr. {{ name }}</h2>
+        <p>Review patient appointment requests, confirm visits, request medical access when needed, and keep messages moving without the old bulky layout.</p>
+        <div class="hero-actions">
+          <a class="btn btn-primary" href="#appointment-requests">Review Requests</a>
+          <a class="btn btn-secondary" href="#chat-panel">Open Chat</a>
+        </div>
+      </div>
+
+      <div class="hero-side">
+        <div class="hero-card hero-summary">
+          <div class="summary-top">
+            <div>
+              <div class="eyebrow" style="margin-bottom:10px;">Today</div>
+              <h3>Doctor Snapshot</h3>
+              <div class="summary-mask"><span>Privacy ID</span>{{ hashed_id|mask_hash }}</div>
+            </div>
+            <div class="summary-chip">{{ pending_appointment_requests|length if pending_appointment_requests else 0 }}</div>
+          </div>
+          <div class="summary-grid">
+            <div class="summary-stat">
+              <span>Pending</span>
+              <strong>{{ pending_appointment_requests|length if pending_appointment_requests else 0 }}</strong>
+            </div>
+            <div class="summary-stat">
+              <span>Scheduled</span>
+              <strong>{{ scheduled_appointments|length if scheduled_appointments else 0 }}</strong>
+            </div>
+            <div class="summary-stat">
+              <span>Patients</span>
+              <strong>{{ appointment_patients|length if appointment_patients else 0 }}</strong>
+            </div>
+            <div class="summary-stat">
+              <span>Chat</span>
+              <strong>{{ chat_contacts|length if chat_contacts else 0 }}</strong>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="stats-grid">
+      <div class="metric">
+        <span>Pending Requests</span>
+        <strong>{{ pending_appointment_requests|length if pending_appointment_requests else 0 }}</strong>
+      </div>
+      <div class="metric">
+        <span>Scheduled Visits</span>
+        <strong>{{ scheduled_appointments|length if scheduled_appointments else 0 }}</strong>
+      </div>
+      <div class="metric">
+        <span>Appointment Patients</span>
+        <strong>{{ appointment_patients|length if appointment_patients else 0 }}</strong>
+      </div>
+      <div class="metric">
+        <span>Accessible Patients</span>
+        <strong>{{ accessible_patients|length if accessible_patients else 0 }}</strong>
+      </div>
+    </section>
+
+    <section class="section-grid">
+      <div class="card">
+        <h3>What Needs Attention</h3>
+        {% if pending_appointment_requests or scheduled_appointments or accessible_patients %}
+          <ul class="notice-list">
+            {% if pending_appointment_requests %}
+              <li>
+                <span class="dot red"></span>
+                <span>{{ pending_appointment_requests|length }} appointment request{% if pending_appointment_requests|length != 1 %}s{% endif %} waiting for a decision.</span>
+              </li>
+            {% endif %}
+            {% if scheduled_appointments %}
+              <li>
+                <span class="dot teal"></span>
+                <span>{{ scheduled_appointments|length }} visit{% if scheduled_appointments|length != 1 %}s{% endif %} already on your schedule.</span>
+              </li>
+            {% endif %}
+            {% if accessible_patients %}
+              <li>
+                <span class="dot green"></span>
+                <span>{{ accessible_patients|length }} patient{% if accessible_patients|length != 1 %}s{% endif %} already approved for medical access.</span>
+              </li>
+            {% endif %}
+          </ul>
+        {% else %}
+          <div class="callout">
+            <p>No attention needed right now. Your dashboard is calm and up to date.</p>
+          </div>
+        {% endif %}
+      </div>
+
+      <div class="card">
+        <h3>Patients Ready For Access</h3>
+        {% if appointment_patients %}
+          <div class="pill-list">
+            {% for patient in appointment_patients %}
+              <a href="{{ url_for('dashboard', patient_id=patient.id) }}" class="pill">{{ patient.name }}</a>
+            {% endfor %}
+          </div>
+        {% else %}
+          <p class="empty-text">Approve an appointment first and the patient will appear here for medical access requests.</p>
+        {% endif %}
+      </div>
+    </section>
+
+    <section class="section-grid">
+      <div class="card" id="appointment-requests">
+        <h3>Pending Appointment Requests</h3>
+        {% if pending_appointment_requests %}
+          <div class="table-wrap">
+            <table>
+              <tr>
+                <th>Patient</th>
+                <th>Contact</th>
+                <th>Request</th>
+                <th>Action</th>
+              </tr>
+              {% for appt in pending_appointment_requests %}
+              <tr>
+                <td>{{ appt.patient_name }}</td>
+                <td>
+                  {{ appt.patient_email }}<br>
+                  {% if appt.patient_phone %}{{ appt.patient_phone }}{% else %}<span class="empty-text">No phone</span>{% endif %}
+                </td>
+                <td>{{ appt.notes or 'Patient asked for an appointment.' }}</td>
+                <td>
+                  <form method="POST" action="{{ url_for('doctor_approve_appointment', appointment_id=appt.id) }}" class="request-console js-schedule-console">
+                    <div class="request-console-head">
+                      <span class="request-chip">Schedule Pod</span>
+                      <span class="request-mini">Pending request</span>
+                    </div>
+                    <div class="request-grid">
+                      <input type="hidden" name="appointment_date" class="js-appointment-datetime">
+                      <div class="request-date-shell">
+                        <div class="request-date-shell-head">
+                          <div class="request-date-shell-title">Schedule date</div>
+                          <div class="request-date-shell-tip">Pick a future slot</div>
+                        </div>
+                        <div class="request-select-grid">
+                          <div class="request-select-wrap">
+                            <select class="request-select js-month" aria-label="Month"></select>
+                          </div>
+                          <div class="request-select-wrap">
+                            <select class="request-select js-day" aria-label="Day"></select>
+                          </div>
+                          <div class="request-select-wrap">
+                            <select class="request-select js-year" aria-label="Year"></select>
+                          </div>
+                        </div>
+                      </div>
+                      <div class="request-date-row">
+                        <label class="request-field">
+                          <span>Hour</span>
+                          <input class="request-input time-part" type="number" name="appointment_hour" min="1" max="12" placeholder="08" required>
+                        </label>
+                        <label class="request-field">
+                          <span>Min</span>
+                          <input class="request-input time-part" type="number" name="appointment_minute" min="0" max="59" placeholder="30" required>
+                        </label>
+                      </div>
+                      <div class="request-ampm" role="group" aria-label="Appointment meridiem">
+                        <button type="button" class="active js-meridiem" data-meridiem="AM">AM</button>
+                        <button type="button" class="js-meridiem" data-meridiem="PM">PM</button>
+                      </div>
+                      <label class="request-field">
+                        <span>Doctor note</span>
+                        <textarea class="request-textarea" name="notes" placeholder="Optional scheduling note..."></textarea>
+                      </label>
+                    </div>
+                    <div class="request-actions">
+                      <button class="auth-btn primary-neon" type="submit">Approve & Schedule</button>
+                      <button class="auth-btn secondary-glow" type="reset">Clear</button>
+                    </div>
+                  </form>
+                  <form method="POST" action="{{ url_for('doctor_reject_appointment', appointment_id=appt.id) }}" class="request-console" style="margin-top:10px;">
+                    <input type="hidden" name="patient_id" value="{{ appt.patient_id }}">
+                    <div class="request-console-head">
+                      <span class="request-chip reject">Decline Lane</span>
+                      <span class="request-mini">No slots fit</span>
+                    </div>
+                    <button class="auth-btn reject-neon" type="submit">Reject</button>
+                  </form>
+                </td>
+              </tr>
+              {% endfor %}
+            </table>
+          </div>
+        {% else %}
+          <p class="empty-text">No pending appointment requests right now.</p>
+        {% endif %}
+      </div>
+
+      <div class="card" id="scheduled-appointments">
+        <h3>Scheduled Visits</h3>
+        {% if scheduled_appointments %}
+          <div class="table-wrap">
+            <table>
+              <tr>
+                <th>Patient</th>
+                <th>Date</th>
+                <th>Status</th>
+              </tr>
+              {% for appt in scheduled_appointments %}
+              <tr>
+                <td>{{ appt.patient_name }}</td>
+                <td>{{ appt.appointment_date }}</td>
+                <td><span class="status-badge status-{{ appt.status }}">{{ appt.status }}</span></td>
+              </tr>
+              {% endfor %}
+            </table>
+          </div>
+        {% else %}
+          <p class="empty-text">No approved appointments yet.</p>
+        {% endif %}
+      </div>
+    </section>
+
+    <section class="section-grid">
+      <div class="card" id="records-panel">
+        <h3>Request Records + Prescription Access</h3>
+        <p class="empty-text">This appears for patients who already have an approved appointment with you.</p>
+        {% if appointment_patients %}
+          <div class="table-wrap">
+            <table>
+              <tr>
+                <th>Patient</th>
+                <th>Email</th>
+                <th>Hashed ID</th>
+                <th>Action</th>
+              </tr>
+              {% for p in appointment_patients %}
+              <tr>
+                <td>{{ p.name }}</td>
+                <td>{{ p.email }}</td>
+                <td><code>{{ p.hashed_id|mask_hash }}</code></td>
+                <td>
+                  <form method="POST" action="{{ url_for('doctor_request', patient_id=p.id) }}">
+                    <button class="auth-btn" type="submit">Request Medical Access</button>
+                  </form>
+                </td>
+              </tr>
+              {% endfor %}
+            </table>
+          </div>
+        {% else %}
+          <p class="empty-text">Approve an appointment first. Then that patient will appear here for medical access requests.</p>
+        {% endif %}
+      </div>
+
+      <div class="card" id="prescription-panel">
+        <h3>Write Prescription</h3>
+        {% if selected_medical_patient %}
+          <div class="request-console" style="margin-bottom:14px;">
+            <div class="request-console-head">
+              <div>
+                <div class="request-chip">Prescription Chain</div>
+                <strong style="display:block;margin-top:8px;font-size:18px;color:#17393a;">{{ selected_prescription_status_label }}</strong>
+              </div>
+              {% if selected_prescription_stage == 'complete' %}
+                <span class="status-badge status-approved">Complete</span>
+              {% elif selected_prescription_stage == 'rejected' %}
+                <span class="status-badge status-rejected">Rejected</span>
+              {% elif selected_prescription_stage == 'waiting_chain' %}
+                <span class="status-badge status-pending">Waiting</span>
+              {% else %}
+                <span class="status-badge status-pending">Draft</span>
+              {% endif %}
+            </div>
+            <p style="position:relative;z-index:1;color:#5a7777;line-height:1.7;font-size:13px;margin:0;">{{ selected_prescription_status_note }}</p>
+          </div>
+          <form method="POST" action="{{ url_for('doctor_prescribe') }}">
+            <input type="hidden" name="patient_id" value="{{ selected_medical_patient.id }}">
+            <div class="field">
+              <label>Patient</label>
+              <input type="text" value="{{ selected_medical_patient.name }}" disabled>
+            </div>
+            <div class="field">
+              <label>Medicine</label>
+              <select
+                name="medicine_name"
+                id="medicineSelect"
+                class="medicine-select"
+                required
+              >
+                <option value="">Choose a medicine from storage</option>
+                {% for medicine in available_medicines %}
+                  <option
+                    value="{{ medicine.medicine_name }}"
+                    data-stock-status="{{ medicine.stock_status }}"
+                    data-quantity="{{ medicine.quantity_in_stock }}"
+                    data-unit="{{ medicine.unit }}"
+                    style="
+                      {% if medicine.stock_status == 'ok' %}
+                        background:#eaf8ef;color:#1f5c36;
+                      {% elif medicine.stock_status == 'low' %}
+                        background:#fff2bf;color:#7a5b09;
+                      {% else %}
+                        background:#ffe0e0;color:#8a2c2c;
+                      {% endif %}
+                    "
+                  >
+                    {{ medicine.medicine_name }} -
+                    {% if medicine.stock_status == 'ok' %}
+                      In stock
+                    {% elif medicine.stock_status == 'low' %}
+                      Running low
+                    {% else %}
+                      Empty
+                    {% endif %}
+                    ({{ medicine.quantity_in_stock }} {{ medicine.unit }})
+                  </option>
+                {% endfor %}
+              </select>
+              <div class="medicine-stock-note is-hidden" id="medicineStockNote"></div>
+            </div>
+            <div class="field">
+              <label>Dosage</label>
+              <input type="text" name="dosage" placeholder="1 tablet twice daily" required>
+            </div>
+            <div class="field">
+              <label>Instructions</label>
+              <textarea name="instructions" placeholder="How and when to take it..." required></textarea>
+            </div>
+            <button class="auth-btn primary-neon" type="submit">Save Prescription</button>
+          </form>
+        {% else %}
+          <p class="empty-text">This form unlocks only after the patient approves your medical access request.</p>
+        {% endif %}
+      </div>
+    </section>
+
+    <section class="section-grid">
+      <div class="card">
+        <h3>Patient Private Details</h3>
+        {% if selected_medical_patient %}
+          <div class="table-wrap">
+            <table>
+              <tr>
+                <th>Name</th>
+                <th>Email</th>
+                <th>Age</th>
+                <th>Gender</th>
+              </tr>
+              <tr>
+                <td>{{ selected_medical_patient.name }}</td>
+                <td>{{ selected_medical_patient.email }}</td>
+                <td>{{ selected_medical_patient.age }}</td>
+                <td>{{ selected_medical_patient.gender }}</td>
+              </tr>
+            </table>
+          </div>
+        {% else %}
+          <p class="empty-text">Private patient details stay hidden until medical access is approved.</p>
+        {% endif %}
+      </div>
+
+      <div class="card">
+        <h3>Accessible Records</h3>
+        {% if records %}
+          <div class="table-wrap">
+            <table>
+              <tr>
+                <th>Patient</th>
+                <th>Data Hash</th>
+                <th>Blockchain TX</th>
+                <th>Created</th>
+              </tr>
+              {% for r in records %}
+              <tr>
+                <td>{{ r.patient_name }}</td>
+                <td><code>{{ r.data_hash|mask_hash }}</code></td>
+                <td>{% if r.blockchain_tx_hash %}<code>{{ r.blockchain_tx_hash|mask_hash }}</code>{% else %}-{% endif %}</td>
+                <td>{{ r.created_at }}</td>
+              </tr>
+              {% endfor %}
+            </table>
+          </div>
+        {% else %}
+          <p class="empty-text">No approved records yet.</p>
+        {% endif %}
+      </div>
+    </section>
+
+    <section class="section-grid">
+      <div class="card">
+        <h3>Prescription History</h3>
+        {% if selected_medical_patient and prescriptions %}
+          <div class="table-wrap">
+            <table>
+              <tr>
+                <th>Medicine</th>
+                <th>Dosage</th>
+                <th>Created</th>
+              </tr>
+              {% for rx in prescriptions %}
+              <tr>
+                <td>{{ rx.medicine_name }}</td>
+                <td>{{ rx.dosage }}<br><small>{{ rx.instructions }}</small></td>
+                <td>{{ rx.created_at }}</td>
+              </tr>
+              {% endfor %}
+            </table>
+          </div>
+        {% elif selected_medical_patient %}
+          <p class="empty-text">No prescriptions written for this patient yet.</p>
+        {% else %}
+          <p class="empty-text">Prescription history unlocks only after the patient approves your request.</p>
+        {% endif %}
+      </div>
+
+      <div class="card chat-panel" id="chat-panel">
+        <h3>Patient Chat</h3>
+        <p class="empty-text">Message your approved patients here.</p>
+        <div class="chat-panel-grid" style="margin-top:14px;">
+          <div class="chat-sidebar">
+            {% if chat_contacts %}
+              {% for contact in chat_contacts %}
+                <a href="{{ url_for('dashboard', patient_id=contact.id) }}#chat-panel" class="chat-contact {% if selected_chat_id == contact.id %}active{% endif %}">
+                  <div class="chat-contact-head">
+                    <strong>{{ contact.name }}</strong>
+                    <span class="presence-badge {% if contact.is_online %}presence-online{% else %}presence-offline{% endif %}" id="doctor-presence-{{ contact.id }}">{{ 'online' if contact.is_online else 'offline' }}</span>
+                  </div>
+                  <small>{{ contact.email }}</small>
+                  <small>{% if contact.last_message_at %}Last message: {{ contact.last_message_at }}{% else %}No messages yet{% endif %}</small>
+                </a>
+              {% endfor %}
+            {% else %}
+              <div class="chat-empty">
+                <p class="empty-text">No patient chats available yet.</p>
+              </div>
+            {% endif %}
+          </div>
+
+          <div class="chat-window">
+            {% if selected_contact %}
+              <h4>{{ selected_contact.name }}</h4>
+              <div class="chat-meta">
+                <span class="presence-badge {% if selected_contact.is_online %}presence-online{% else %}presence-offline{% endif %}" id="doctorSelectedPresenceBadge">{{ 'online' if selected_contact.is_online else 'offline' }}</span>
+                <span>{{ selected_contact.email }}</span>
+              </div>
+
+              <div class="chat-thread" id="doctorChatThread">
+                {% if chat_messages %}
+                  {% for msg in chat_messages %}
+                    <div class="message-row {% if msg.sender_role == 'doctor' %}mine{% endif %}">
+                      <div class="message-bubble">
+                        {{ msg.message_text }}
+                        <span class="message-time">{{ msg.created_at }}</span>
+                      </div>
+                    </div>
+                  {% endfor %}
+                {% else %}
+                  <div class="chat-empty" id="doctorChatEmpty">
+                    <p class="empty-text">No messages yet. Start the conversation.</p>
+                  </div>
+                {% endif %}
+              </div>
+
+              <form method="POST" action="{{ url_for('send_chat_message') }}#chat-panel" class="chat-form" id="doctorChatForm">
+                <input type="hidden" name="patient_id" value="{{ selected_contact.id }}">
+                <textarea name="message_text" id="doctorChatInput" placeholder="Write your message to the patient..." required></textarea>
+                <button class="btn btn-primary" type="submit" id="doctorChatSubmit">Send Message</button>
+                <div class="chat-sending" id="doctorChatStatus" aria-live="polite"></div>
+              </form>
+            {% else %}
+              <div class="chat-empty">
+                <p class="empty-text">Select a patient to open the chat.</p>
+              </div>
+            {% endif %}
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <a class="logout-link" href="{{ url_for('logout') }}">Logout</a>
+  </div>
+
+  <div class="session-timer-popup" id="sessionTimerPopup" aria-live="polite" data-timeout-seconds="{{ auth_idle_timeout_seconds }}">
+    <h4>Session sign out timer</h4>
+    <p>Your secure session ends after inactivity.</p>
+    <div class="session-timer-value" id="sessionTimerValue">10:00</div>
+  </div>
+
+  <script>
+    (function () {
+      document.querySelectorAll(".js-schedule-console").forEach((form) => {
+        const hidden = form.querySelector(".js-appointment-datetime");
+        const monthSelect = form.querySelector(".js-month");
+        const daySelect = form.querySelector(".js-day");
+        const yearSelect = form.querySelector(".js-year");
+        const hourInput = form.querySelector('input[name="appointment_hour"]');
+        const minuteInput = form.querySelector('input[name="appointment_minute"]');
+        const meridiemButtons = Array.from(form.querySelectorAll(".js-meridiem"));
+        let meridiem = "AM";
+        const monthNames = ["January","February","March","April","May","June","July","August","September","October","November","December"];
+
+        function pad(value) {
+          return String(value).padStart(2, "0");
+        }
+
+        function buildYearOptions() {
+          if (!yearSelect) return;
+          const currentYear = new Date().getFullYear();
+          yearSelect.innerHTML = "";
+          for (let year = currentYear; year <= currentYear + 3; year += 1) {
+            const option = document.createElement("option");
+            option.value = String(year);
+            option.textContent = String(year);
+            yearSelect.appendChild(option);
+          }
+        }
+
+        function buildMonthOptions() {
+          if (!monthSelect) return;
+          monthSelect.innerHTML = "";
+          monthNames.forEach((month, index) => {
+            const option = document.createElement("option");
+            option.value = String(index + 1);
+            option.textContent = month;
+            monthSelect.appendChild(option);
+          });
+        }
+
+        function buildDayOptions() {
+          if (!daySelect || !monthSelect || !yearSelect) return;
+          const monthIndex = Math.max(1, Number(monthSelect.value || 1));
+          const yearValue = Number(yearSelect.value || new Date().getFullYear());
+          const daysInMonth = new Date(yearValue, monthIndex, 0).getDate();
+          const previousDay = Number(daySelect.value || 1);
+          daySelect.innerHTML = "";
+          for (let day = 1; day <= daysInMonth; day += 1) {
+            const option = document.createElement("option");
+            option.value = String(day);
+            option.textContent = pad(day);
+            daySelect.appendChild(option);
+          }
+          daySelect.value = String(Math.min(previousDay, daysInMonth));
+        }
+
+        function setDefaultDate() {
+          const today = new Date();
+          if (yearSelect) yearSelect.value = String(today.getFullYear());
+          if (monthSelect) monthSelect.value = String(today.getMonth() + 1);
+          buildDayOptions();
+          if (daySelect) daySelect.value = String(today.getDate());
+        }
+
+        function syncDatetime() {
+          if (!hidden || !monthSelect || !daySelect || !yearSelect || !hourInput || !minuteInput) return;
+          const yearValue = yearSelect.value;
+          const monthValue = pad(monthSelect.value || 1);
+          const dayValue = pad(daySelect.value || 1);
+          const hourValue = String(hourInput.value || "").padStart(2, "0");
+          const minuteValue = String(minuteInput.value || "").padStart(2, "0");
+          if (yearValue && monthValue && dayValue && hourValue && minuteValue) {
+            let hourNum = Number(hourValue);
+            if (!Number.isFinite(hourNum)) {
+              hidden.value = "";
+              return;
+            }
+            if (meridiem === "PM" && hourNum < 12) hourNum += 12;
+            if (meridiem === "AM" && hourNum === 12) hourNum = 0;
+            const hour24 = String(hourNum).padStart(2, "0");
+            hidden.value = `${yearValue}-${monthValue}-${dayValue} ${hour24}:${minuteValue}:00`;
+          } else {
+            hidden.value = "";
+          }
+        }
+
+        buildYearOptions();
+        buildMonthOptions();
+        setDefaultDate();
+        buildDayOptions();
+        monthSelect && monthSelect.addEventListener("change", function () {
+          buildDayOptions();
+          syncDatetime();
+        });
+        yearSelect && yearSelect.addEventListener("change", function () {
+          buildDayOptions();
+          syncDatetime();
+        });
+        daySelect && daySelect.addEventListener("change", syncDatetime);
+        hourInput && hourInput.addEventListener("input", syncDatetime);
+        minuteInput && minuteInput.addEventListener("input", syncDatetime);
+        meridiemButtons.forEach((btn) => {
+          btn.addEventListener("click", function () {
+            meridiem = btn.dataset.meridiem || "AM";
+            meridiemButtons.forEach((item) => item.classList.toggle("active", item === btn));
+            syncDatetime();
+          });
+        });
+        form.addEventListener("reset", function () {
+          window.setTimeout(function () {
+            meridiem = "AM";
+            meridiemButtons.forEach((item) => item.classList.toggle("active", item.dataset.meridiem === "AM"));
+            buildYearOptions();
+            buildMonthOptions();
+            setDefaultDate();
+            buildDayOptions();
+            syncDatetime();
+          }, 0);
+        });
+        form.addEventListener("submit", function (event) {
+          buildDayOptions();
+          syncDatetime();
+          if (!hidden || !hidden.value) {
+            event.preventDefault();
+          }
+        });
+      });
+
+      const medicineSelect = document.getElementById("medicineSelect");
+      const medicineStockNote = document.getElementById("medicineStockNote");
+      if (medicineSelect && medicineStockNote) {
+        const statusLabels = {
+          ok: "In stock",
+          low: "Running low",
+          out: "Out of stock"
+        };
+
+        function syncMedicineState() {
+          const option = medicineSelect.options[medicineSelect.selectedIndex];
+          const status = option ? option.dataset.stockStatus || "" : "";
+          const quantity = option ? option.dataset.quantity || "" : "";
+          const unit = option ? option.dataset.unit || "units" : "units";
+
+          medicineSelect.classList.remove("status-ok", "status-low", "status-out");
+          medicineStockNote.classList.remove("status-ok", "status-low", "status-out");
+
+          if (!status) {
+            medicineStockNote.textContent = "";
+            medicineStockNote.classList.add("is-hidden");
+            return;
+          }
+
+          medicineStockNote.classList.remove("is-hidden");
+          medicineSelect.classList.add(`status-${status}`);
+          medicineStockNote.classList.add(`status-${status}`);
+          medicineStockNote.textContent = `${statusLabels[status] || "Stock status unknown"}: ${quantity} ${unit} available in pharmacy storage.`;
+        }
+
+        medicineSelect.addEventListener("change", syncMedicineState);
+        syncMedicineState();
+      }
+
+      const doctorPopup = document.getElementById("doctorPopup");
+      const doctorPopupTimer = document.getElementById("doctorPopupTimer");
+      const doctorPopupDismiss = document.getElementById("doctorPopupDismiss");
+      const doctorPopupProgress = document.getElementById("doctorPopupProgress");
+      if (doctorPopup) {
+        const popupDurationSeconds = Number(doctorPopup.dataset.seconds || "5");
+        let popupSecondsRemaining = popupDurationSeconds;
+        let popupInterval = null;
+        let popupTimeout = null;
+
+        function closeDoctorPopup() {
+          doctorPopup.classList.remove("visible");
+          if (doctorPopupProgress) {
+            doctorPopupProgress.classList.remove("running");
+          }
+          if (popupInterval) {
+            clearInterval(popupInterval);
+            popupInterval = null;
+          }
+          if (popupTimeout) {
+            clearTimeout(popupTimeout);
+            popupTimeout = null;
+          }
+        }
+
+        requestAnimationFrame(function () {
+          doctorPopup.classList.add("visible");
+          if (doctorPopupProgress) {
+            doctorPopupProgress.style.animationDuration = `${popupDurationSeconds}s`;
+            doctorPopupProgress.classList.add("running");
+          }
+        });
+
+        if (window.history && typeof window.history.replaceState === "function") {
+          const currentUrl = new URL(window.location.href);
+          currentUrl.searchParams.delete("doctor_feedback");
+          currentUrl.searchParams.delete("doctor_feedback_type");
+          currentUrl.searchParams.delete("doctor_feedback_title");
+          currentUrl.searchParams.delete("doctor_feedback_badge");
+          currentUrl.searchParams.delete("doctor_feedback_seconds");
+          window.history.replaceState({}, document.title, currentUrl.pathname + currentUrl.search + currentUrl.hash);
+        }
+
+        if (doctorPopupTimer) {
+          doctorPopupTimer.textContent = String(popupSecondsRemaining);
+        }
+
+        popupInterval = setInterval(function () {
+          popupSecondsRemaining -= 1;
+          if (doctorPopupTimer && popupSecondsRemaining >= 0) {
+            doctorPopupTimer.textContent = String(popupSecondsRemaining);
+          }
+          if (popupSecondsRemaining <= 0) {
+            clearInterval(popupInterval);
+            popupInterval = null;
+          }
+        }, 1000);
+
+        popupTimeout = setTimeout(closeDoctorPopup, popupDurationSeconds * 1000);
+        if (doctorPopupDismiss) {
+          doctorPopupDismiss.addEventListener("click", closeDoctorPopup);
+        }
+      }
+
+      const doctorChatForm = document.getElementById("doctorChatForm");
+      const doctorChatThread = document.getElementById("doctorChatThread");
+      const doctorChatInput = document.getElementById("doctorChatInput");
+      const doctorChatSubmit = document.getElementById("doctorChatSubmit");
+      const doctorChatStatus = document.getElementById("doctorChatStatus");
+      const doctorChatEmpty = document.getElementById("doctorChatEmpty");
+      const doctorSelectedPresenceBadge = document.getElementById("doctorSelectedPresenceBadge");
+      const doctorSelectedChatId = {{ selected_chat_id if selected_chat_id else 'null' }};
+      if (doctorChatForm && doctorChatThread && doctorChatInput && doctorChatSubmit && doctorChatStatus) {
+        function scrollDoctorChatToBottom() {
+          doctorChatThread.scrollTop = doctorChatThread.scrollHeight;
+        }
+
+        function appendDoctorMessage(messageText, createdAt) {
+          if (doctorChatEmpty) {
+            doctorChatEmpty.remove();
+          }
+          const row = document.createElement("div");
+          row.className = "message-row mine";
+
+          const bubble = document.createElement("div");
+          bubble.className = "message-bubble";
+          bubble.append(document.createTextNode(messageText));
+
+          const time = document.createElement("span");
+          time.className = "message-time";
+          time.textContent = createdAt;
+          bubble.appendChild(time);
+
+          row.appendChild(bubble);
+          doctorChatThread.appendChild(row);
+          scrollDoctorChatToBottom();
+        }
+
+        scrollDoctorChatToBottom();
+
+        async function refreshDoctorPresence() {
+          try {
+            const response = await fetch("{{ url_for('doctor_chat_presence') }}", {
+              headers: {"X-Requested-With": "fetch"}
+            });
+            const data = await response.json().catch(function () { return {}; });
+            if (!response.ok || !data.ok || !Array.isArray(data.contacts)) {
+              return;
+            }
+
+            const seenIds = new Set();
+            data.contacts.forEach(function (contact) {
+              seenIds.add(String(contact.id));
+              const badge = document.getElementById("doctor-presence-" + contact.id);
+              const isOnline = !!contact.is_online;
+              const label = isOnline ? "online" : "offline";
+
+              if (badge) {
+                badge.textContent = label;
+                badge.classList.toggle("presence-online", isOnline);
+                badge.classList.toggle("presence-offline", !isOnline);
+              }
+
+              if (doctorSelectedPresenceBadge && Number(doctorSelectedChatId) === Number(contact.id)) {
+                doctorSelectedPresenceBadge.textContent = label;
+                doctorSelectedPresenceBadge.classList.toggle("presence-online", isOnline);
+                doctorSelectedPresenceBadge.classList.toggle("presence-offline", !isOnline);
+              }
+            });
+
+            document.querySelectorAll(".presence-badge[id^='doctor-presence-']").forEach(function (badge) {
+              const badgeId = badge.id.replace("doctor-presence-", "");
+              if (seenIds.has(String(badgeId))) {
+                return;
+              }
+              badge.textContent = "offline";
+              badge.classList.remove("presence-online");
+              badge.classList.add("presence-offline");
+            });
+
+            if (doctorSelectedPresenceBadge && doctorSelectedChatId !== null && !seenIds.has(String(doctorSelectedChatId))) {
+              doctorSelectedPresenceBadge.textContent = "offline";
+              doctorSelectedPresenceBadge.classList.remove("presence-online");
+              doctorSelectedPresenceBadge.classList.add("presence-offline");
+            }
+          } catch (error) {
+            return;
+          }
+        }
+
+        refreshDoctorPresence();
+        window.setInterval(refreshDoctorPresence, 20000);
+
+        doctorChatForm.addEventListener("submit", async function (event) {
+          event.preventDefault();
+          const formData = new FormData(doctorChatForm);
+          const messageText = (formData.get("message_text") || "").toString().trim();
+          if (!messageText) {
+            doctorChatStatus.textContent = "Message cannot be empty.";
+            doctorChatStatus.classList.add("error");
+            return;
+          }
+
+          doctorChatStatus.textContent = "Sending...";
+          doctorChatStatus.classList.remove("error");
+          doctorChatSubmit.disabled = true;
+          doctorChatInput.disabled = true;
+
+          try {
+            const response = await fetch(doctorChatForm.action.replace("#chat-panel", ""), {
+              method: "POST",
+              headers: {
+                "X-Requested-With": "fetch"
+              },
+              body: formData
+            });
+
+            const data = await response.json();
+            if (!response.ok || !data.ok) {
+              throw new Error(data.error || "Unable to send the message right now.");
+            }
+
+            appendDoctorMessage(data.message_text, data.created_at);
+            doctorChatForm.reset();
+            doctorChatStatus.textContent = "Message sent.";
+            doctorChatInput.focus();
+          } catch (error) {
+            doctorChatStatus.textContent = error.message || "Unable to send the message right now.";
+            doctorChatStatus.classList.add("error");
+          } finally {
+            doctorChatSubmit.disabled = false;
+            doctorChatInput.disabled = false;
+          }
+        });
+      }
+
+      const popup = document.getElementById("sessionTimerPopup");
+      const value = document.getElementById("sessionTimerValue");
+      if (!popup || !value) return;
+
+      const logoutUrl = "{{ url_for('logout') }}";
+      const idleTimeoutMs = Number(popup.dataset.timeoutSeconds || "600") * 1000;
+      let deadline = Date.now() + idleTimeoutMs;
+
+      function formatTime(totalSeconds) {
+        const minutes = Math.floor(totalSeconds / 60);
+        const seconds = totalSeconds % 60;
+        return String(minutes).padStart(2, "0") + ":" + String(seconds).padStart(2, "0");
+      }
+
+      function forceLogout() {
+        window.location.replace(logoutUrl);
+      }
+
+      window.resetSessionIdleCountdown = function () {
+        deadline = Date.now() + idleTimeoutMs;
+        renderTimer();
+      };
+
+      function renderTimer() {
+        const remainingSeconds = Math.max(0, Math.ceil((deadline - Date.now()) / 1000));
+        value.textContent = formatTime(remainingSeconds);
+        popup.classList.toggle("visible", remainingSeconds <= 30);
+        popup.classList.toggle("warning", remainingSeconds <= 15);
+        if (remainingSeconds <= 0) {
+          forceLogout();
+        }
+      }
+
+      renderTimer();
+      window.setInterval(renderTimer, 1000);
+      document.addEventListener("visibilitychange", function () {
+        if (!document.hidden) renderTimer();
+      });
+      window.addEventListener("focus", renderTimer);
+    })();
+  </script>
+</body>
+</html>

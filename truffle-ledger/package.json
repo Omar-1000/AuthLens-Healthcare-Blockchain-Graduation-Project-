@@ -1,0 +1,13 @@
+{
+  "name": "ehealth-truffle-ledger",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Truffle project for the eHealth integrity demo",
+  "scripts": {
+    "compile": "truffle compile",
+    "migrate": "truffle migrate --network development"
+  },
+  "devDependencies": {
+    "truffle": "^5.11.5"
+  }
+}

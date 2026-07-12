@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Verify OTP | E-Health</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+
+
+    <div class="top-bar">
+        <div class="container">
+            <nav class="top-nav">
+                <a href="{{ url_for('home') }}">Home</a>
+                <a href="{{ url_for('signup') }}">Sign Up</a>
+                <a href="#">Contact Us</a>
+            </nav>
+        </div>
+    </div>
+
+
+    <header class="main-header">
+        <div class="container">
+            <div class="header-content">
+                <a href="{{ url_for('home') }}" class="logo">
+                    <svg class="logo-icon" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M20 5C12 5 8 12 8 18C8 24 12 28 16 30C16 30 14 34 10 36C10 36 18 35 22 30C22 30 23 30 24 30C32 30 36 23 36 17C36 11 32 5 20 5Z" fill="#00A9A5"/>
+                        <path d="M20 10C16 10 14 14 14 18C14 22 16 24 18 25C18 25 17 27 15 28C15 28 19 27 21 25C21 25 22 25 22 25C26 25 28 21 28 17C28 13 26 10 20 10Z" fill="white"/>
+                    </svg>
+                    <span class="logo-text">E-Health</span>
+                </a>
+            </div>
+        </div>
+    </header>
+
+
+    <section class="auth">
+        <div class="auth-card">
+            <h2>OTP Verification</h2>
+            <p class="auth-sub">Enter the 6-digit code sent to your email.</p>
+
+
+            {% if error %}
+                <p style="color:#b00020; margin-bottom:10px;">{{ error }}</p>
+            {% endif %}
+
+
+            {% if success %}
+                <p style="color:#006B6B; margin-bottom:10px;">{{ success }}</p>
+            {% endif %}
+
+            <form method="POST" action="{{ url_for('verify_otp') }}">
+                <label>Enter OTP</label>
+                <input type="text" name="otp" maxlength="6" placeholder="6-digit OTP" required>
+                <button class="auth-btn" type="submit">Verify OTP</button>
+            </form>
+
+
+            <form method="POST" action="{{ url_for('resend_otp') }}" style="margin-top:10px;">
+                <button class="auth-btn" type="submit" style="background:#004D4D;">Resend OTP</button>
+            </form>
+
+
+            <p class="auth-footer">
+                <a href="{{ url_for('login') }}">Back to Login</a>
+            </p>
+        </div>
+    </section>
+
+
+</body>
+</html>

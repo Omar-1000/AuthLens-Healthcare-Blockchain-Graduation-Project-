@@ -1,0 +1,2098 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AuthLens Healthcare Portal</title>
+
+
+<link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+
+
+<style>
+*{
+  margin:0;
+  padding:0;
+  box-sizing:border-box;
+  font-family:"Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+}
+
+
+html{
+  scroll-behavior:smooth;
+}
+
+
+body{
+  --scroll-tint:0;
+  background:
+    linear-gradient(
+      135deg,
+      color-mix(in srgb, #eef9f9 calc(100% - var(--scroll-tint)), #00a9a5 var(--scroll-tint)) 0%,
+      color-mix(in srgb, #e6f7f6 calc(100% - var(--scroll-tint)), #00a9a5 var(--scroll-tint)) 40%,
+      color-mix(in srgb, #d8f1ef calc(100% - var(--scroll-tint)), #008b88 calc(var(--scroll-tint) * 0.9)) 100%
+    );
+  color:#003b3a;
+  overflow-x:hidden;
+  transition:background 0.18s linear;
+}
+
+
+.container,
+.dashboard-container{
+  width:90%;
+  max-width:1200px;
+  margin:auto;
+}
+
+
+.header-shell{
+  width:min(96vw, 1760px);
+  margin:auto;
+}
+
+
+.bg-shape{
+  position:fixed;
+  border-radius:50%;
+  background:rgba(0,169,165,0.08);
+  filter:blur(5px);
+  z-index:0;
+  animation:floatShape 8s ease-in-out infinite;
+}
+
+
+.shape1{
+  width:220px;
+  height:220px;
+  top:70px;
+  left:-70px;
+}
+
+
+.shape2{
+  width:260px;
+  height:260px;
+  right:-80px;
+  top:180px;
+  animation-delay:2s;
+}
+
+
+.shape3{
+  width:200px;
+  height:200px;
+  left:10%;
+  bottom:50px;
+  animation-delay:1s;
+}
+
+
+@keyframes floatShape{
+  0%,100%{transform:translateY(0px);}
+  50%{transform:translateY(-18px);}
+}
+
+
+.page-shell{
+  position:relative;
+  z-index:2;
+}
+
+
+/* Top Navigation */
+.top-bar{
+  background:linear-gradient(135deg, #005a59 0%, #004948 100%);
+  border-bottom:1px solid rgba(255,255,255,0.08);
+}
+
+
+.top-nav{
+  display:flex;
+  justify-content:flex-end;
+  align-items:center;
+  gap:20px;
+  padding:14px 0 13px;
+  flex-wrap:wrap;
+}
+
+
+.top-nav a{
+  text-decoration:none;
+  color:#e8fbfb;
+  font-size:13px;
+  font-weight:700;
+  letter-spacing:0.01em;
+  transition:0.3s;
+}
+
+
+.top-nav a:hover{
+  color:#7ff3ef;
+  transform:translateY(-1px);
+}
+
+
+/* Header */
+.main-header{
+  padding:18px 0 16px;
+  background:rgba(255,255,255,0.82);
+  border-bottom:1px solid rgba(0,73,72,0.10);
+  box-shadow:0 12px 26px rgba(0,59,58,0.05);
+  position:sticky;
+  top:0;
+  z-index:110;
+}
+
+
+.header-content{
+  display:grid;
+  grid-template-columns:minmax(280px, 1fr) auto;
+  align-items:center;
+  gap:24px;
+  flex-wrap:wrap;
+}
+
+
+.logo{
+  text-decoration:none;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  padding:8px 0;
+  position:relative;
+  width:100%;
+  min-height:54px;
+}
+
+
+.logo-text{
+  width:100%;
+  font-size:clamp(28px, 2.8vw, 44px);
+  font-weight:800;
+  color:#003b3a;
+  letter-spacing:0.03em;
+  position:relative;
+  display:block;
+  line-height:1;
+  text-shadow:
+    0 0 0 rgba(0,169,165,0),
+    0 0 12px rgba(0,169,165,0.18),
+    0 0 26px rgba(0,169,165,0.12);
+  animation:logoGlowPulse 4s ease-in-out infinite;
+}
+
+
+@keyframes logoGlowPulse{
+  0%, 50%, 100%{
+    color:#003b3a;
+    text-shadow:
+      0 0 0 rgba(0,169,165,0),
+      0 0 12px rgba(0,169,165,0.18),
+      0 0 26px rgba(0,169,165,0.12);
+  }
+  25%{
+    color:#005a59;
+    text-shadow:
+      0 0 10px rgba(0,169,165,0.30),
+      0 0 24px rgba(0,169,165,0.24),
+      0 0 42px rgba(0,169,165,0.16);
+  }
+}
+
+
+.main-nav{
+  display:flex;
+  align-items:center;
+  justify-content:flex-end;
+  gap:18px;
+  flex-wrap:wrap;
+}
+
+
+.main-nav a{
+  text-decoration:none;
+  color:#245f5d;
+  font-weight:600;
+  font-size:15px;
+  padding:10px 0;
+  position:relative;
+  transition:0.3s;
+}
+
+
+.main-nav a::after{
+  content:"";
+  position:absolute;
+  left:0;
+  bottom:-5px;
+  width:0;
+  height:2px;
+  background:#00A9A5;
+  transition:0.3s;
+}
+
+
+.main-nav a:hover{
+  color:#00A9A5;
+}
+
+
+.main-nav a:hover::after{
+  width:100%;
+}
+
+
+/* HERO */
+.hero{
+  min-height:85vh;
+  display:grid;
+  grid-template-columns:1.05fr 0.95fr;
+  align-items:center;
+  gap:40px;
+  padding:40px 5% 80px;
+  position:relative;
+}
+
+
+.hero::before{
+  content:"";
+  position:absolute;
+  left:-80px;
+  top:40px;
+  width:580px;
+  height:520px;
+  background:radial-gradient(circle at center, rgba(0,169,165,0.12), rgba(0,169,165,0.02) 60%, transparent 75%);
+  z-index:0;
+  pointer-events:none;
+}
+
+
+.hero-content{
+  animation:fadeUp 1s ease;
+  position:relative;
+  z-index:2;
+  background:transparent;
+  min-height:auto;
+  padding:0;
+  display:block;
+  border:none;
+  box-shadow:none;
+  backdrop-filter:none;
+  -webkit-backdrop-filter:none;
+}
+
+.hero-content::after{
+  display:none;
+}
+
+
+.hero-badge{
+  display:inline-flex;
+  align-items:center;
+  gap:10px;
+  padding:10px 16px;
+  border-radius:999px;
+  background:#ffffff;
+  border:1px solid #d9eeee;
+  color:#006b69;
+  font-size:14px;
+  font-weight:700;
+  margin-bottom:20px;
+  box-shadow:0 10px 24px rgba(0,59,58,0.06);
+}
+
+
+.hero-badge-dot{
+  width:10px;
+  height:10px;
+  border-radius:50%;
+  background:#00A9A5;
+  box-shadow:0 0 0 0 rgba(0,169,165,0.55);
+  animation:pulseDot 1.8s infinite;
+}
+
+
+@keyframes pulseDot{
+  0%{box-shadow:0 0 0 0 rgba(0,169,165,0.55);}
+  70%{box-shadow:0 0 0 10px rgba(0,169,165,0);}
+  100%{box-shadow:0 0 0 0 rgba(0,169,165,0);}
+}
+
+
+.hero-text-container{
+  max-width:620px;
+}
+
+
+.hero-title{
+  font-size:56px;
+  line-height:1.08;
+  font-weight:800;
+  color:#003b3a;
+  margin-bottom:18px;
+}
+
+
+.dynamic-word{
+  display:inline-block;
+  min-width:180px;
+  color:#00A9A5;
+  transition:opacity 0.5s ease, transform 0.5s ease;
+}
+
+
+.dynamic-word.fade-out{
+  opacity:0;
+  transform:translateY(10px);
+}
+
+
+.dynamic-word.fade-in{
+  opacity:1;
+  transform:translateY(0);
+}
+
+
+.hero-description{
+  font-size:17px;
+  line-height:1.9;
+  color:#4c6f6e;
+  margin-bottom:28px;
+  max-width:580px;
+}
+
+
+.cta-row{
+  display:flex;
+  gap:14px;
+  flex-wrap:wrap;
+  margin-bottom:24px;
+}
+
+
+.cta-button{
+  position:relative;
+  overflow:hidden;
+  display:inline-block;
+  padding:14px 24px;
+  border-radius:12px;
+  text-decoration:none;
+  font-weight:700;
+  transition:0.3s ease;
+}
+
+
+.cta-button::before{
+  content:"";
+  position:absolute;
+  top:0;
+  left:-120%;
+  width:120%;
+  height:100%;
+  background:linear-gradient(90deg, transparent, rgba(255,255,255,0.28), transparent);
+  transition:0.55s ease;
+}
+
+
+.cta-button:hover::before{
+  left:130%;
+}
+
+
+.cta-button{
+  background:linear-gradient(135deg, #00A9A5 0%, #008e8b 100%);
+  color:white;
+  box-shadow:0 14px 28px rgba(0,169,165,0.18);
+}
+
+
+.cta-button:hover{
+  transform:translateY(-2px) scale(1.02);
+  box-shadow:0 20px 36px rgba(0,169,165,0.24);
+}
+
+
+.cta-outline{
+  background:white;
+  color:#006b69;
+  border:1px solid #dceeee;
+}
+
+
+.cta-outline:hover{
+  border-color:#00A9A5;
+  box-shadow:0 12px 24px rgba(0,169,165,0.08);
+}
+
+
+/* HERO IMAGE SLIDER */
+.hero-image{
+  position:relative;
+  min-height:560px;
+  display:flex;
+  align-items:center;
+  z-index:2;
+}
+
+
+.hero-slider{
+  position:relative;
+  width:100%;
+  height:560px;
+  border-radius:28px;
+  overflow:hidden;
+  box-shadow:0 22px 55px rgba(0, 59, 58, 0.16);
+  animation:floatImage 5s ease-in-out infinite;
+  background:#2a026000;
+}
+
+
+.hero-slide{
+  position:absolute;
+  inset:0;
+  opacity:0;
+  transition:opacity 1s ease-in-out;
+}
+
+
+.hero-slide.active{
+  opacity:1;
+  z-index:1;
+}
+
+
+.hero-slide img{
+  width:100%;
+  height:100%;
+  object-fit:cover;
+  display:block;
+  filter:brightness(0.92) saturate(1.03);
+}
+
+
+.hero-slider-overlay{
+  position:absolute;
+  inset:0;
+  background:linear-gradient(to top, rgba(0,59,58,0.24), rgba(0,0,0,0.03));
+  z-index:2;
+  pointer-events:none;
+}
+
+
+.hero-dots{
+  position:absolute;
+  bottom:18px;
+  left:50%;
+  transform:translateX(-50%);
+  display:flex;
+  gap:10px;
+  z-index:3;
+}
+
+
+.hero-dot{
+  width:11px;
+  height:11px;
+  border-radius:50%;
+  background:#cfe8e7;
+  border:1px solid #ffffff;
+  cursor:pointer;
+  transition:0.3s ease;
+}
+
+
+.hero-dot.active{
+  background:white;
+  transform:scale(1.15);
+}
+
+
+@keyframes floatImage{
+  0%,100%{transform:translateY(0);}
+  50%{transform:translateY(-16px);}
+}
+
+
+/* STATS SECTION */
+.stats-section{
+  padding:20px 5% 70px;
+}
+
+
+.stats-wrapper{
+  width:90%;
+  max-width:1200px;
+  margin:auto;
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
+  gap:22px;
+}
+
+
+.stat-box{
+  background:#ffffff;
+  border:1px solid #e2f0ef;
+  border-radius:20px;
+  padding:28px 24px;
+  text-align:center;
+  box-shadow:0 14px 30px rgba(0,59,58,0.08);
+  transition:0.35s ease;
+}
+
+
+.stat-box:hover{
+  transform:translateY(-6px);
+  box-shadow:0 20px 38px rgba(0,169,165,0.14);
+}
+
+
+.stat-icon{
+  width:64px;
+  height:64px;
+  margin:0 auto 14px;
+  border-radius:18px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-size:28px;
+  background:linear-gradient(135deg, rgba(0,169,165,0.14), rgba(0,142,139,0.08));
+  color:#008e8b;
+  box-shadow:inset 0 0 0 1px rgba(0,169,165,0.08);
+}
+
+
+.stat-number{
+  font-size:40px;
+  font-weight:800;
+  color:#00A9A5;
+  margin-bottom:10px;
+}
+
+
+.stat-label{
+  font-size:16px;
+  font-weight:600;
+  color:#245f5d;
+  line-height:1.5;
+}
+
+
+.stat-box.finished .stat-number{
+  animation:finishPop 0.45s ease;
+}
+
+
+@keyframes finishPop{
+  0%{transform:scale(1);}
+  50%{transform:scale(1.08);}
+  100%{transform:scale(1);}
+}
+
+
+/* SECURITY / TRUST SECTION */
+.security-section{
+  padding:30px 0 85px;
+}
+
+
+.security-shell{
+  width:90%;
+  max-width:1200px;
+  margin:auto;
+  display:grid;
+  grid-template-columns:1fr 1.05fr;
+  gap:34px;
+  align-items:center;
+}
+
+
+.security-content{
+  background:linear-gradient(135deg, #005a59 0%, #004948 100%);
+  color:white;
+  border-radius:28px;
+  padding:38px 34px;
+  box-shadow:0 24px 45px rgba(0,59,58,0.18);
+  position:relative;
+  overflow:hidden;
+}
+
+
+.security-content::before{
+  content:"";
+  position:absolute;
+  right:-60px;
+  top:-60px;
+  width:180px;
+  height:180px;
+  border-radius:50%;
+  background:rgba(255,255,255,0.08);
+}
+
+
+.security-kicker{
+  color:#9ef1ee;
+  font-size:14px;
+  font-weight:800;
+  letter-spacing:0.6px;
+  text-transform:uppercase;
+  margin-bottom:12px;
+}
+
+
+.security-title{
+  font-size:34px;
+  line-height:1.2;
+  margin-bottom:16px;
+}
+
+
+.security-text{
+  color:#d9f6f5;
+  line-height:1.8;
+  margin-bottom:24px;
+  max-width:520px;
+}
+
+
+.security-points{
+  display:grid;
+  gap:12px;
+}
+
+
+.security-point{
+  display:flex;
+  align-items:flex-start;
+  gap:12px;
+  background:rgba(255,255,255,0.08);
+  border:1px solid rgba(255,255,255,0.08);
+  border-radius:16px;
+  padding:14px 16px;
+}
+
+
+.security-point-icon{
+  width:34px;
+  height:34px;
+  border-radius:10px;
+  background:rgba(255,255,255,0.14);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-size:16px;
+  flex-shrink:0;
+}
+
+
+.security-point strong{
+  display:block;
+  margin-bottom:3px;
+  font-size:15px;
+}
+
+
+.security-point span{
+  color:#d9f6f5;
+  font-size:14px;
+  line-height:1.6;
+}
+
+
+.security-flow{
+  background:white;
+  border-radius:28px;
+  padding:34px 28px;
+  box-shadow:0 20px 40px rgba(0,59,58,0.08);
+  border:1px solid #e7f2f2;
+}
+
+
+.flow-title{
+  text-align:center;
+  font-size:28px;
+  color:#003b3a;
+  margin-bottom:10px;
+}
+
+
+.flow-sub{
+  text-align:center;
+  color:#5c7a79;
+  line-height:1.7;
+  margin-bottom:26px;
+}
+
+
+.flow-grid{
+  display:grid;
+  grid-template-columns:repeat(7,1fr);
+  gap:16px;
+  align-items:center;
+}
+
+
+.flow-step{
+  background:linear-gradient(180deg, #fbfefe 0%, #f4fbfb 100%);
+  border:1px solid #e3f2f2;
+  border-radius:20px;
+  padding:22px 16px;
+  min-height:180px;
+  text-align:center;
+  box-shadow:0 14px 28px rgba(0,59,58,0.05);
+  transition:0.35s ease;
+}
+
+
+.flow-step:hover{
+  transform:translateY(-6px) scale(1.01);
+  box-shadow:0 20px 35px rgba(0,169,165,0.10);
+}
+
+
+.flow-icon{
+  width:64px;
+  height:64px;
+  margin:0 auto 14px;
+  border-radius:18px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-size:28px;
+  background:linear-gradient(135deg, rgba(0,169,165,0.14), rgba(0,142,139,0.06));
+}
+
+
+.flow-step h4{
+  color:#003b3a;
+  font-size:18px;
+  margin-bottom:8px;
+}
+
+
+.flow-step p{
+  color:#647e7d;
+  line-height:1.65;
+  font-size:14px;
+}
+
+
+.flow-arrow{
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  color:#00A9A5;
+  font-size:28px;
+  font-weight:900;
+}
+
+
+/* DASHBOARD SERVICES */
+.dashboard-section{
+  padding:80px 0;
+  background:rgba(255,255,255,0.18);
+  backdrop-filter:blur(10px);
+  -webkit-backdrop-filter:blur(10px);
+}
+
+
+.dashboard-title{
+  font-size:34px;
+  margin-bottom:10px;
+  color:#003b3a;
+  text-align:center;
+}
+
+
+.dashboard-sub{
+  color:#666;
+  margin-bottom:40px;
+  text-align:center;
+  font-size:16px;
+}
+
+
+.dashboard-grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(260px,1fr));
+  gap:25px;
+}
+
+
+.card{
+  background:rgba(255,255,255,0.58);
+  padding:30px;
+  border-radius:18px;
+  box-shadow:0 14px 30px rgba(0,59,58,0.08);
+  transition:0.35s ease;
+  border:1px solid rgba(255,255,255,0.52);
+  position:relative;
+  overflow:hidden;
+  backdrop-filter:blur(12px);
+  -webkit-backdrop-filter:blur(12px);
+}
+
+
+.card::before{
+  content:"";
+  position:absolute;
+  top:0;
+  left:0;
+  width:100%;
+  height:4px;
+  background:linear-gradient(90deg, #00A9A5, #008e8b);
+}
+
+
+.card:hover{
+  transform:translateY(-8px) scale(1.015);
+  box-shadow:0 18px 36px rgba(0,169,165,0.12);
+}
+
+
+.card-icon{
+  width:58px;
+  height:58px;
+  border-radius:16px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  margin-bottom:16px;
+  font-size:26px;
+  background:linear-gradient(135deg, rgba(0,169,165,0.12), rgba(0,142,139,0.07));
+  color:#008e8b;
+}
+
+
+.card h3{
+  margin-bottom:10px;
+  color:#003b3a;
+  font-size:22px;
+}
+
+
+.card p{
+  color:#666;
+  margin-bottom:20px;
+  line-height:1.7;
+}
+
+
+.card-btn{
+  display:inline-block;
+  padding:10px 18px;
+  background:#00A9A5;
+  color:white;
+  text-decoration:none;
+  border-radius:10px;
+  font-weight:700;
+  transition:0.3s ease;
+}
+
+
+.card-btn:hover{
+  background:#008e8b;
+  transform:translateY(-2px);
+}
+
+
+/* FEATURES */
+.features{
+  padding:80px 0;
+  background:rgba(255,255,255,0.14);
+  backdrop-filter:blur(8px);
+  -webkit-backdrop-filter:blur(8px);
+}
+
+
+.features-grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(250px,1fr));
+  gap:30px;
+  margin-top:40px;
+}
+
+
+.feature{
+  text-align:center;
+  background:rgba(255,255,255,0.54);
+  border:1px solid rgba(255,255,255,0.5);
+  border-radius:18px;
+  padding:26px 22px;
+  box-shadow:0 12px 26px rgba(0,59,58,0.06);
+  transition:0.35s ease;
+  backdrop-filter:blur(12px);
+  -webkit-backdrop-filter:blur(12px);
+}
+
+
+.feature:hover{
+  transform:translateY(-6px) scale(1.015);
+  box-shadow:0 16px 30px rgba(0,169,165,0.10);
+}
+
+
+.feature-icon{
+  width:62px;
+  height:62px;
+  margin:0 auto;
+  border-radius:18px;
+  background:linear-gradient(135deg, rgba(0,169,165,0.13), rgba(0,142,139,0.06));
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-size:28px;
+  color:#008e8b;
+}
+
+
+.feature h4{
+  margin-top:15px;
+  margin-bottom:10px;
+  color:#003b3a;
+  font-size:21px;
+}
+
+
+.feature p{
+  color:#666;
+  line-height:1.7;
+}
+
+
+/* ILLUSTRATION SECTION */
+.illustration-section{
+  padding:20px 0 80px;
+}
+
+
+.illustration-shell{
+  width:90%;
+  max-width:1200px;
+  margin:auto;
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:32px;
+  align-items:center;
+}
+
+
+.illustration-card{
+  background:white;
+  border:1px solid #e9f3f3;
+  border-radius:28px;
+  padding:34px;
+  box-shadow:0 18px 36px rgba(0,59,58,0.07);
+}
+
+
+.illustration-title{
+  font-size:34px;
+  color:#003b3a;
+  margin-bottom:14px;
+}
+
+
+.illustration-text{
+  color:#5d7978;
+  line-height:1.8;
+  margin-bottom:22px;
+}
+
+
+.illustration-list{
+  display:grid;
+  gap:12px;
+}
+
+
+.illustration-list-item{
+  display:flex;
+  align-items:flex-start;
+  gap:12px;
+  color:#245f5d;
+  line-height:1.7;
+  font-weight:600;
+}
+
+
+.illustration-list-item span{
+  color:#00A9A5;
+  font-size:18px;
+  margin-top:1px;
+}
+
+
+.health-illustration{
+  position:relative;
+  min-height:440px;
+  border-radius:32px;
+  background:linear-gradient(135deg, #e7fbfa 0%, #d9f4f2 100%);
+  overflow:hidden;
+  border:1px solid rgba(0,169,165,0.12);
+  box-shadow:0 20px 40px rgba(0,59,58,0.08);
+}
+
+
+.illustration-shape{
+  position:absolute;
+  border-radius:50%;
+  background:rgba(0,169,165,0.10);
+}
+
+
+.illustration-shape.one{
+  width:180px;
+  height:180px;
+  top:-40px;
+  right:-30px;
+}
+
+
+.illustration-shape.two{
+  width:140px;
+  height:140px;
+  bottom:-25px;
+  left:-20px;
+}
+
+
+/* FIXED CHARACTERS */
+.doctor-figure,
+.patient-figure{
+  position:absolute;
+  bottom:84px;
+  width:128px;
+  height:220px;
+  z-index:3;
+}
+
+
+.doctor-figure{
+  left:110px;
+}
+
+
+.patient-figure{
+  right:110px;
+}
+
+
+.head{
+  width:72px;
+  height:72px;
+  border-radius:50%;
+  background:#ffd9bf;
+  margin:0 auto;
+  position:relative;
+  z-index:2;
+  box-shadow:inset 0 -5px 0 rgba(0,0,0,0.04);
+}
+
+
+.hair{
+  position:absolute;
+  top:-4px;
+  left:8px;
+  width:56px;
+  height:28px;
+  border-radius:28px 28px 12px 12px;
+  background:#245f5d;
+}
+
+
+.body{
+  width:112px;
+  height:134px;
+  margin:-8px auto 0;
+  border-radius:26px;
+  position:relative;
+}
+
+
+.doctor-figure .body{
+  background:white;
+  border:3px solid #d8eeee;
+}
+
+
+.patient-figure .body{
+  background:#12a9a7;
+}
+
+
+.arm{
+  position:absolute;
+  width:24px;
+  height:78px;
+  border-radius:20px;
+  top:20px;
+}
+
+
+.doctor-figure .arm{
+  background:white;
+  border:3px solid #d8eeee;
+}
+
+
+.patient-figure .arm{
+  background:#12a9a7;
+}
+
+
+.arm.left{
+  left:-7px;
+  transform:rotate(12deg);
+}
+
+
+.arm.right{
+  right:-7px;
+  transform:rotate(-12deg);
+}
+
+
+.leg{
+  position:absolute;
+  width:22px;
+  height:58px;
+  border-radius:18px;
+  background:#2a6b69;
+  bottom:-42px;
+  z-index:2;
+}
+
+
+.leg.left{
+  left:24px;
+}
+
+
+.leg.right{
+  right:24px;
+}
+
+
+.stethoscope{
+  position:absolute;
+  width:46px;
+  height:46px;
+  border:4px solid #00A9A5;
+  border-top:none;
+  border-radius:0 0 26px 26px;
+  left:30px;
+  top:28px;
+}
+
+
+.tablet{
+  position:absolute;
+  right:20px;
+  top:62px;
+  width:96px;
+  height:128px;
+  border-radius:20px;
+  background:#ffffff;
+  border:4px solid #cfe8e7;
+  box-shadow:0 14px 26px rgba(0,59,58,0.08);
+  transform:rotate(5deg);
+  z-index:2;
+}
+
+
+.tablet::before{
+  content:"";
+  position:absolute;
+  left:14px;
+  top:18px;
+  width:54px;
+  height:7px;
+  border-radius:8px;
+  background:#d3eded;
+  box-shadow:0 20px 0 #d3eded, 0 40px 0 #d3eded;
+}
+
+
+.tablet::after{
+  content:"";
+  position:absolute;
+  right:12px;
+  bottom:16px;
+  width:26px;
+  height:26px;
+  border-radius:50%;
+  background:linear-gradient(135deg, #00A9A5, #008e8b);
+}
+
+
+.floating-bubble{
+  position:absolute;
+  background:white;
+  border-radius:18px;
+  padding:9px 13px;
+  box-shadow:0 14px 28px rgba(0,59,58,0.08);
+  color:#245f5d;
+  font-size:13px;
+  font-weight:700;
+  animation:floatMini 4.5s ease-in-out infinite;
+  z-index:1;
+  white-space:nowrap;
+}
+
+
+.bubble1{
+  top:40px;
+  left:28px;
+}
+
+
+.bubble2{
+  top:98px;
+  right:96px;
+  animation-delay:1s;
+}
+
+
+.bubble3{
+  bottom:28px;
+  left:50%;
+  transform:translateX(-50%);
+  animation-delay:0.5s;
+  padding:8px 12px;
+  font-size:12px;
+  z-index:1;
+}
+
+
+@keyframes floatMini{
+  0%,100%{transform:translateY(0);}
+  50%{transform:translateY(-8px);}
+}
+
+
+.bubble3{
+  animation-name:floatMiniCenter;
+}
+
+
+@keyframes floatMiniCenter{
+  0%,100%{transform:translateX(-50%) translateY(0);}
+  50%{transform:translateX(-50%) translateY(-8px);}
+}
+
+
+/* FOOTER */
+.footer{
+  background:#003b3a;
+  color:white;
+  padding:30px;
+  text-align:center;
+  margin-top:40px;
+}
+
+
+.footer p{
+  margin:5px 0;
+}
+
+
+/* reveal animation */
+.reveal{
+  opacity:0;
+  transform:translateY(30px);
+  transition:all 0.8s ease;
+}
+
+
+.reveal.active{
+  opacity:1;
+  transform:translateY(0);
+}
+
+
+.reveal-scale{
+  opacity:0;
+  transform:translateY(24px) scale(0.96);
+  transition:all 0.8s ease;
+}
+
+
+.reveal-scale.active{
+  opacity:1;
+  transform:translateY(0) scale(1);
+}
+
+
+@keyframes fadeUp{
+  from{
+    opacity:0;
+    transform:translateY(25px);
+  }
+  to{
+    opacity:1;
+    transform:translateY(0);
+  }
+}
+
+
+@media (max-width: 1100px){
+  .security-shell,
+  .illustration-shell{
+    grid-template-columns:1fr;
+  }
+
+
+  .flow-grid{
+    grid-template-columns:1fr;
+  }
+
+
+  .flow-arrow{
+    transform:rotate(90deg);
+  }
+}
+
+
+@media (max-width: 980px){
+  .hero{
+    grid-template-columns:1fr;
+  }
+
+
+  .hero-title{
+    font-size:42px;
+  }
+
+
+  .hero-slider{
+    height:420px;
+  }
+
+
+  .hero-image{
+    min-height:auto;
+  }
+
+
+  .health-illustration{
+    min-height:500px;
+  }
+
+
+  .doctor-figure{
+    left:60px;
+  }
+
+
+  .patient-figure{
+    right:60px;
+  }
+}
+
+
+@media (max-width: 700px){
+  .header-content{
+    grid-template-columns:1fr;
+    justify-content:center;
+  }
+
+
+  .logo-text{
+    font-size:32px;
+    letter-spacing:0.01em;
+  }
+
+
+  .top-nav,
+  .main-nav{
+    justify-content:center;
+  }
+
+
+  .hero{
+    padding:20px 5% 60px;
+  }
+
+
+  .hero-title{
+    font-size:34px;
+  }
+
+
+  .hero-description{
+    font-size:15px;
+  }
+
+
+  .dashboard-title,
+  .illustration-title,
+  .security-title,
+  .flow-title{
+    font-size:28px;
+  }
+
+
+  .stat-number{
+    font-size:34px;
+  }
+  .health-illustration{
+    min-height:460px;
+  }
+
+
+  .doctor-figure,
+  .patient-figure{
+    width:110px;
+    height:200px;
+    bottom:92px;
+  }
+
+
+  .doctor-figure{
+    left:16px;
+  }
+
+
+  .patient-figure{
+    right:16px;
+  }
+
+
+  .body{
+    width:96px;
+    height:120px;
+  }
+
+
+  .head{
+    width:62px;
+    height:62px;
+  }
+
+
+  .hair{
+    width:48px;
+    left:7px;
+  }
+
+
+  .arm{
+    height:68px;
+  }
+
+
+  .leg{
+    width:20px;
+    height:52px;
+    bottom:-38px;
+  }
+
+
+  .leg.left{
+    left:20px;
+  }
+
+
+  .leg.right{
+    right:20px;
+  }
+
+
+  .tablet{
+    width:82px;
+    height:114px;
+    right:8px;
+    top:70px;
+  }
+
+
+  .bubble2{
+    right:70px;
+    top:100px;
+  }
+
+
+  .bubble3{
+    bottom:18px;
+    font-size:11px;
+  }
+}
+</style>
+</head>
+
+
+<body>
+
+
+<div class="bg-shape shape1"></div>
+<div class="bg-shape shape2"></div>
+<div class="bg-shape shape3"></div>
+
+
+<div class="page-shell">
+
+
+  <!-- Top Navigation -->
+  <div class="top-bar">
+    <div class="header-shell">
+      <nav class="top-nav">
+        <a href="#">My Health Online</a>
+        <a href="#">Book Appointment</a>
+        <a href="#">Donate</a>
+        <a href="#">Careers</a>
+        <a href="#">Contact</a>
+      </nav>
+    </div>
+  </div>
+
+
+  <!-- Header -->
+  <header class="main-header">
+    <div class="header-shell">
+      <div class="header-content">
+        <a href="/" class="logo">
+          <span class="logo-text">AuthLens HealthCare</span>
+        </a>
+
+
+        <nav class="main-nav">
+          <a href="#">Find Care</a>
+          <a href="#">Patient Resources</a>
+          <a href="#">Health & Wellness</a>
+          <a href="#">Research</a>
+          <a href="#">About</a>
+        </nav>
+      </div>
+    </div>
+  </header>
+
+
+  <!-- HERO -->
+  <section class="hero">
+    <div class="hero-content">
+      <div class="hero-text-container">
+
+
+        <div class="hero-badge">
+          <span class="hero-badge-dot"></span>
+          Blockchain-Enabled Secure Care Access
+        </div>
+
+
+        <h1 class="hero-title">
+          Secure <span id="dynamicWord" class="dynamic-word">Digital</span><br>
+          Healthcare Portal
+        </h1>
+
+
+        <p class="hero-description">
+          Access your health records, communicate with doctors, manage appointments, and monitor your healthcare securely in one place with privacy-focused authentication and trusted digital workflows.
+        </p>
+
+
+        <div class="cta-row">
+          <a href="/login" class="cta-button">Login</a>
+          <a href="/signup" class="cta-button cta-outline">Create Account</a>
+        </div>
+      </div>
+    </div>
+
+
+    <div class="hero-image">
+      <div class="hero-slider">
+        <div class="hero-slide active">
+          <img src="{{ url_for('static', filename='images/image1.jpg') }}" alt="Healthcare Portal 1">
+        </div>
+
+
+        <div class="hero-slide">
+          <img src="{{ url_for('static', filename='images/image2.jpg') }}" alt="Healthcare Portal 2">
+        </div>
+
+
+        <div class="hero-slide">
+          <img src="{{ url_for('static', filename='images/image3.jpg') }}" alt="Healthcare Portal 3">
+        </div>
+
+
+        <div class="hero-slider-overlay"></div>`r`n        <div class="hero-dots">
+          <span class="hero-dot active" onclick="showHeroSlide(0)"></span>
+          <span class="hero-dot" onclick="showHeroSlide(1)"></span>
+          <span class="hero-dot" onclick="showHeroSlide(2)"></span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+
+  <!-- STATS -->
+  <section class="stats-section">
+    <div class="stats-wrapper">
+      <div class="stat-box reveal-scale">
+        <div class="stat-icon">👥</div>
+        <div class="stat-number" data-target="250">0</div>
+        <div class="stat-label">Daily Patient Visits</div>
+      </div>
+
+
+      <div class="stat-box reveal-scale">
+        <div class="stat-icon">📅</div>
+        <div class="stat-number" data-target="1200">0</div>
+        <div class="stat-label">Appointments Booked Monthly</div>
+      </div>
+
+
+      <div class="stat-box reveal-scale">
+        <div class="stat-icon">🩺</div>
+        <div class="stat-number" data-target="85">0</div>
+        <div class="stat-label">Specialist Doctors Available</div>
+      </div>
+
+
+      <div class="stat-box reveal-scale">
+        <div class="stat-icon">🔐</div>
+        <div class="stat-number" data-target="5000">0</div>
+        <div class="stat-label">Secure Records Managed</div>
+      </div>
+    </div>
+  </section>
+
+
+  <!-- SECURITY SECTION -->
+  <section class="security-section">
+    <div class="security-shell">
+
+
+      <div class="security-content reveal">
+        <div class="security-kicker">Trust & Protection</div>
+        <h2 class="security-title">Built for security-first healthcare access</h2>
+        <p class="security-text">
+          This portal is designed to support a modern healthcare experience with strong identity verification, controlled access, and privacy-preserving data handling aligned with your cybersecurity project direction.
+        </p>
+
+
+        <div class="security-points">
+          <div class="security-point">
+            <div class="security-point-icon">🔑</div>
+            <div>
+              <strong>Zero-Trust Authentication</strong>
+              <span>Every access request is verified before records are shown or updated.</span>
+            </div>
+          </div>
+
+
+          <div class="security-point">
+            <div class="security-point-icon">⛓</div>
+            <div>
+              <strong>Blockchain Audit Trail</strong>
+              <span>Important actions can be recorded as trusted proof for traceability and integrity.</span>
+            </div>
+          </div>
+
+
+          <div class="security-point">
+            <div class="security-point-icon">🛡</div>
+            <div>
+              <strong>End-to-End Record Protection</strong>
+              <span>Medical data remains encrypted and protected across the access lifecycle.</span>
+            </div>
+          </div>
+
+
+          <div class="security-point">
+            <div class="security-point-icon">👁</div>
+            <div>
+              <strong>Privacy-Preserving Identity</strong>
+              <span>Users interact through secure credentials without exposing unnecessary personal data.</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+
+      <div class="security-flow reveal-scale">
+        <h2 class="flow-title">Security Architecture Flow</h2>
+        <p class="flow-sub">A simple visual flow that matches your project story: authenticated user access, trusted validation, protected records, and monitored actions.</p>
+
+
+        <div class="flow-grid">
+          <div class="flow-step">
+            <div class="flow-icon">👤</div>
+            <h4>User Login</h4>
+            <p>Patient or doctor begins a secure login and identity verification request.</p>
+          </div>
+
+
+          <div class="flow-arrow">➜</div>
+
+
+          <div class="flow-step">
+            <div class="flow-icon">🔐</div>
+            <h4>Zero-Trust Check</h4>
+            <p>System verifies permission, role, and access context before approval.</p>
+          </div>
+
+
+          <div class="flow-arrow">➜</div>
+
+
+          <div class="flow-step">
+            <div class="flow-icon">⛓</div>
+            <h4>Blockchain Validation</h4>
+            <p>Integrity and traceability logic confirms trusted record or access activity.</p>
+          </div>
+
+
+          <div class="flow-arrow">➜</div>
+
+
+          <div class="flow-step">
+            <div class="flow-icon">📁</div>
+            <h4>Secure Record Access</h4>
+            <p>Encrypted medical information is viewed only after successful authorization.</p>
+          </div>
+        </div>
+      </div>
+
+
+    </div>
+  </section>
+
+
+  <!-- DASHBOARD SERVICES -->
+  <section class="dashboard-section">
+    <div class="dashboard-container">
+      <h2 class="dashboard-title reveal">Healthcare Portal</h2>
+      <p class="dashboard-sub reveal">Access all healthcare services from one secure dashboard</p>
+
+
+      <div class="dashboard-grid">
+
+
+        <div class="card reveal-scale">
+          <div class="card-icon">🧑‍⚕️</div>
+          <h3>Patient Portal</h3>
+          <p>View medical records, prescriptions and test results securely.</p>
+          <a href="/login" class="card-btn">Access Portal</a>
+        </div>
+
+
+        <div class="card reveal-scale">
+          <div class="card-icon">🩺</div>
+          <h3>Doctor Dashboard</h3>
+          <p>Manage patients, review records and provide secure consultations.</p>
+          <a href="/login" class="card-btn">Doctor Login</a>
+        </div>
+
+
+        <div class="card reveal-scale">
+          <div class="card-icon">📆</div>
+          <h3>Appointments</h3>
+          <p>Book appointments and manage your upcoming visits.</p>
+          <a href="#" class="card-btn">Book Now</a>
+        </div>
+
+
+        <div class="card reveal-scale">
+          <div class="card-icon">📄</div>
+          <h3>Health Records</h3>
+          <p>Securely store and access encrypted healthcare records.</p>
+          <a href="#" class="card-btn">View Records</a>
+        </div>
+
+
+      </div>
+    </div>
+  </section>
+
+
+  <!-- FEATURES -->
+  <section class="features">
+    <div class="dashboard-container">
+      <h2 class="dashboard-title reveal">Why Use Our Healthcare Platform</h2>
+
+
+      <div class="features-grid">
+
+
+        <div class="feature reveal-scale">
+          <div class="feature-icon">🔐</div>
+          <h4>Secure Authentication</h4>
+          <p>Advanced authentication including blockchain verification and OTP.</p>
+        </div>
+
+
+        <div class="feature reveal-scale">
+          <div class="feature-icon">🧬</div>
+          <h4>Encrypted Medical Records</h4>
+          <p>Your healthcare data is securely encrypted and protected.</p>
+        </div>
+
+
+        <div class="feature reveal-scale">
+          <div class="feature-icon">🌐</div>
+          <h4>24/7 Healthcare Access</h4>
+          <p>Access your healthcare services anytime from anywhere.</p>
+        </div>
+
+
+        <div class="feature reveal-scale">
+          <div class="feature-icon">💬</div>
+          <h4>Doctor Communication</h4>
+          <p>Secure messaging between patients and doctors.</p>
+        </div>
+
+
+      </div>
+    </div>
+  </section>
+
+
+  <!-- ILLUSTRATION SECTION -->
+  <section class="illustration-section">
+    <div class="illustration-shell">
+
+
+      <div class="illustration-card reveal">
+        <h2 class="illustration-title">Modern care with secure digital interaction</h2>
+        <p class="illustration-text">
+          This section gives your homepage a more dynamic healthcare feel while still matching your cybersecurity-centered graduation project. It visually supports trust, communication, and secure medical access.
+        </p>
+
+
+        <div class="illustration-list">
+          <div class="illustration-list-item"><span>✔</span> Easy patient-doctor communication through a protected platform</div>
+          <div class="illustration-list-item"><span>✔</span> Clear separation between identity verification and record access</div>
+          <div class="illustration-list-item"><span>✔</span> Better visual storytelling for demos, GitHub, and presentations</div>
+          <div class="illustration-list-item"><span>✔</span> A cleaner homepage that feels more premium and interactive</div>
+        </div>
+      </div>
+
+
+      <div class="health-illustration reveal-scale">
+        <div class="illustration-shape one"></div>
+        <div class="illustration-shape two"></div>
+
+
+        <div class="floating-bubble bubble1">🛡 Secure Access</div>
+        <div class="floating-bubble bubble2">💬 Live Consultation</div>
+        <div class="floating-bubble bubble3">📋 Protected Records</div>
+
+
+        <div class="doctor-figure">
+          <div class="head">
+            <div class="hair"></div>
+          </div>
+          <div class="body">
+            <div class="stethoscope"></div>
+            <div class="arm left"></div>
+            <div class="arm right"></div>
+            <div class="leg left"></div>
+            <div class="leg right"></div>
+          </div>
+        </div>
+
+
+        <div class="patient-figure">
+          <div class="head">
+            <div class="hair"></div>
+          </div>
+          <div class="body">
+            <div class="arm left"></div>
+            <div class="arm right"></div>
+            <div class="leg left"></div>
+            <div class="leg right"></div>
+          </div>
+        </div>
+
+
+        <div class="tablet"></div>
+      </div>
+
+
+    </div>
+  </section>
+
+
+  <!-- FOOTER -->
+  <footer class="footer">
+    <p>© 2026 AuthLens Health Portal</p>
+    <p>Secure Healthcare Authentication System</p>
+  </footer>
+
+
+</div>
+
+
+<script>
+/* changing hero word every 4 sec */
+const words = ["Digital", "Trusted", "Modern", "Smart", "Secure"];
+const dynamicWord = document.getElementById("dynamicWord");
+let wordIndex = 0;
+
+
+setInterval(() => {
+  dynamicWord.classList.add("fade-out");
+
+
+  setTimeout(() => {
+    wordIndex = (wordIndex + 1) % words.length;
+    dynamicWord.textContent = words[wordIndex];
+    dynamicWord.classList.remove("fade-out");
+    dynamicWord.classList.add("fade-in");
+
+
+    setTimeout(() => {
+      dynamicWord.classList.remove("fade-in");
+    }, 500);
+  }, 400);
+}, 4000);
+
+
+/* hero image slider every 5 sec */
+const heroSlides = document.querySelectorAll(".hero-slide");
+const heroDots = document.querySelectorAll(".hero-dot");
+let currentHeroSlide = 0;
+let heroInterval;
+
+
+function showHeroSlide(index) {
+  heroSlides.forEach((slide, i) => {
+    slide.classList.toggle("active", i === index);
+  });
+
+
+  heroDots.forEach((dot, i) => {
+    dot.classList.toggle("active", i === index);
+  });
+
+
+  currentHeroSlide = index;
+}
+
+
+function nextHeroSlide() {
+  currentHeroSlide = (currentHeroSlide + 1) % heroSlides.length;
+  showHeroSlide(currentHeroSlide);
+}
+
+
+function startHeroSlider() {
+  heroInterval = setInterval(nextHeroSlide, 5000);
+}
+
+
+function resetHeroSlider() {
+  clearInterval(heroInterval);
+  startHeroSlider();
+}
+
+
+/* stats counter animation */
+const counters = document.querySelectorAll(".stat-number");
+let statsStarted = false;
+
+
+function animateCounters() {
+  if (statsStarted) return;
+
+
+  const statsSection = document.querySelector(".stats-section");
+  if (!statsSection) return;
+
+
+  const sectionTop = statsSection.getBoundingClientRect().top;
+
+
+  if (sectionTop < window.innerHeight - 80) {
+    statsStarted = true;
+
+
+    counters.forEach(counter => {
+      const target = +counter.getAttribute("data-target");
+      const duration = 3000;
+      const startTime = performance.now();
+      const parentBox = counter.closest(".stat-box");
+
+
+      function updateCounter(currentTime) {
+        const elapsed = currentTime - startTime;
+        const progress = Math.min(elapsed / duration, 1);
+        const easedProgress = 1 - Math.pow(1 - progress, 3);
+        const value = Math.floor(easedProgress * target);
+
+
+        counter.textContent = value.toLocaleString() + "+";
+
+
+        if (progress < 1) {
+          requestAnimationFrame(updateCounter);
+        } else {
+          counter.textContent = target.toLocaleString() + "+";
+          if (parentBox) {
+            parentBox.classList.add("finished");
+          }
+        }
+      }
+
+
+      requestAnimationFrame(updateCounter);
+    });
+  }
+}
+
+
+/* scroll reveal */
+const reveals = document.querySelectorAll(".reveal, .reveal-scale");
+
+
+function revealOnScroll() {
+  const windowHeight = window.innerHeight;
+
+
+  reveals.forEach((el) => {
+    const top = el.getBoundingClientRect().top;
+    if (top < windowHeight - 80) {
+      el.classList.add("active");
+    }
+  });
+}
+
+
+function updateScrollTint() {
+  const doc = document.documentElement;
+  const maxScroll = Math.max(doc.scrollHeight - window.innerHeight, 1);
+  const progress = Math.min(window.scrollY / maxScroll, 1);
+  const tint = Math.min(68, Math.round(progress * 68));
+  document.body.style.setProperty("--scroll-tint", `${tint}%`);
+}
+
+
+window.addEventListener("scroll", revealOnScroll);
+window.addEventListener("scroll", animateCounters);
+window.addEventListener("scroll", updateScrollTint);
+
+
+window.addEventListener("load", () => {
+  revealOnScroll();
+  animateCounters();
+  updateScrollTint();
+  startHeroSlider();
+
+
+  heroDots.forEach((dot, index) => {
+    dot.addEventListener("click", () => {
+      showHeroSlide(index);
+      resetHeroSlider();
+    });
+  });
+});
+</script>
+
+
+</body>
+</html>
+
+
+

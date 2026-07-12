@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Verify Record | E-Health</title>
+<link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+<style>
+:root{--teal:#004D4D;--glass:rgba(255,255,255,0.66);--shadow:0 24px 54px rgba(0,77,77,0.12);--text:#153635;--muted:#5e7978;}
+*{box-sizing:border-box;margin:0;padding:0;font-family:"Segoe UI",Tahoma,Geneva,Verdana,sans-serif;}
+body{min-height:100vh;background:radial-gradient(circle at top right, rgba(0,77,77,0.12), transparent 20%),radial-gradient(circle at bottom left, rgba(141,240,216,0.26), transparent 24%),linear-gradient(135deg,#f3fbfb 0%,#e7f2f1 60%,#e0efee 100%);color:var(--text);}
+.shell{width:min(1380px,94vw);margin:28px auto;}
+.topbar,.panel{background:var(--glass);border:1px solid rgba(255,255,255,0.56);backdrop-filter:blur(18px);box-shadow:var(--shadow);}
+.topbar{border-radius:26px;padding:18px 24px;display:flex;justify-content:space-between;align-items:center;gap:14px;margin-bottom:20px;flex-wrap:wrap;}
+.topbar h1{font-size:24px;}
+.topbar p{font-size:14px;color:var(--muted);margin-top:4px;}
+.topbar-links{display:flex;gap:10px;flex-wrap:wrap;}
+.topbar-links a{text-decoration:none;color:#164847;font-weight:800;padding:10px 14px;border-radius:999px;background:rgba(255,255,255,0.72);border:1px solid rgba(0,77,77,0.08);}
+.grid{display:grid;grid-template-columns:1fr 380px;gap:20px;}
+.panel{border-radius:26px;padding:22px;}
+.hero{background:radial-gradient(circle at top right, rgba(255,255,255,0.18), transparent 24%),linear-gradient(135deg,#0b6d6a 0%,#004D4D 100%);color:#fff;border-radius:24px;padding:22px;margin-bottom:18px;}
+.hero h2{font-size:30px;margin-bottom:8px;}
+.hero p{color:rgba(255,255,255,0.84);line-height:1.7;}
+.mini-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-top:16px;}
+.mini-card{padding:16px;border-radius:20px;background:rgba(255,255,255,0.70);border:1px solid rgba(0,77,77,0.08);}
+.mini-card strong{display:block;font-size:30px;color:#123c3b;line-height:1;}
+.mini-card span{display:block;margin-top:8px;color:var(--muted);font-size:13px;line-height:1.6;}
+.hash-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:16px;}
+.hash-box{background:rgba(255,255,255,0.72);border:1px solid rgba(0,77,77,0.08);border-radius:20px;padding:16px;}
+.hash-box strong{display:block;margin-bottom:10px;}
+.hash-box code{font-size:12px;word-break:break-all;color:#125250;}
+.request-box{margin-top:16px;padding:16px;border-radius:20px;background:rgba(255,255,255,0.72);border:1px solid rgba(0,77,77,0.08);}
+.request-box code{display:block;margin-top:10px;font-size:12px;word-break:break-all;color:#125250;}
+.node-actions{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:12px;}
+.node-actions form{margin:0;}
+.mini-btn{border:none;cursor:pointer;border-radius:12px;padding:10px 12px;font-size:12px;font-weight:900;color:#fff;min-height:40px;}
+.mini-btn.teal{background:linear-gradient(135deg,#0b8d8a 0%,#0b6d6a 100%);}
+.mini-btn.gold{background:linear-gradient(135deg,#d6a538 0%,#b67d12 100%);}
+.mini-btn.red{background:linear-gradient(135deg,#da6464 0%,#b94141 100%);}
+.result-strip{margin-top:16px;padding:16px 18px;border-radius:20px;color:#fff;display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;}
+.result-strip.valid{background:linear-gradient(135deg,#23a861 0%,#178648 100%);}
+.result-strip.compromised{background:linear-gradient(135deg,#db5d5d 0%,#b93e3e 100%);}
+.alert-strip{margin-top:16px;padding:16px 18px;border-radius:20px;color:#fff;display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;}
+.alert-strip.safe{background:linear-gradient(135deg,#27b26d 0%,#15824a 100%);}
+.alert-strip.danger{background:linear-gradient(135deg,#e05b5b 0%,#b83b3b 100%);}
+.nodes{display:grid;gap:14px;margin-top:18px;}
+.node{background:rgba(255,255,255,0.72);border:1px solid rgba(0,77,77,0.08);border-radius:20px;padding:16px;}
+.node-top{display:flex;justify-content:space-between;gap:10px;align-items:flex-start;margin-bottom:10px;}
+.badge{display:inline-flex;align-items:center;justify-content:center;padding:8px 12px;border-radius:999px;font-size:12px;font-weight:900;text-transform:uppercase;}
+.badge.valid{background:#def7e7;color:#19834b;}
+.badge.mismatch,.badge.compromised{background:#ffe1e1;color:#b93e3e;}
+.badge.offline,.badge.delayed{background:#fff2cc;color:#9a6a00;}
+.node code{display:block;margin-top:10px;font-size:12px;word-break:break-all;color:#135553;}
+.side-stack{display:grid;gap:16px;}
+.field{display:grid;gap:8px;}
+.field label{font-size:13px;font-weight:800;color:#325857;}
+.field select{border-radius:16px;border:1px solid rgba(0,77,77,0.12);background:rgba(255,255,255,0.82);padding:12px 14px;outline:none;width:100%;}
+.stack{display:grid;gap:12px;margin-top:16px;}
+.btn{width:100%;border:none;cursor:pointer;border-radius:16px;padding:13px 16px;font-weight:900;color:#fff;box-shadow:0 14px 24px rgba(0,77,77,0.14);}
+.btn.teal{background:linear-gradient(135deg,#0b8d8a 0%,#0b6d6a 100%);}
+.btn.gold{background:linear-gradient(135deg,#d6a538 0%,#b67d12 100%);}
+.btn.red{background:linear-gradient(135deg,#da6464 0%,#b94141 100%);}
+.note{color:var(--muted);line-height:1.7;font-size:14px;}
+@media (max-width:1080px){.grid,.hash-grid,.mini-grid{grid-template-columns:1fr;}}
+</style>
+</head>
+<body>
+<div class="shell">
+  <div class="topbar">
+    <div>
+      <h1>Verify Record #{{ record.id }}</h1>
+      <p>Detailed node votes, hash comparison, and consensus outcome for your demo walkthrough.</p>
+    </div>
+    <div class="topbar-links">
+      <a href="{{ url_for('integrity_dashboard', record_id=record.id) }}">Integrity Dashboard</a>
+      <a href="{{ url_for('record_history', record_id=record.id) }}">Record History</a>
+      {% if role == 'admin' %}
+      <a href="{{ url_for('integrity_dashboard') }}">Admin Integrity</a>
+      {% elif role == 'patient' %}
+      <a href="{{ url_for('patient_home') }}">Patient Home</a>
+      {% else %}
+      <a href="{{ url_for('dashboard') }}">Doctor Dashboard</a>
+      {% endif %}
+    </div>
+  </div>
+  <div class="grid">
+    <div>
+      <div class="hero">
+        <h2>{{ snapshot.final_status }}</h2>
+        <p>This record verification run compares the current database payload with the blockchain reference hash, then collects votes from four simulated integrity nodes.</p>
+      </div>
+      <div class="panel">
+        <div class="mini-grid">
+          <div class="mini-card"><strong>{{ snapshot.valid_percentage }}%</strong><span>Consensus score from valid nodes.</span></div>
+          <div class="mini-card"><strong>{{ snapshot.current_version_no }}</strong><span>Latest record version stored in the local version chain.</span></div>
+          <div class="mini-card"><strong>{{ snapshot.database_change_state }}</strong><span>{{ snapshot.database_change_message }}</span></div>
+        </div>
+        <div class="hash-grid">
+          <div class="hash-box"><strong>Current Database Hash</strong><code>{{ snapshot.current_db_hash|mask_hash }}</code></div>
+          <div class="hash-box"><strong>Blockchain Reference Hash</strong><code>{{ snapshot.blockchain_hash|mask_hash }}</code><small style="display:block;margin-top:8px;color:#5e7978;font-size:12px;">Source: {% if snapshot.blockchain_source and snapshot.blockchain_source.startswith('ganache:') %}Ganache{% else %}Database mirror{% endif %}</small></div>
+          <div class="hash-box"><strong>Blockchain Transaction</strong><code>{{ snapshot.blockchain_tx_hash|mask_hash }}</code></div>
+          <div class="hash-box"><strong>Current Tamper State</strong><code>{{ 'Tamper simulation enabled' if snapshot.tamper_enabled else 'Database state clean' }}</code></div>
+        </div>
+        <div class="result-strip {{ 'valid' if snapshot.final_status == 'VALID' else 'compromised' }}">
+          <div>Consensus threshold: {{ snapshot.consensus_threshold }}%</div>
+          <div>Valid nodes: {{ snapshot.valid_nodes }}/{{ snapshot.total_nodes }}</div>
+          <div>Verified at: {{ snapshot.verified_at }}</div>
+        </div>
+        <div class="alert-strip {{ 'danger' if snapshot.database_change_detected else 'safe' }}">
+          <div><strong>{{ 'DATABASE CHANGE DETECTED' if snapshot.database_change_detected else 'DATABASE STATE VERIFIED' }}</strong><div style="margin-top:6px;">{{ snapshot.database_change_message }}</div></div>
+          <div>{{ 'Tamper simulation active' if snapshot.tamper_enabled else 'No tamper simulation active' }}</div>
+        </div>
+        {% if snapshot.latest_change_request %}
+        <div class="request-box">
+          <strong>Latest Signed Change Request</strong>
+          <p class="note" style="margin-top:10px;">{{ snapshot.latest_change_request.requested_by_name or 'Unknown user' }} ({{ snapshot.latest_change_request.requester_role }}) signed version {{ snapshot.latest_change_request.version_no }}{% if snapshot.latest_change_request.request_status == 'ledger_anchored' %} and pushed it to the ledger{% else %} and is waiting for node approval{% endif %}.</p>
+          <p class="note">Signer key id: {{ snapshot.latest_change_request.signer_key_id|mask_hash(8,4) }} | Signature: {{ 'Verified' if snapshot.latest_change_request.signature_verified else 'Rejected' }}</p>
+          <p class="note">Broadcast at: {{ snapshot.latest_change_request.broadcast_at }} | Ledger update: {{ snapshot.latest_change_request.ledger_updated_at or 'Pending' }}</p>
+          <p class="note">Accepted nodes: {{ snapshot.latest_change_request.accepted_nodes }} | Rejected nodes: {{ snapshot.latest_change_request.rejected_nodes }}</p>
+        </div>
+        {% endif %}
+      </div>
+      <div class="panel" style="margin-top:18px;">
+        <h2>Node Decisions</h2>
+        <div class="nodes">
+          {% for node in snapshot.node_results %}
+          <div class="node">
+            <div class="node-top">
+              <div><strong>{{ node.node_name }}</strong><p class="note">{{ node.status_note }}</p></div>
+              <span class="badge {{ node.status }}">{{ node.status }}</span>
+            </div>
+            <div class="note">Sync status: {{ node.sync_status|upper }} | Local version: {{ node.local_version_no }}</div>
+            <div class="note">Signature verified: {{ 'Yes' if node.signature_verified else 'No' }}</div>
+            {% if snapshot.pending_change_request and node.can_poll %}
+            <div class="note">Node poll: {{ node.vote_status|upper }} | Identity checked: {{ 'Yes' if node.identity_checked else 'No' }}</div>
+            <div class="node-actions">
+              <form method="POST" action="{{ url_for('check_change_request_identity') }}">
+                <input type="hidden" name="change_request_id" value="{{ snapshot.pending_change_request.id }}">
+                <input type="hidden" name="node_name" value="{{ node.node_name }}">
+                <button class="mini-btn teal" type="submit">Check Identity</button>
+              </form>
+              <form method="POST" action="{{ url_for('vote_on_change_request') }}">
+                <input type="hidden" name="change_request_id" value="{{ snapshot.pending_change_request.id }}">
+                <input type="hidden" name="node_name" value="{{ node.node_name }}">
+                <input type="hidden" name="vote" value="accepted">
+                <button class="mini-btn gold" type="submit" {% if not node.identity_verified %}disabled{% endif %}>Accept</button>
+              </form>
+              <form method="POST" action="{{ url_for('vote_on_change_request') }}">
+                <input type="hidden" name="change_request_id" value="{{ snapshot.pending_change_request.id }}">
+                <input type="hidden" name="node_name" value="{{ node.node_name }}">
+                <input type="hidden" name="vote" value="rejected">
+                <button class="mini-btn red" type="submit" {% if not node.identity_verified %}disabled{% endif %}>Reject</button>
+              </form>
+            </div>
+            {% endif %}
+            <div class="note">Verification time: {{ node.last_verification_time }}</div>
+            <code>{{ node.last_seen_hash|mask_hash }}</code>
+          </div>
+          {% endfor %}
+        </div>
+      </div>
+    </div>
+    <div class="side-stack">
+      <div class="panel">
+        <h2>Simulation Lab</h2>
+        <p class="note">Trigger targeted demo events to show resilience, tampering detection, or hostile votes.</p>
+        <div class="stack">
+          <form method="POST" action="{{ url_for('simulate_node_down') }}"><input type="hidden" name="record_id" value="{{ record.id }}"><div class="field"><label>Target Node</label><select name="node_name" required>{% for node in snapshot.node_results %}<option value="{{ node.node_name }}">{{ node.node_name }}</option>{% endfor %}</select></div><button class="btn gold" type="submit" style="margin-top:12px;">Simulate Node Down</button></form>
+          <form method="POST" action="{{ url_for('simulate_delay') }}"><input type="hidden" name="record_id" value="{{ record.id }}"><div class="field"><label>Target Node</label><select name="node_name" required>{% for node in snapshot.node_results %}<option value="{{ node.node_name }}">{{ node.node_name }}</option>{% endfor %}</select></div><button class="btn gold" type="submit" style="margin-top:12px;">Simulate Delay</button></form>
+          <form method="POST" action="{{ url_for('simulate_attack') }}"><input type="hidden" name="record_id" value="{{ record.id }}"><div class="field"><label>Target Node</label><select name="node_name" required>{% for node in snapshot.node_results %}<option value="{{ node.node_name }}">{{ node.node_name }}</option>{% endfor %}</select></div><button class="btn red" type="submit" style="margin-top:12px;">Simulate Attacker Node</button></form>
+          <form method="POST" action="{{ url_for('simulate_tamper') }}"><input type="hidden" name="record_id" value="{{ record.id }}"><button class="btn red" type="submit">Simulate Database Tampering</button></form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+</body>
+</html>
